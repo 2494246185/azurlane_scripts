@@ -119266,7 +119266,7 @@ end)()
 	}
 	pg.base.activity_ins_chat_language[12290] = {
 		param = "的确，不是意识接入，而是靠手动操作角色行动……貌似更难了？",
-		ship_group = 960003,
+		ship_group = 960021,
 		option = "",
 		type = 1,
 		id = 12290,
@@ -119574,7 +119574,7 @@ end)()
 		flag = 1
 	}
 	pg.base.activity_ins_chat_language[12328] = {
-		param = "可恶，都跑哪去了……<color=#93e9ff>@Mary Celeste@Golden Hind@Whydah@Adventure Galley@São Martinho</color> ",
+		param = "可恶，都跑哪去了，飓风船团的大家！",
 		ship_group = 960001,
 		option = "",
 		type = 1,
@@ -119686,8 +119686,8 @@ end)()
 		flag = 1
 	}
 	pg.base.activity_ins_chat_language[12342] = {
-		param = "而且，我们商团已经把「新手港」收购了哦？",
-		ship_group = 960003,
+		param = "而且，我已经把「新手港」收购了哦？",
+		ship_group = 960005,
 		option = "",
 		type = 1,
 		id = 12342,
@@ -119696,7 +119696,7 @@ end)()
 end)()
 ;(function()
 	pg.base.activity_ins_chat_language[12343] = {
-		param = "商、商团？！你们两个跑去建商团了？！",
+		param = "商、商团？！你跑去建商团了？！",
 		ship_group = 960001,
 		option = "",
 		type = 1,
@@ -119720,8 +119720,8 @@ end)()
 		flag = 1
 	}
 	pg.base.activity_ins_chat_language[12346] = {
-		param = "呵呵~现在才察觉到已经晚了哦~不想破产的话就加入我们商团吧~",
-		ship_group = 960003,
+		param = "现在才察觉到已经晚了哦~不想破产的话就加入我们商团吧~",
+		ship_group = 960005,
 		option = "",
 		type = 1,
 		id = 12346,

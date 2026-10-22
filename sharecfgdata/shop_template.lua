@@ -121987,7 +121987,7 @@ end)()
 		tag = 2,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 7,
+		order = 8,
 		akashi_pick = 0,
 		group = 0,
 		num = 1,
