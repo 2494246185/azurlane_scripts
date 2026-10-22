@@ -1,0 +1,45 @@
+local ChargeAwardPage = class("ChargeAwardPage", import("...base.BaseActivityPage"))
+
+function ChargeAwardPage:OnInit()
+	self.bg = self._tf:Find("bg")
+	self.charge = self._tf:Find("charge")
+	self.take = self._tf:Find("take")
+	self.finish = self._tf:Find("finish")
+	self.tip = self.take:Find("tip")
+end
+
+function ChargeAwardPage:OnDataSetting()
+	return
+end
+
+function ChargeAwardPage:OnFirstFlush()
+	onButton(self, self.charge, function()
+		self:emit(ActivityMediator.EVENT_GO_SCENE, SCENE.CHARGE, {
+			wrap = ChargeScene.TYPE_DIAMOND
+		})
+	end)
+	onButton(self, self.take, function()
+		self:emit(ActivityMediator.EVENT_OPERATION, {
+			cmd = 1,
+			activity_id = self.activity.id
+		})
+	end)
+end
+
+function ChargeAwardPage:OnUpdateFlush()
+	setActive(self.charge, self.activity.data2 == 0 and self.activity.data1 == 0)
+	setButtonEnabled(self.take, self.activity.data2 == 0)
+	setActive(self.take, self.activity.data1 > 0)
+	setActive(self.tip, ChargeAwardPage.IsShowTip(self.activity))
+	setActive(self.finish, self.activity.data2 == 1)
+end
+
+function ChargeAwardPage:IsShowTip()
+	return self.data1 > 0 and self.data2 == 0
+end
+
+function ChargeAwardPage:OnDestroy()
+	clearImageSprite(self.bg)
+end
+
+return ChargeAwardPage
