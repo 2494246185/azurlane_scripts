@@ -937,7 +937,7 @@ function Fleet:ChangeToElite()
 		}
 	}
 
-	for iter_68_0, iter_68_1 in ipairs(self.commanderIds) do
+	for iter_68_0, iter_68_1 in pairs(self.commanderIds) do
 		var_68_1[TeamType.FormCommander][iter_68_0] = iter_68_1
 	end
 

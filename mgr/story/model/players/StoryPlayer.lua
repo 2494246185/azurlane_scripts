@@ -1319,7 +1319,7 @@ function StoryPlayer:UpdateEffectInterLayer(arg_110_1, arg_110_2)
 	local var_110_3 = GetOrAddComponent(self.frontTr, typeof(Canvas))
 
 	var_110_3.overrideSorting = true
-	var_110_3.sortingOrder = var_110_0 + 1 + 1
+	var_110_3.sortingOrder = var_110_0 + 1 + 10
 	self.activeInterLayer = arg_110_1
 
 	GetOrAddComponent(self.frontTr, typeof(GraphicRaycaster))

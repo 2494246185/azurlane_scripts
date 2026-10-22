@@ -8,7 +8,8 @@ function MainLeftPanel4Mellow:GetBtns()
 		MainWordBtn.New(findTF(self._tf, "btns/word"), self.event),
 		MainChangeSkinBtn.New(findTF(self._tf, "btns/change"), self.event),
 		MainResetL2dBtn.New(findTF(self._tf, "btns/l2d"), self.event),
-		MainL2dBoundBtn.New(findTF(self._tf, "btns/l2d_bound"), self.event)
+		MainL2dBoundBtn.New(findTF(self._tf, "btns/l2d_bound"), self.event),
+		MainPaintingLiteBtn.New(findTF(self._tf, "btns/painting_lit"), self.event)
 	}
 end
 

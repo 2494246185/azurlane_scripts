@@ -182,81 +182,54 @@ function IslandShip:GetCurrentEnergy()
 		return math.min(self.maxEnerey, self.energy)
 	end
 
-	local var_20_0 = pg.TimeMgr.GetInstance()
-	local var_20_1 = var_20_0:GetServerTime()
-	local var_20_2 = math.floor(self.energy + (var_20_1 - self.recorverTime) / self.recoverSpeed)
-
-	if var_20_0 > 0 then
-		var_20_2 = var_20_2 + math.floor(math.floor((var_20_1 - self.recorverTime) / self.recoverSpeed) * self:GetSkillAddRecoverSpeed() * 0.01)
-	end
-
-	local var_20_3 = self:GetVaildStatusByType(IslandBuffType.SHIP_POWER_RECOVER)
-
-	if #var_20_3 == 0 then
-		return math.min(self.maxEnerey, var_20_2)
-	end
-
-	return math.min(self.maxEnerey, var_20_2 + math.floor((function(arg_21_0, arg_21_1, arg_21_2, arg_21_3)
-		local var_21_0 = math.max(arg_21_0, arg_21_2)
-		local var_21_1 = math.min(arg_21_1, arg_21_3)
-
-		if var_21_0 < var_21_1 then
-			return var_21_1 - var_21_0
-		else
-			return 0
-		end
-	end)(self.recorverTime, var_20_1, var_20_3:GetStartTime(), var_20_3:GetEndTime()) / self.recoverSpeed * (var_20_3:GetBuffEffect()[1] * 0.01)))
+	return math.floor(self:GetCurrentEnergyDecimal())
 end
 
 function IslandShip:GetCurrentEnergyDecimal()
-	local var_22_0 = pg.TimeMgr.GetInstance():GetServerTime()
-	local var_22_1 = self.energy + (var_22_0 - self.recorverTime) / self.recoverSpeed
-	local var_22_2 = self:GetVaildStatusByType(IslandBuffType.SHIP_POWER_RECOVER)
-	local var_22_3 = self:GetSkillAddRecoverSpeed()
+	local var_21_0 = pg.TimeMgr.GetInstance()
+	local var_21_1 = var_21_0:GetServerTime()
+	local var_21_2 = self:GetVaildStatusByType(IslandBuffType.SHIP_POWER_RECOVER)
+	local var_21_3 = self.energy + (var_21_1 - self.recorverTime) / self.recoverSpeed + (var_21_1 - self.recorverTime) / self.recoverSpeed * self:GetSkillAddRecoverSpeed() * 0.01
 
-	if var_22_3 > 0 then
-		var_22_1 = var_22_1 + (var_22_0 - self.recorverTime) / self.recoverSpeed * var_22_3 * 0.01
+	if #var_21_0 == 0 then
+		return math.min(self.maxEnerey, var_21_3)
 	end
 
-	if #var_22_2 == 0 then
-		return math.min(self.maxEnerey, var_22_1)
-	end
+	return math.min(self.maxEnerey, var_21_3 + (function(arg_22_0, arg_22_1, arg_22_2, arg_22_3)
+		local var_22_0 = math.max(arg_22_0, arg_22_2)
+		local var_22_1 = math.min(arg_22_1, arg_22_3)
 
-	return math.min(self.maxEnerey, var_22_1 + (function(arg_23_0, arg_23_1, arg_23_2, arg_23_3)
-		local var_23_0 = math.max(arg_23_0, arg_23_2)
-		local var_23_1 = math.min(arg_23_1, arg_23_3)
-
-		if var_23_0 < var_23_1 then
-			return var_23_1 - var_23_0
+		if var_22_0 < var_22_1 then
+			return var_22_1 - var_22_0
 		else
 			return 0
 		end
-	end)(self.recorverTime, var_22_0, var_22_2:GetStartTime(), var_22_2:GetEndTime()) / self.recoverSpeed * (var_22_2:GetBuffEffect()[1] * 0.01))
+	end)(self.recorverTime, var_21_1, var_21_2:GetStartTime(), var_21_2:GetEndTime()) / self.recoverSpeed * (var_21_2:GetBuffEffect()[1] * 0.01))
 end
 
 function IslandShip:GetEnergyMaxTime()
-	local var_24_0 = pg.TimeMgr.GetInstance()
-	local var_24_1 = var_24_0:GetServerTime()
-	local var_24_2 = self.maxEnerey - self:GetCurrentEnergyDecimal()
-	local var_24_3 = self:GetVaildStatusByType(IslandBuffType.SHIP_POWER_RECOVER)
-	local var_24_4 = self.recoverSpeed / (1 + self:GetSkillAddRecoverSpeed() * 0.01)
+	local var_23_0 = pg.TimeMgr.GetInstance()
+	local var_23_1 = var_23_0:GetServerTime()
+	local var_23_2 = self.maxEnerey - self:GetCurrentEnergyDecimal()
+	local var_23_3 = self:GetVaildStatusByType(IslandBuffType.SHIP_POWER_RECOVER)
+	local var_23_4 = self.recoverSpeed / (1 + self:GetSkillAddRecoverSpeed() * 0.01)
 
-	if #var_24_0 == 0 then
-		return var_24_1 + math.floor(var_24_2 * var_24_4)
+	if #var_23_0 == 0 then
+		return var_23_1 + math.floor(var_23_2 * var_23_4)
 	end
 
-	if var_24_1 <= var_24_3:GetEndTime() then
-		local var_24_5 = var_24_4 / (1 + var_24_3:GetBuffEffect()[1] * 0.01)
-		local var_24_6 = var_24_5 * (var_24_3:GetEndTime() - var_24_1)
+	if var_23_1 <= var_23_3:GetEndTime() then
+		local var_23_5 = var_23_4 / (1 + var_23_3:GetBuffEffect()[1] * 0.01)
+		local var_23_6 = var_23_5 * (var_23_3:GetEndTime() - var_23_1)
 
-		if var_24_2 <= var_24_6 then
-			return var_24_1 + math.floor(var_24_2 / var_24_5)
+		if var_23_2 <= var_23_6 then
+			return var_23_1 + math.floor(var_23_2 / var_23_5)
 		end
 
-		return var_24_1 + math.floor((var_24_2 - var_24_6) / var_24_4) + math.floor(var_24_2 / var_24_5)
+		return var_23_1 + math.floor((var_23_2 - var_23_6) / var_23_4) + math.floor(var_23_2 / var_23_5)
 	end
 
-	return var_24_1 + math.floor(var_24_2 * var_24_4)
+	return var_23_1 + math.floor(var_23_2 * var_23_4)
 end
 
 function IslandShip:AnySkillCanUpgrade()
@@ -268,13 +241,13 @@ function IslandShip:HasStatus()
 end
 
 function IslandShip:GetPower()
-	local var_27_0 = 0
+	local var_26_0 = 0
 
-	for iter_27_0, iter_27_1 in pairs(self:GetAttrs()) do
-		var_27_0 = var_27_0 + iter_27_1
+	for iter_26_0, iter_26_1 in pairs(self:GetAttrs()) do
+		var_26_0 = var_26_0 + iter_26_1
 	end
 
-	return self:GetLevel() * 1000000 + var_27_0
+	return self:GetLevel() * 1000000 + var_26_0
 end
 
 function IslandShip:GetName()
@@ -294,19 +267,19 @@ function IslandShip:GetPrefab()
 end
 
 function IslandShip:GetModelUnit()
-	local var_32_0 = self:getConfig("unit_id")
+	local var_31_0 = self:getConfig("unit_id")
 
 	if self.cur_skin_id and self.cur_skin_id ~= 0 then
-		var_32_0 = pg.island_skin_template[self.cur_skin_id].model
+		var_31_0 = pg.island_skin_template[self.cur_skin_id].model
 
-		local var_32_1 = getProxy(IslandProxy)
+		local var_31_1 = getProxy(IslandProxy)
 
-		if var_32_1 ~= 0 then
-			var_32_0 = pg.island_skin_colordiff_template[var_32_1:GetIsland():GetCharacterAgency():GetCurrentSkinColorByShipId(self.id, self.cur_skin_id)].model
+		if var_31_1 ~= 0 then
+			var_31_0 = pg.island_skin_colordiff_template[var_31_1:GetIsland():GetCharacterAgency():GetCurrentSkinColorByShipId(self.id, self.cur_skin_id)].model
 		end
 	end
 
-	return var_32_0
+	return var_31_0
 end
 
 function IslandShip:GetCurrentSkinId()
@@ -314,32 +287,32 @@ function IslandShip:GetCurrentSkinId()
 end
 
 function IslandShip:GetModel()
-	local var_34_0 = pg.island_unit_character[self:GetModelUnit()]
+	local var_33_0 = pg.island_unit_character[self:GetModelUnit()]
 
 	return {
-		model = var_34_0.model,
-		animator = var_34_0.animator,
-		personal_ani = var_34_0.personal_ani
+		model = var_33_0.model,
+		animator = var_33_0.animator,
+		personal_ani = var_33_0.personal_ani
 	}
 end
 
-function IslandShip:GetModelBySkinAndColorId(arg_35_1, arg_35_2)
-	local var_35_0 = self:getConfig("unit_id")
+function IslandShip:GetModelBySkinAndColorId(arg_34_1, arg_34_2)
+	local var_34_0 = self:getConfig("unit_id")
 
-	if arg_35_1 and arg_35_1 ~= 0 then
-		var_35_0 = pg.island_skin_template[arg_35_1].model
+	if arg_34_1 and arg_34_1 ~= 0 then
+		var_34_0 = pg.island_skin_template[arg_34_1].model
 
-		if arg_35_2 ~= 0 then
-			var_35_0 = pg.island_skin_colordiff_template[arg_35_2].model
+		if arg_34_2 ~= 0 then
+			var_34_0 = pg.island_skin_colordiff_template[arg_34_2].model
 		end
 	end
 
-	return var_35_0
+	return var_34_0
 end
 
-function IslandShip:ChangeSkinId(arg_36_1)
-	if self.cur_skin_id ~= arg_36_1 then
-		self.cur_skin_id = arg_36_1
+function IslandShip:ChangeSkinId(arg_35_1)
+	if self.cur_skin_id ~= arg_35_1 then
+		self.cur_skin_id = arg_35_1
 	end
 end
 
@@ -359,9 +332,9 @@ function IslandShip:StaticGetPrefab()
 	return pg.island_unit_character[pg.island_chara_template[self].unit_id].IslandShipIcon
 end
 
-function IslandShip:UpdateState(arg_41_1, arg_41_2)
-	self.state = arg_41_1
-	self.stateId = arg_41_2
+function IslandShip:UpdateState(arg_40_1, arg_40_2)
+	self.state = arg_40_1
+	self.stateId = arg_40_2
 end
 
 function IslandShip:GetState()
@@ -393,7 +366,7 @@ function IslandShip:GetStatePlaceName()
 end
 
 function IslandShip:IsDelegable()
-	local var_49_0 = self:GetState() == IslandShip.STATE_NORMAL and not getProxy(IslandProxy):GetIsland():GetFollowerAgency():Following(self.id) or false
+	local var_48_0 = self:GetState() == IslandShip.STATE_NORMAL and not getProxy(IslandProxy):GetIsland():GetFollowerAgency():Following(self.id) or false
 
 	return (false or nil) and true
 end
@@ -427,119 +400,119 @@ function IslandShip:UpgradeBreakOut()
 
 	self:InitMaxLevel()
 
-	local var_55_0 = self:GetMaxEnergy()
+	local var_54_0 = self:GetMaxEnergy()
 
 	self:InitMaxEnergy(true)
 
-	local var_55_1 = self:GetMaxEnergy()
+	local var_54_1 = self:GetMaxEnergy()
 
-	if var_55_0 < var_55_1 then
-		self.energy = var_55_1 - (var_55_0 - self:GetEnergy())
+	if var_54_0 < var_54_1 then
+		self.energy = var_54_1 - (var_54_0 - self:GetEnergy())
 	end
 
 	self:InitSkill()
 end
 
 function IslandShip:GetBreakoutMatrials()
-	local var_56_0 = {}
+	local var_55_0 = {}
 
-	for iter_56_0, iter_56_1 in ipairs(self:getConfig("upgrade_material")[self:GetBreakLevel()] or {}) do
-		table.insert(var_56_0, {
+	for iter_55_0, iter_55_1 in ipairs(self:getConfig("upgrade_material")[self:GetBreakLevel()] or {}) do
+		table.insert(var_55_0, {
 			type = DROP_TYPE_ISLAND_ITEM,
-			id = iter_56_1[1],
-			count = iter_56_1[2]
+			id = iter_55_1[1],
+			count = iter_55_1[2]
 		})
 	end
 
-	return var_56_0
+	return var_55_0
 end
 
 function IslandShip:InitAttrs()
-	local var_57_0 = self:GetBreakPhaseValue()
-	local var_57_1 = math.floor(self.level / var_57_0)
+	local var_56_0 = self:GetBreakPhaseValue()
+	local var_56_1 = math.floor(self.level / var_56_0)
 
-	for iter_57_0, iter_57_1 in ipairs((self:getConfig("base_att"))) do
-		self.attrs[IslandShipAttr.GetAtrrName(iter_57_1[1])] = iter_57_1[2]
+	for iter_56_0, iter_56_1 in ipairs((self:getConfig("base_att"))) do
+		self.attrs[IslandShipAttr.GetAtrrName(iter_56_1[1])] = iter_56_1[2]
 	end
 
-	for iter_57_2, iter_57_3 in ipairs((self:getConfig("growth_att"))) do
-		local var_57_2 = IslandShipAttr.GetAtrrName(iter_57_3[1])
-		local var_57_3 = 0
+	for iter_56_2, iter_56_3 in ipairs((self:getConfig("growth_att"))) do
+		local var_56_2 = IslandShipAttr.GetAtrrName(iter_56_3[1])
+		local var_56_3 = 0
 
-		for iter_57_4 = 1, var_57_1 do
-			var_57_3 = var_57_3 + iter_57_3[2][iter_57_4] * var_57_0
+		for iter_56_4 = 1, var_56_1 do
+			var_56_3 = var_56_3 + iter_56_3[2][iter_56_4] * var_56_0
 		end
 
-		if var_57_1 < #iter_57_3[2] then
-			var_57_3 = var_57_3 + iter_57_3[2][var_57_1 + 1] * (self.level % var_57_0)
+		if var_56_1 < #iter_56_3[2] then
+			var_56_3 = var_56_3 + iter_56_3[2][var_56_1 + 1] * (self.level % var_56_0)
 		end
 
-		self.attrs[var_57_2] = self.attrs[var_57_2] + var_57_3
+		self.attrs[var_56_2] = self.attrs[var_56_2] + var_56_3
 	end
 
-	for iter_57_5, iter_57_6 in pairs(self.extraAttrs) do
-		self.attrs[iter_57_5] = self.attrs[iter_57_5] + iter_57_6
+	for iter_56_5, iter_56_6 in pairs(self.extraAttrs) do
+		self.attrs[iter_56_5] = self.attrs[iter_56_5] + iter_56_6
 	end
 
-	for iter_57_7, iter_57_8 in pairs(self.attrs) do
-		self.attrs[iter_57_7] = math.floor(iter_57_8)
+	for iter_56_7, iter_56_8 in pairs(self.attrs) do
+		self.attrs[iter_56_7] = math.floor(iter_56_8)
 	end
 end
 
 function IslandShip:GetGrowthAtt()
-	local var_58_0 = {}
+	local var_57_0 = {}
 
-	for iter_58_0, iter_58_1 in ipairs((self:getConfig("growth_att"))) do
-		var_58_0[IslandShipAttr.GetAtrrName(iter_58_1[1])] = iter_58_1[2][self:GetBreakLevel()] or 0
+	for iter_57_0, iter_57_1 in ipairs((self:getConfig("growth_att"))) do
+		var_57_0[IslandShipAttr.GetAtrrName(iter_57_1[1])] = iter_57_1[2][self:GetBreakLevel()] or 0
 	end
 
-	return var_58_0
+	return var_57_0
 end
 
 function IslandShip:GetAttrs()
 	return self.attrs
 end
 
-function IslandShip:GetAttr(arg_60_1)
-	return self.attrs[arg_60_1] or 0
+function IslandShip:GetAttr(arg_59_1)
+	return self.attrs[arg_59_1] or 0
 end
 
-function IslandShip:GetAttrGradeCnt(arg_61_1)
-	local var_61_0 = 0
+function IslandShip:GetAttrGradeCnt(arg_60_1)
+	local var_60_0 = 0
 
-	for iter_61_0, iter_61_1 in pairs(self.attrs) do
-		if arg_61_1 >= self:GetAttrGrade(iter_61_0) then
-			var_61_0 = var_61_0 + 1
+	for iter_60_0, iter_60_1 in pairs(self.attrs) do
+		if arg_60_1 >= self:GetAttrGrade(iter_60_0) then
+			var_60_0 = var_60_0 + 1
+		end
+	end
+
+	return var_60_0
+end
+
+function IslandShip:GetAttrGradeByValue(arg_61_1)
+	local var_61_0 = pg.island_chara_att.all[#pg.island_chara_att.all]
+
+	for iter_61_0, iter_61_1 in ipairs(pg.island_chara_att.all) do
+		if pg.island_chara_att[iter_61_1].range[1] <= arg_61_1 and arg_61_1 <= pg.island_chara_att[iter_61_1].range[2] then
+			var_61_0 = iter_61_1
+
+			break
 		end
 	end
 
 	return var_61_0
 end
 
-function IslandShip:GetAttrGradeByValue(arg_62_1)
-	local var_62_0 = pg.island_chara_att.all[#pg.island_chara_att.all]
-
-	for iter_62_0, iter_62_1 in ipairs(pg.island_chara_att.all) do
-		if pg.island_chara_att[iter_62_1].range[1] <= arg_62_1 and arg_62_1 <= pg.island_chara_att[iter_62_1].range[2] then
-			var_62_0 = iter_62_1
-
-			break
-		end
-	end
-
-	return var_62_0
+function IslandShip:GetAttrGrade(arg_62_1)
+	return self:GetAttrGradeByValue((self:GetAttr(arg_62_1)))
 end
 
-function IslandShip:GetAttrGrade(arg_63_1)
-	return self:GetAttrGradeByValue((self:GetAttr(arg_63_1)))
+function IslandShip:GetAttrGradeName(arg_63_1)
+	return pg.island_chara_att[self:GetAttrGrade(arg_63_1)].name
 end
 
-function IslandShip:GetAttrGradeName(arg_64_1)
-	return pg.island_chara_att[self:GetAttrGrade(arg_64_1)].name
-end
-
-function IslandShip:GetAttrGradeEffect(arg_65_1)
-	return pg.island_chara_att[self:GetAttrGrade(arg_65_1)].effect
+function IslandShip:GetAttrGradeEffect(arg_64_1)
+	return pg.island_chara_att[self:GetAttrGrade(arg_64_1)].effect
 end
 
 function IslandShip:SetUnlockExtraAttLimit()
@@ -553,22 +526,22 @@ function IslandShip:IsUnlockExtraAttLimit()
 end
 
 function IslandShip:InitMaxExtraAttrs()
-	for iter_68_0, iter_68_1 in ipairs(self:getConfig("extra_max")) do
-		self.maxExtraAttrs[IslandShipAttr.GetAtrrName(iter_68_1[1])] = self.unlockExtraAttLimit and iter_68_1[2][2] or iter_68_1[2][1]
+	for iter_67_0, iter_67_1 in ipairs(self:getConfig("extra_max")) do
+		self.maxExtraAttrs[IslandShipAttr.GetAtrrName(iter_67_1[1])] = self.unlockExtraAttLimit and iter_67_1[2][2] or iter_67_1[2][1]
 	end
 end
 
-function IslandShip:GetExtraAttrLimit(arg_69_1)
-	return self.maxExtraAttrs[arg_69_1] or 0
+function IslandShip:GetExtraAttrLimit(arg_68_1)
+	return self.maxExtraAttrs[arg_68_1] or 0
 end
 
-function IslandShip:GetExtraAttrValue(arg_70_1)
-	return self.extraAttrs[arg_70_1] or 0
+function IslandShip:GetExtraAttrValue(arg_69_1)
+	return self.extraAttrs[arg_69_1] or 0
 end
 
 function IslandShip:ExistPotency()
-	for iter_71_0, iter_71_1 in pairs(IslandShipAttr.ATTRS) do
-		if self:GetExtraAttrLimit(iter_71_1) > self:GetExtraAttrValue(iter_71_1) then
+	for iter_70_0, iter_70_1 in pairs(IslandShipAttr.ATTRS) do
+		if self:GetExtraAttrLimit(iter_70_1) > self:GetExtraAttrValue(iter_70_1) then
 			return true
 		end
 	end
@@ -576,31 +549,31 @@ function IslandShip:ExistPotency()
 	return false
 end
 
-function IslandShip:AddExtraAttr(arg_72_1, arg_72_2)
-	self.extraAttrs[arg_72_1] = math.min(self:GetExtraAttrValue(arg_72_1) + arg_72_2, (self:GetExtraAttrLimit(arg_72_1)))
+function IslandShip:AddExtraAttr(arg_71_1, arg_71_2)
+	self.extraAttrs[arg_71_1] = math.min(self:GetExtraAttrValue(arg_71_1) + arg_71_2, (self:GetExtraAttrLimit(arg_71_1)))
 
 	self:InitAttrs()
 end
 
-function IslandShip:GetUpgradeExtraAttrConsume(arg_73_1)
-	local var_73_0 = table.indexof(IslandShipAttr.ATTRS, arg_73_1)
-	local var_73_1
+function IslandShip:GetUpgradeExtraAttrConsume(arg_72_1)
+	local var_72_0 = table.indexof(IslandShipAttr.ATTRS, arg_72_1)
+	local var_72_1
 
-	if var_73_0 <= 0 then
+	if var_72_0 <= 0 then
 		do return {} end
 
-		var_73_1 = {}
+		var_72_1 = {}
 	end
 
-	for iter_73_0, iter_73_1 in ipairs(self:getConfig("att_item")[var_73_0] or {}) do
-		table.insert(var_73_1, {
+	for iter_72_0, iter_72_1 in ipairs(self:getConfig("att_item")[var_72_0] or {}) do
+		table.insert(var_72_1, {
 			count = 1,
 			type = DROP_TYPE_ISLAND_ITEM,
-			id = iter_73_1
+			id = iter_72_1
 		})
 	end
 
-	return var_73_1
+	return var_72_1
 end
 
 function IslandShip:GetExtraAttrLimitUnlockConsume()
@@ -635,45 +608,45 @@ function IslandShip:CanUpgradeSkill()
 	if self.skill:IsMaxLevel() then
 		do return false end
 
-		local var_78_0 = getProxy(IslandProxy):GetIsland():GetInventoryAgency()
+		local var_77_0 = getProxy(IslandProxy):GetIsland():GetInventoryAgency()
 	end
 
-	return _.all(self.skill:GetUpgradeMaterial(), function(arg_79_0)
-		return var_78_0:GetOwnCount(arg_79_0.id) >= arg_79_0.count
+	return _.all(self.skill:GetUpgradeMaterial(), function(arg_78_0)
+		return var_77_0:GetOwnCount(arg_78_0.id) >= arg_78_0.count
 	end)
 end
 
 function IslandShip:HasGreetingSkill()
-	local var_80_0 = self:GetSkill()
+	local var_79_0 = self:GetSkill()
 
-	return var_80_0 and var_80_0:IsUnlock() and var_80_0:IsGreetingType()
+	return var_79_0 and var_79_0:IsUnlock() and var_79_0:IsGreetingType()
 end
 
-function IslandShip:ApplySkill(arg_81_1)
-	self:GetSkill():Apply(self, arg_81_1)
+function IslandShip:ApplySkill(arg_80_1)
+	self:GetSkill():Apply(self, arg_80_1)
 end
 
-function IslandShip:GetVaildStatusByGroup(arg_82_1)
-	return _.select(self.status, function(arg_83_0)
-		return not arg_83_0:IsExpiration() and arg_83_0:GetGroup() == arg_82_1
+function IslandShip:GetVaildStatusByGroup(arg_81_1)
+	return _.select(self.status, function(arg_82_0)
+		return not arg_82_0:IsExpiration() and arg_82_0:GetGroup() == arg_81_1
 	end)
 end
 
 function IslandShip:GetVaildStatus()
-	return _.select(self.status, function(arg_85_0)
-		return not arg_85_0:IsExpiration()
+	return _.select(self.status, function(arg_84_0)
+		return not arg_84_0:IsExpiration()
 	end)
 end
 
-function IslandShip:GetVaildStatusByType(arg_86_1)
-	return _.select(self.status, function(arg_87_0)
-		return not arg_87_0:IsExpiration() and arg_87_0:GetBuffType() == arg_86_1
+function IslandShip:GetVaildStatusByType(arg_85_1)
+	return _.select(self.status, function(arg_86_0)
+		return not arg_86_0:IsExpiration() and arg_86_0:GetBuffType() == arg_85_1
 	end)
 end
 
 function IslandShip:GetDisplayStatus()
-	return _.select(self.status, function(arg_89_0)
-		return not arg_89_0:IsExpiration() and arg_89_0:CanDisplay()
+	return _.select(self.status, function(arg_88_0)
+		return not arg_88_0:IsExpiration() and arg_88_0:CanDisplay()
 	end)
 end
 
@@ -681,42 +654,42 @@ function IslandShip:GetFavoriteGift()
 	return self:getConfig("gift_id")
 end
 
-function IslandShip:IsFavoriteGift(arg_91_1)
-	return _.any(self:GetFavoriteGift(), function(arg_92_0)
-		return arg_92_0 == arg_91_1
+function IslandShip:IsFavoriteGift(arg_90_1)
+	return _.any(self:GetFavoriteGift(), function(arg_91_0)
+		return arg_91_0 == arg_90_1
 	end)
 end
 
-function IslandShip:AddStatus(arg_93_1)
-	local var_93_0 = _.detect(self.status, function(arg_94_0)
-		return arg_94_0.id == arg_93_1.id
+function IslandShip:AddStatus(arg_92_1)
+	local var_92_0 = _.detect(self.status, function(arg_93_0)
+		return arg_93_0.id == arg_92_1.id
 	end)
 
-	if var_93_0 then
-		table.removebyvalue(self.status, var_93_0)
+	if var_92_0 then
+		table.removebyvalue(self.status, var_92_0)
 	end
 
-	local var_93_1 = self:GetVaildStatus()
-	local var_93_2 = arg_93_1:GetDuelTypeList()
-	local var_93_3 = _.detect(var_93_1, function(arg_95_0)
-		return table.contains(var_93_2, arg_95_0:GetGroup())
+	local var_92_1 = self:GetVaildStatus()
+	local var_92_2 = arg_92_1:GetDuelTypeList()
+	local var_92_3 = _.detect(var_92_1, function(arg_94_0)
+		return table.contains(var_92_2, arg_94_0:GetGroup())
 	end)
 
-	if var_93_3 then
-		table.removebyvalue(self.status, var_93_3)
+	if var_92_3 then
+		table.removebyvalue(self.status, var_92_3)
 	end
 
-	local var_93_4 = arg_93_1:GetDuelIdList()
-	local var_93_5 = _.detect(var_93_1, function(arg_96_0)
-		return table.contains(var_93_4, arg_96_0.id)
+	local var_92_4 = arg_92_1:GetDuelIdList()
+	local var_92_5 = _.detect(var_92_1, function(arg_95_0)
+		return table.contains(var_92_4, arg_95_0.id)
 	end)
 
-	if var_93_5 then
-		table.removebyvalue(self.status, var_93_5)
+	if var_92_5 then
+		table.removebyvalue(self.status, var_92_5)
 	end
 
-	pg.GameTrackerMgr.GetInstance():Record(GameTrackerBuilder.BuildIslandShipAddBuff(self.id, arg_93_1.id))
-	table.insert(self.status, arg_93_1)
+	pg.GameTrackerMgr.GetInstance():Record(GameTrackerBuilder.BuildIslandShipAddBuff(self.id, arg_92_1.id))
+	table.insert(self.status, arg_92_1)
 end
 
 return IslandShip

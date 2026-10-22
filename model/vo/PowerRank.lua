@@ -152,7 +152,7 @@ function PowerRank:getTitleWord(arg_6_1, arg_6_2)
 	end
 
 	if arg_6_1 == PowerRank.TYPE_PT then
-		var_6_0[4] = Item.getConfigData((id2ItemId(getProxy(ActivityProxy):getActivityById(arg_6_2):getConfig("config_id")))).name
+		var_6_0[4] = Item.getConfigData((id2ItemId((getProxy(ActivityProxy):getActivityById(arg_6_2):getConfig("config_id"))))).name
 	end
 
 	return var_6_0
@@ -168,7 +168,10 @@ function PowerRank:getActivityByRankType(arg_8_1)
 	end
 
 	return _.detect(getProxy(ActivityProxy):getActivitiesByType(PowerRank.typeInfo[arg_8_1].act_type), function(arg_9_0)
-		return not arg_9_0:isEnd() and (arg_8_1 ~= PowerRank.TYPE_PT or tonumber(arg_9_0:getConfig("config_data")) > 0)
+		local var_9_0 = arg_9_0:getConfig("config_data")
+		local var_9_1 = type(var_9_0) == "number" and tonumber(var_9_0) > 0
+
+		return not arg_9_0:isEnd() and (arg_8_1 ~= PowerRank.TYPE_PT or type(var_9_0) == "number" and tonumber(var_9_0) > 0) or type(var_9_0) == "table" and #var_9_0 > 0
 	end)
 end
 

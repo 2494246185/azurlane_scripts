@@ -61,7 +61,7 @@ function TerminalAdventurePage:OnInit()
 end
 
 function TerminalAdventurePage:InitPtUI()
-	LoadImageSpriteAsync(Drop.New(self.ptData:GetRes()):getIcon(), self.ptIconTF, false)
+	LoadImageSpriteAsync(self.ptData:GetRes():getIcon(), self.ptIconTF, false)
 	self.awardUIList:make(function(arg_6_0, arg_6_1, arg_6_2)
 		if arg_6_0 == UIItemList.EventUpdate then
 			local var_6_0 = arg_6_1 + 1

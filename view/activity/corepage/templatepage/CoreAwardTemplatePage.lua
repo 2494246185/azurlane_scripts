@@ -181,9 +181,11 @@ function CoreAwardTemplatePage:OnUpdateItem(arg_16_1, arg_16_2)
 	}):getName())
 	self:RefreshCountText(var_16_0, arg_16_2)
 
-	GetOrAddComponent(arg_16_2:Find("owner"), typeof(CanvasGroup)).alpha = var_16_0.count == var_16_0.config.count and 0.5 or 1
+	local var_16_2 = var_16_0.count > 0 and var_16_0.count >= var_16_0.config.count
 
-	setActive(arg_16_2:Find("got"), var_16_0.count == var_16_0.config.count)
+	GetOrAddComponent(arg_16_2:Find("owner"), typeof(CanvasGroup)).alpha = var_16_0.count > 0 and var_16_0.count >= var_16_0.config.count and 0.5 or 1
+
+	setActive(arg_16_2:Find("got"), var_16_2)
 	setActive(arg_16_2:Find("new"), var_16_0.config.is_new == "1")
 end
 

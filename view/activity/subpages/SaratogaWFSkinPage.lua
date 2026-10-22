@@ -8,7 +8,7 @@ function SaratogaWFSkinPage:OnFirstFlush()
 			targets = self.ptData.targets,
 			level = self.ptData.level,
 			count = self.ptData.count,
-			resDrop = Drop.New(self.ptData:GetRes())
+			resDrop = self.ptData:GetRes()
 		})
 	end, SFX_PANEL)
 	onButton(self, self.battleBtn, function()

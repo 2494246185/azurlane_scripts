@@ -133,9 +133,11 @@ function ToloveCollectPage:OnUpdateItem(arg_12_1, arg_12_2)
 	}):getName())
 	setText(arg_12_2:Find("owner/number"), var_12_0.count .. "/" .. var_12_0.config.count)
 
-	GetOrAddComponent(arg_12_2:Find("owner"), typeof(CanvasGroup)).alpha = var_12_0.count == var_12_0.config.count and 0.5 or 1
+	local var_12_2 = var_12_0.count > 0 and var_12_0.count >= var_12_0.config.count
 
-	setActive(arg_12_2:Find("got"), var_12_0.count == var_12_0.config.count)
+	GetOrAddComponent(arg_12_2:Find("owner"), typeof(CanvasGroup)).alpha = var_12_0.count > 0 and var_12_0.count >= var_12_0.config.count and 0.5 or 1
+
+	setActive(arg_12_2:Find("got"), var_12_2)
 	setActive(arg_12_2:Find("new"), var_12_0.config.is_new == "1")
 end
 

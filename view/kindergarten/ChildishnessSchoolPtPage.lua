@@ -34,7 +34,7 @@ end
 
 function ChildishnessSchoolPtPage:Show()
 	self:UpdatePtData()
-	self:updateResIcon(Drop.New(self.ptData:GetRes()), self.ptData.type)
+	self:updateResIcon(self.ptData:GetRes(), self.ptData.type)
 	self:UpdateList(self.ptData.dropList, self.ptData.targets, self.ptData.level)
 
 	self.totalTxt.text = self.ptData.count

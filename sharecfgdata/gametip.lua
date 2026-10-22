@@ -38727,7 +38727,7 @@ end)()
 
 (function()
 	_G.pg.base.gametip.activity_1024_memory = {
-		tip = "道具数量不足，完成活动任务可获取「鬼怪故事页」",
+		tip = "道具数量不足，完成活动任务可获取「假日故事页」",
 	}
 end)()
 
@@ -47807,6 +47807,18 @@ end)()
 end)()
 
 (function()
+	_G.pg.base.gametip.Outpost_20250904_Sidebar4 = {
+		tip = "作战准备",
+	}
+end)()
+
+(function()
+	_G.pg.base.gametip.Outpost_20250904_Sidebar5 = {
+		tip = "重樱的邀约 ",
+	}
+end)()
+
+(function()
 	_G.pg.base.gametip.Outpost_20250904_Title1 = {
 		tip = "作战准备",
 	}
@@ -55370,6 +55382,18 @@ end)()
 (function()
 	_G.pg.base.gametip.ActivityRemaster_NoticeJump_AlreadySelected = {
 		tip = "当前已有开启中的轻量化复刻活动，请通过主界面活动入口进入",
+	}
+end)()
+
+(function()
+	_G.pg.base.gametip.HurricaneTreasureCoreActivityUI_subtitle_1 = {
+		tip = "飓风的藏宝地",
+	}
+end)()
+
+(function()
+	_G.pg.base.gametip.windfog_skin_stroy_finish = {
+		tip = "完成所有故事可获得",
 	}
 end)()
 

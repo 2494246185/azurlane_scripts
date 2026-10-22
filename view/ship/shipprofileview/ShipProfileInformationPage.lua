@@ -195,7 +195,7 @@ function ShipProfileInformationPage:UpdateLanguage()
 
 	setActive(self.voiceBtn, var_20_5)
 
-	if var_20_5 and ShipGroup.LockCv1(var_20_0) then
+	if var_20_5 and ShipSkin.LockCv1(self.skin.id) then
 		self:UpdateLang2()
 		setActive(self.voiceBtn, false)
 	end

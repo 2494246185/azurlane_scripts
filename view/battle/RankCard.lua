@@ -91,12 +91,7 @@ function RankCard:update(arg_2_1, arg_2_2)
 	if var_2_2 then
 		if arg_2_1.type == PowerRank.TYPE_PT then
 			if arg_2_2 then
-				local var_2_3 = getProxy(ActivityProxy)
-
-				setImageSprite(self.scoreIconTF, LoadSprite((Drop.New({
-					type = DROP_TYPE_RESOURCE,
-					id = var_2_3:getActivityById(arg_2_2):getConfig("config_id")
-				}).getIcon(var_2_3))))
+				setImageSprite(self.scoreIconTF, LoadSprite(getProxy(ActivityProxy):getActivityById(arg_2_2):GetPTDrop():getIcon()))
 			end
 		else
 			setImageSprite(self.scoreIconTF, GetSpriteFromAtlas(var_2_2[1], var_2_2[2]), true)

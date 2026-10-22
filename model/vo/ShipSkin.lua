@@ -19,6 +19,7 @@ ShipSkin.WITH_CHANGE = 8
 ShipSkin.WITH_LIVE2D_PLUS = 9
 ShipSkin.WITH_DOUBLE_VIOCE = 10
 ShipSkin.WITH_ASMR = 11
+ShipSkin.WITH_LIGHT = 12
 ShipSkin.VOICE_LANG_JP = 1
 ShipSkin.VOICE_LANG_CN = 2
 
@@ -34,7 +35,8 @@ function ShipSkin:Tag2Name()
 		[ShipSkin.WITH_CHANGE] = "change",
 		[ShipSkin.WITH_LIVE2D_PLUS] = "live2d_plus",
 		[ShipSkin.WITH_DOUBLE_VIOCE] = "double_voice",
-		[ShipSkin.WITH_ASMR] = "asmr_skin"
+		[ShipSkin.WITH_ASMR] = "asmr_skin",
+		[ShipSkin.WITH_LIGHT] = "light_skin"
 	}
 
 	return ShipSkin.Tag2NameTab[self]
@@ -272,6 +274,10 @@ function ShipSkin:IsTransSkin()
 	return self:getConfig("skin_type") == ShipSkin.SKIN_TYPE_REMAKE
 end
 
+function ShipSkin:LockCv1()
+	return table.contains(pg.gameset.profile_cv1_button_block.description, self)
+end
+
 function ShipSkin:IsProposeSkin()
 	return self:getConfig("skin_type") == ShipSkin.SKIN_TYPE_PROPOSE
 end
@@ -301,48 +307,48 @@ function ShipSkin:MatchChangeSkinMain()
 end
 
 function ShipSkin:CanShare()
-	local var_40_0 = getProxy(ShipSkinProxy):hasSkin(self.configId)
+	local var_41_0 = getProxy(ShipSkinProxy):hasSkin(self.configId)
 
-	local function var_40_1()
-		if var_40_0 then
+	local function var_41_1()
+		if var_41_0 then
 			return true
 		end
 
 		return self:InShowTime()
 	end
 
-	local var_40_3 = self:getConfig("skin_type")
+	local var_41_3 = self:getConfig("skin_type")
 
-	return not (var_40_3 == ShipSkin.SKIN_TYPE_DEFAULT or var_40_3 == ShipSkin.SKIN_TYPE_REMAKE or var_40_3 == ShipSkin.SKIN_TYPE_OLD or var_40_3 == ShipSkin.SKIN_TYPE_NOT_HAVE_HIDE and not var_40_0 or var_40_3 == ShipSkin.SKIN_TYPE_SHOW_IN_TIME and not var_40_1())
+	return not (var_41_3 == ShipSkin.SKIN_TYPE_DEFAULT or var_41_3 == ShipSkin.SKIN_TYPE_REMAKE or var_41_3 == ShipSkin.SKIN_TYPE_OLD or var_41_3 == ShipSkin.SKIN_TYPE_NOT_HAVE_HIDE and not var_41_0 or var_41_3 == ShipSkin.SKIN_TYPE_SHOW_IN_TIME and not var_41_1())
 end
 
 function ShipSkin:CanShareInJuus()
-	local var_43_0 = getProxy(ShipSkinProxy):hasSkin(self.configId)
-	local var_43_1 = self:getConfig("skin_type")
+	local var_44_0 = getProxy(ShipSkinProxy):hasSkin(self.configId)
+	local var_44_1 = self:getConfig("skin_type")
 
-	return not (var_43_1 == ShipSkin.SKIN_TYPE_REMAKE or var_43_1 == ShipSkin.SKIN_TYPE_OLD or var_43_1 == ShipSkin.SKIN_TYPE_NOT_HAVE_HIDE and not var_43_0 or var_43_1 == ShipSkin.SKIN_TYPE_SHOW_IN_TIME and not var_43_0)
+	return not (var_44_1 == ShipSkin.SKIN_TYPE_REMAKE or var_44_1 == ShipSkin.SKIN_TYPE_OLD or var_44_1 == ShipSkin.SKIN_TYPE_NOT_HAVE_HIDE and not var_44_0 or var_44_1 == ShipSkin.SKIN_TYPE_SHOW_IN_TIME and not var_44_0)
 end
 
-function ShipSkin:IsShareSkin(arg_44_1)
-	return table.contains(pg.ship_data_group[pg.ship_data_group.get_id_list_by_group_type[self.groupId][1]].share_group_id, pg.ship_skin_template[arg_44_1].ship_group)
+function ShipSkin:IsShareSkin(arg_45_1)
+	return table.contains(pg.ship_data_group[pg.ship_data_group.get_id_list_by_group_type[self.groupId][1]].share_group_id, pg.ship_skin_template[arg_45_1].ship_group)
 end
 
-function ShipSkin:CanUseShareSkinForShip(arg_45_1)
-	local var_45_0 = ShipSkin.IsShareSkin(self, arg_45_1)
-	local var_45_1 = ShipSkin.New({
-		id = arg_45_1
+function ShipSkin:CanUseShareSkinForShip(arg_46_1)
+	local var_46_0 = ShipSkin.IsShareSkin(self, arg_46_1)
+	local var_46_1 = ShipSkin.New({
+		id = arg_46_1
 	})
-	local var_45_2 = false
-	local var_45_3 = var_45_1:CanShare()
-	local var_45_4 = var_45_1:IsProposeSkin()
+	local var_46_2 = false
+	local var_46_3 = var_46_1:CanShare()
+	local var_46_4 = var_46_1:IsProposeSkin()
 
-	if var_45_3 and var_45_4 and self.propose then
-		var_45_2 = true
-	elseif var_45_3 and not var_45_4 then
-		var_45_2 = math.floor(self:getIntimacy() / 100) >= self:GetNoProposeIntimacyMax()
+	if var_46_3 and var_46_4 and self.propose then
+		var_46_2 = true
+	elseif var_46_3 and not var_46_4 then
+		var_46_2 = math.floor(self:getIntimacy() / 100) >= self:GetNoProposeIntimacyMax()
 	end
 
-	return var_45_0 and var_45_2
+	return var_46_0 and var_46_2
 end
 
 function ShipSkin:ExistReward()
@@ -350,87 +356,91 @@ function ShipSkin:ExistReward()
 end
 
 function ShipSkin:GetRewardList()
-	local var_47_0
+	local var_48_0
 
 	if not self:ExistReward() then
 		do return {} end
 
-		var_47_0 = {}
+		var_48_0 = {}
 	end
 
-	for iter_47_0, iter_47_1 in pairs(pg.ship_skin_reward[self.configId].reward) do
-		table.insert(var_47_0, {
-			type = iter_47_1[1],
-			id = iter_47_1[2],
-			count = iter_47_1[3]
+	for iter_48_0, iter_48_1 in pairs(pg.ship_skin_reward[self.configId].reward) do
+		table.insert(var_48_0, {
+			type = iter_48_1[1],
+			id = iter_48_1[2],
+			count = iter_48_1[3]
 		})
 	end
 
-	return var_47_0
+	return var_48_0
 end
 
 function ShipSkin:GetRewardListDesc()
-	local var_48_0 = self:GetRewardList()
+	local var_49_0 = self:GetRewardList()
 
-	if #var_48_0 <= 0 then
+	if #var_49_0 <= 0 then
 		return ""
 	end
 
-	return getDropInfo((_.map(var_48_0, function(arg_49_0)
+	return getDropInfo((_.map(var_49_0, function(arg_50_0)
 		return {
-			arg_49_0.type,
-			arg_49_0.id,
-			arg_49_0.count
+			arg_50_0.type,
+			arg_50_0.id,
+			arg_50_0.count
 		}
 	end)))
 end
 
 function ShipSkin:GetShareGroupIds()
-	local var_50_0 = self:getConfig("ship_group")
-	local var_50_1
+	local var_51_0 = self:getConfig("ship_group")
+	local var_51_1
 
-	if pg.ship_data_group.get_id_list_by_group_type[var_50_0] then
-		var_50_1 = pg.ship_data_group.get_id_list_by_group_type[var_50_0][1] or nil
+	if pg.ship_data_group.get_id_list_by_group_type[var_51_0] then
+		var_51_1 = pg.ship_data_group.get_id_list_by_group_type[var_51_0][1] or nil
 	end
 
-	return var_50_0, underscore.to_array((var_50_1 or nil) and (pg.ship_data_group[var_50_1].share_group_id or {}))
+	return var_51_0, underscore.to_array((var_51_1 or nil) and (pg.ship_data_group[var_51_1].share_group_id or {}))
 end
 
 function ShipSkin:GetAllChangeSkinIds()
-	local var_51_0
+	local var_52_0
 
 	if not ShipSkin.GetChangeSkinMainId(self) then
 		do return {
 			self
 		} end
 
-		var_51_0 = {}
+		var_52_0 = {}
 	end
 
-	var_51_0[1] = ShipSkin.GetChangeSkinMainId(self)
+	var_52_0[1] = ShipSkin.GetChangeSkinMainId(self)
 
-	local var_51_1 = self
+	local var_52_1 = self
 
-	for iter_51_0 = 1, 10 do
-		local var_51_2 = ShipSkin.GetChangeSkinNextId(self)
+	for iter_52_0 = 1, 10 do
+		local var_52_2 = ShipSkin.GetChangeSkinNextId(self)
 
-		if not table.contains(var_51_0, var_51_2) then
-			table.insert(var_51_0, var_51_2)
+		if not table.contains(var_52_0, var_52_2) then
+			table.insert(var_52_0, var_52_2)
 		end
 
-		var_51_1 = var_51_2
+		var_52_1 = var_52_2
 
-		if ShipSkin.GetChangeSkinIndex(var_51_2) == 1 then
-			return var_51_0
+		if ShipSkin.GetChangeSkinIndex(var_52_2) == 1 then
+			return var_52_0
 		end
 	end
 
-	return var_51_0
+	return var_52_0
 end
 
 function ShipSkin:IsChangeSkin()
 	if not pg.ship_skin_template[self] then
 		warning("skin not exist " .. self)
+	end
+
+	if type(pg.ship_skin_template[self].tag) ~= "table" then
+		return false
 	end
 
 	return table.contains(pg.ship_skin_template[self].tag, ShipSkin.WITH_CHANGE) or table.contains(pg.ship_skin_template[self].tag, ShipSkin.WITH_DOUBLE_VIOCE) or table.contains(pg.ship_skin_template[self].tag, ShipSkin.WITH_ASMR)
@@ -453,75 +463,83 @@ function ShipSkin:GetChangeSkinData()
 		return nil
 	end
 
-	local var_54_0 = pg.ship_skin_template[self]
+	local var_55_0 = pg.ship_skin_template[self]
 
-	if pg.ship_skin_template[self] and var_54_0.change_skin and var_54_0.change_skin ~= "" then
-		return var_54_0.change_skin
+	if pg.ship_skin_template[self] and var_55_0.change_skin and var_55_0.change_skin ~= "" then
+		return var_55_0.change_skin
 	end
 
 	return nil
 end
 
-function ShipSkin:IsSameChangeSkinGroup(arg_55_1)
-	if not ShipSkin.IsChangeSkin(self) or not ShipSkin.IsChangeSkin(arg_55_1) then
+function ShipSkin:IsLightSkin()
+	if not pg.ship_skin_template[self] then
+		warning("skin not exist " .. self)
+	end
+
+	return table.contains(pg.ship_skin_template[self].tag, ShipSkin.WITH_LIGHT)
+end
+
+function ShipSkin:IsSameChangeSkinGroup(arg_57_1)
+	if not ShipSkin.IsChangeSkin(self) or not ShipSkin.IsChangeSkin(arg_57_1) then
 		return false
 	end
 
-	return ShipSkin.GetChangeSkinGroupId(self) == ShipSkin.GetChangeSkinGroupId(arg_55_1)
+	return ShipSkin.GetChangeSkinGroupId(self) == ShipSkin.GetChangeSkinGroupId(arg_57_1)
 end
 
 function ShipSkin:GetChangeSkinGroupId()
-	local var_56_0 = ShipSkin.GetChangeSkinData(self)
+	local var_58_0 = ShipSkin.GetChangeSkinData(self)
 
-	return (var_56_0 or nil) and (var_56_0.group or nil)
+	return (var_58_0 or nil) and (var_58_0.group or nil)
 end
 
 function ShipSkin:GetChangeSkinNextId()
-	local var_57_0 = ShipSkin.GetChangeSkinData(self)
+	local var_59_0 = ShipSkin.GetChangeSkinData(self)
 
-	return (var_57_0 or nil) and (var_57_0.next or nil)
+	return (var_59_0 or nil) and (var_59_0.next or nil)
 end
 
 function ShipSkin:GetChangeSkinIndex()
-	local var_58_0 = ShipSkin.GetChangeSkinData(self)
+	local var_60_0 = ShipSkin.GetChangeSkinData(self)
 
-	return (var_58_0 or nil) and (var_58_0.index or nil)
+	return (var_60_0 or nil) and (var_60_0.index or nil)
 end
 
 function ShipSkin:GetChangeSkinState()
-	local var_59_0 = ShipSkin.GetChangeSkinData(self)
+	local var_61_0 = ShipSkin.GetChangeSkinData(self)
 
-	return (var_59_0 or nil) and (var_59_0.state or nil)
+	return (var_61_0 or nil) and (var_61_0.state or nil)
 end
 
 function ShipSkin:GetChangeSkinAction()
-	local var_60_0 = ShipSkin.GetChangeSkinData(self)
+	local var_62_0 = ShipSkin.GetChangeSkinData(self)
 
-	return (var_60_0 or nil) and (var_60_0.action or nil)
+	return (var_62_0 or nil) and (var_62_0.action or nil)
 end
 
-function ShipSkin:GetChangeSkinCustomDataId(arg_61_1)
-	local var_61_0 = ShipSkin.GetChangeSkinData(self)
+function ShipSkin:GetChangeSkinCustomDataId(arg_63_1)
+	local var_63_0 = ShipSkin.GetChangeSkinData(self)
 
-	return (var_61_0 or nil) and (var_61_0[arg_61_1] or nil)
+	return (var_63_0 or nil) and (var_63_0[arg_63_1] or nil)
 end
 
-function ShipSkin:GetStoreChangeSkinId(arg_62_1)
-	local var_62_0, var_62_1 = ShipPhantom.UnpackMark(arg_62_1)
-	local var_62_2 = PlayerPrefs.GetInt(ShipSkin.GetStoreChangeSkinPrefsName(self, arg_62_1), 0)
+function ShipSkin:GetStoreChangeSkinId(arg_64_1)
+	local var_64_0, var_64_1 = ShipPhantom.UnpackMark(arg_64_1)
+	local var_64_2 = PlayerPrefs.GetInt(ShipSkin.GetStoreChangeSkinPrefsName(self, arg_64_1), 0)
 
-	if var_62_2 == 0 then
+	if var_64_2 == 0 then
 		return nil
 	else
-		return var_62_2
+		return var_64_2
 	end
 end
 
-function ShipSkin:SetStoreChangeSkinId(arg_63_1)
-	local var_63_0 = ShipSkin.GetChangeSkinCustomDataId(self, "asmr") == 1
-	local var_63_1, var_63_2 = ShipPhantom.UnpackMark(arg_63_1)
+function ShipSkin:SetStoreChangeSkinId(arg_65_1)
+	local var_65_0 = ShipSkin.GetChangeSkinCustomDataId(self, "asmr") == 1
+	local var_65_1, var_65_2 = ShipPhantom.UnpackMark(arg_65_1)
 
-	PlayerPrefs.SetInt(ShipSkin.GetStoreChangeSkinPrefsName(ShipSkin.GetChangeSkinGroupId(self), arg_63_1), self)
+	PlayerPrefs.SetInt(ShipSkin.GetStoreChangeSkinPrefsName(ShipSkin.GetChangeSkinGroupId(self), arg_65_1), self)
 end
 
 function ShipSkin.GetStoreChangeSkinPrefsName(...)
@@ -530,16 +548,16 @@ function ShipSkin.GetStoreChangeSkinPrefsName(...)
 	}, "_"))
 end
 
-function ShipSkin:GetBgPrint(arg_65_1)
-	local var_65_0 = noEmptyStr(pg.ship_skin_template[self].bg_sp) or noEmptyStr(pg.ship_skin_template[self].bg) or noEmptyStr(pg.ship_skin_template[self].rarity_bg)
+function ShipSkin:GetBgPrint(arg_67_1)
+	local var_67_0 = noEmptyStr(pg.ship_skin_template[self].bg_sp) or noEmptyStr(pg.ship_skin_template[self].bg) or noEmptyStr(pg.ship_skin_template[self].rarity_bg)
 
-	if var_65_0 then
-		var_65_0 = "bg/star_level_bg_" .. var_65_0
-	elseif not arg_65_1 then
-		var_65_0 = "newshipbg/bg_" .. shipRarity2bgPrint(ShipGroup.getDefaultShipConfig(pg.ship_skin_template[self].ship_group).rarity, ShipGroup.IsBluePrintGroup(groupId), ShipGroup.IsMetaGroup(groupId))
+	if var_67_0 then
+		var_67_0 = "bg/star_level_bg_" .. var_67_0
+	elseif not arg_67_1 then
+		var_67_0 = "newshipbg/bg_" .. shipRarity2bgPrint(ShipGroup.getDefaultShipConfig(pg.ship_skin_template[self].ship_group).rarity, ShipGroup.IsBluePrintGroup(groupId), ShipGroup.IsMetaGroup(groupId))
 	end
 
-	return var_65_0
+	return var_67_0
 end
 
 return ShipSkin

@@ -90,19 +90,23 @@ function ActivityPtData:GetId()
 end
 
 function ActivityPtData:GetRes()
+	if self.resId == 0 then
+		return nil
+	end
+
 	if ({
 		[ActivityConst.ACTIVITY_TYPE_PT_BUFF] = true,
 		[ActivityConst.ACTIVITY_TYPE_PT_BUFF_MARK2] = true
 	})[self.activity:getConfig("type")] and (self.type == 8 or self.type == 9) then
-		return {
+		return Drop.New({
 			type = DROP_TYPE_VITEM,
 			id = self.resId
-		}
+		})
 	else
-		return {
+		return Drop.New({
 			type = DROP_TYPE_RESOURCE,
 			id = self.resId
-		}
+		})
 	end
 end
 

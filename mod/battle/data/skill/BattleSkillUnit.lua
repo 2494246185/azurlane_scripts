@@ -94,6 +94,7 @@ function ys.Battle.BattleSkillUnit:Cast(arg_4_1, arg_4_2)
 	end
 
 	if self._tempData.action then
+		arg_4_1:SendAttackTrigger()
 		arg_4_1:StateChange(var_0_0.Battle.UnitState.STATE_SKILL_START)
 	end
 end

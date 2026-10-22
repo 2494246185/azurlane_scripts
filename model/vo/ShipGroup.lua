@@ -30,10 +30,6 @@ function ShipGroup:IsMotGroup()
 	return ShipGroup.getDefaultShipConfig(self).nationality == Nation.MOT
 end
 
-function ShipGroup:LockCv1()
-	return table.contains(pg.gameset.profile_cv1_button_block.description, self)
-end
-
 ShipGroup.STATE_LOCK = 0
 ShipGroup.STATE_NOTGET = 1
 ShipGroup.STATE_UNLOCK = 2
@@ -41,159 +37,159 @@ ShipGroup.ENABLE_SKIP_TO_CHAPTER = true
 
 local var_0_1 = pg.ship_data_group
 
-function ShipGroup:getState(arg_8_1, arg_8_2)
+function ShipGroup:getState(arg_7_1, arg_7_2)
 	if ShipGroup.ENABLE_SKIP_TO_CHAPTER then
-		if arg_8_2 and not arg_8_1 then
+		if arg_7_2 and not arg_7_1 then
 			return ShipGroup.STATE_NOTGET
 		end
 
 		if var_0_1[self] then
-			local var_8_0 = var_0_1[self]
+			local var_7_0 = var_0_1[self]
 
 			assert(var_0_1[self].hide, "hide can not be nil in code " .. self)
 
-			if not var_8_0.hide then
+			if not var_7_0.hide then
 				return ShipGroup.STATE_LOCK
 			end
 
-			if var_8_0.hide == 1 then
+			if var_7_0.hide == 1 then
 				return ShipGroup.STATE_LOCK
-			elseif var_8_0.hide ~= 0 then
-				assert(var_8_0.hide == 0 or var_8_0.hide == 1, "hide sign invalid in code " .. self)
+			elseif var_7_0.hide ~= 0 then
+				assert(var_7_0.hide == 0 or var_7_0.hide == 1, "hide sign invalid in code " .. self)
 
 				return ShipGroup.STATE_LOCK
 			end
 		end
 
-		if arg_8_1 then
+		if arg_7_1 then
 			return ShipGroup.STATE_UNLOCK
 		else
-			local var_8_1 = var_0_1[self]
+			local var_7_1 = var_0_1[self]
 
 			if not var_0_1[self] then
 				return ShipGroup.STATE_LOCK
 			end
 
-			assert(var_8_1, "code can not be nil" .. self)
+			assert(var_7_1, "code can not be nil" .. self)
 
-			local var_8_2
+			local var_7_2
 
-			if var_8_1.redirect_id ~= 0 then
-				var_8_2 = getProxy(ChapterProxy):getChapterById(var_8_1.redirect_id)
+			if var_7_1.redirect_id ~= 0 then
+				var_7_2 = getProxy(ChapterProxy):getChapterById(var_7_1.redirect_id)
 			end
 
-			if var_8_1.redirect_id == 0 or var_8_2 and var_8_2:isClear() then
+			if var_7_1.redirect_id == 0 or var_7_2 and var_7_2:isClear() then
 				return ShipGroup.STATE_NOTGET
 			else
 				return ShipGroup.STATE_LOCK
 			end
 		end
 	else
-		return (arg_8_1 or nil) and (ShipGroup.STATE_UNLOCK or ShipGroup.STATE_LOCK)
+		return (arg_7_1 or nil) and (ShipGroup.STATE_UNLOCK or ShipGroup.STATE_LOCK)
 	end
 end
 
-function ShipGroup:Ctor(arg_9_1)
-	self.id = arg_9_1.id
-	self.star = arg_9_1.star
-	self.hearts = arg_9_1.heart_count
-	self.iheart = (arg_9_1.heart_flag or 0) > 0
-	self.married = arg_9_1.marry_flag
-	self.maxIntimacy = arg_9_1.intimacy_max
-	self.maxLV = arg_9_1.lv_max
+function ShipGroup:Ctor(arg_8_1)
+	self.id = arg_8_1.id
+	self.star = arg_8_1.star
+	self.hearts = arg_8_1.heart_count
+	self.iheart = (arg_8_1.heart_flag or 0) > 0
+	self.married = arg_8_1.marry_flag
+	self.maxIntimacy = arg_8_1.intimacy_max
+	self.maxLV = arg_8_1.lv_max
 	self.evaluation = nil
 	self.equipCodes = nil
 	self.lastReqStamp = 0
 	self.trans = false
-	self.remoulded = arg_9_1.remoulded
+	self.remoulded = arg_8_1.remoulded
 
-	local var_9_0 = ShipGroup.getDefaultShipConfig(self.id)
+	local var_8_0 = ShipGroup.getDefaultShipConfig(self.id)
 
-	assert(var_9_0, "can not find ship_data_statistics for group " .. self.id)
+	assert(var_8_0, "can not find ship_data_statistics for group " .. self.id)
 
 	self.shipConfig = setmetatable({}, {
-		__index = function(arg_10_0, arg_10_1)
-			return var_9_0[arg_10_1]
+		__index = function(arg_9_0, arg_9_1)
+			return var_8_0[arg_9_1]
 		end
 	})
 
-	local var_9_1 = ShipGroup.GetGroupConfig(self.id)
+	local var_8_1 = ShipGroup.GetGroupConfig(self.id)
 
-	assert(var_9_1, "can not find ship_data_group for group " .. self.id)
+	assert(var_8_1, "can not find ship_data_group for group " .. self.id)
 
 	self.groupConfig = setmetatable({}, {
-		__index = function(arg_11_0, arg_11_1)
-			return var_9_1[arg_11_1]
+		__index = function(arg_10_0, arg_10_1)
+			return var_8_1[arg_10_1]
 		end
 	})
 end
 
-function ShipGroup:getName(arg_12_1)
-	return (arg_12_1 and self.trans or nil) and pg.ship_skin_template[self.groupConfig.trans_skin].name
+function ShipGroup:getName(arg_11_1)
+	return (arg_11_1 and self.trans or nil) and pg.ship_skin_template[self.groupConfig.trans_skin].name
 end
 
 function ShipGroup:getNation()
 	return self.shipConfig.nationality
 end
 
-function ShipGroup:getRarity(arg_14_1)
-	local var_14_0 = self.shipConfig.rarity
+function ShipGroup:getRarity(arg_13_1)
+	local var_13_0 = self.shipConfig.rarity
 
-	if arg_14_1 and self.trans then
-		var_14_0 = var_14_0 + 1
+	if arg_13_1 and self.trans then
+		var_13_0 = var_13_0 + 1
 	end
 
-	return var_14_0
+	return var_13_0
 end
 
 function ShipGroup:getTeamType()
 	return ShipType.GetTeamFromShipType(self:getShipType())
 end
 
-function ShipGroup:getPainting(arg_16_1)
-	local var_16_0 = self.shipConfig.skin_id
+function ShipGroup:getPainting(arg_15_1)
+	local var_15_0 = self.shipConfig.skin_id
 
-	if arg_16_1 and self.trans then
-		var_16_0 = self.groupConfig.trans_skin
+	if arg_15_1 and self.trans then
+		var_15_0 = self.groupConfig.trans_skin
 	end
 
-	local var_16_1 = pg.ship_skin_template[var_16_0]
+	local var_15_1 = pg.ship_skin_template[var_15_0]
 
-	assert(pg.ship_skin_template[var_16_0], "ship_skin_template not exist: " .. var_16_0)
+	assert(pg.ship_skin_template[var_15_0], "ship_skin_template not exist: " .. var_15_0)
 
-	return var_16_1.painting
+	return var_15_1.painting
 end
 
-function ShipGroup:getPaintingId(arg_17_1)
-	return (arg_17_1 and self.trans or nil) and self.groupConfig.trans_skin
+function ShipGroup:getPaintingId(arg_16_1)
+	return (arg_16_1 and self.trans or nil) and self.groupConfig.trans_skin
 end
 
-function ShipGroup:getShipType(arg_18_1)
-	local var_18_0 = self.shipConfig.type
+function ShipGroup:getShipType(arg_17_1)
+	local var_17_0 = self.shipConfig.type
+
+	if arg_17_1 and self.trans then
+		local var_17_1 = Ship.getTransformShipId(self.shipConfig.id)
+
+		if var_17_1 then
+			var_17_0 = pg.ship_data_statistics[var_17_1].type
+		end
+	end
+
+	return var_17_0
+end
+
+function ShipGroup:getShipConfigId(arg_18_1)
+	local var_18_0 = self.shipConfig.id
 
 	if arg_18_1 and self.trans then
 		local var_18_1 = Ship.getTransformShipId(self.shipConfig.id)
 
 		if var_18_1 then
-			var_18_0 = pg.ship_data_statistics[var_18_1].type
+			var_18_0 = pg.ship_data_statistics[var_18_1].id
 		end
 	end
 
 	return var_18_0
-end
-
-function ShipGroup:getShipConfigId(arg_19_1)
-	local var_19_0 = self.shipConfig.id
-
-	if arg_19_1 and self.trans then
-		local var_19_1 = Ship.getTransformShipId(self.shipConfig.id)
-
-		if var_19_1 then
-			var_19_0 = pg.ship_data_statistics[var_19_1].id
-		end
-	end
-
-	return var_19_0
 end
 
 function ShipGroup:getSkinList()
@@ -201,29 +197,29 @@ function ShipGroup:getSkinList()
 end
 
 function ShipGroup:GetDisplayableSkinList()
-	local var_21_0 = {}
+	local var_20_0 = {}
 
-	local function var_21_1(arg_22_0)
-		return arg_22_0.skin_type ~= ShipSkin.SKIN_TYPE_OLD and (arg_22_0.skin_type == ShipSkin.SKIN_TYPE_NOT_HAVE_HIDE and not getProxy(ShipSkinProxy):hasSkin(arg_22_0.id) or false) or true
+	local function var_20_1(arg_21_0)
+		return arg_21_0.skin_type ~= ShipSkin.SKIN_TYPE_OLD and (arg_21_0.skin_type == ShipSkin.SKIN_TYPE_NOT_HAVE_HIDE and not getProxy(ShipSkinProxy):hasSkin(arg_21_0.id) or false) or true
 	end
 
-	local function var_21_2(arg_23_0)
-		return getProxy(ShipSkinProxy):InShowTime(arg_23_0)
+	local function var_20_2(arg_22_0)
+		return getProxy(ShipSkinProxy):InShowTime(arg_22_0)
 	end
 
-	for iter_21_0, iter_21_1 in ipairs(pg.ship_skin_template.all) do
-		if pg.ship_skin_template[iter_21_1].ship_group == self and pg.ship_skin_template[iter_21_1].no_showing ~= "1" and not var_21_1(pg.ship_skin_template[iter_21_1]) and var_21_2(pg.ship_skin_template[iter_21_1].id) then
-			table.insert(var_21_0, pg.ship_skin_template[iter_21_1])
+	for iter_20_0, iter_20_1 in ipairs(pg.ship_skin_template.all) do
+		if pg.ship_skin_template[iter_20_1].ship_group == self and pg.ship_skin_template[iter_20_1].no_showing ~= "1" and not var_20_1(pg.ship_skin_template[iter_20_1]) and var_20_2(pg.ship_skin_template[iter_20_1].id) then
+			table.insert(var_20_0, pg.ship_skin_template[iter_20_1])
 		end
 	end
 
-	for iter_21_2 = #var_21_0, 1, -1 do
-		if ShipSkin.GetChangeSkinGroupId(var_21_0[iter_21_2].id) and ShipSkin.GetChangeSkinIndex(var_21_0[iter_21_2].id) ~= 1 then
-			table.remove(var_21_0, iter_21_2)
+	for iter_20_2 = #var_20_0, 1, -1 do
+		if ShipSkin.GetChangeSkinGroupId(var_20_0[iter_20_2].id) and ShipSkin.GetChangeSkinIndex(var_20_0[iter_20_2].id) ~= 1 then
+			table.remove(var_20_0, iter_20_2)
 		end
 	end
 
-	return var_21_0
+	return var_20_0
 end
 
 function ShipGroup:getDefaultSkin()
@@ -242,16 +238,16 @@ function ShipGroup:getModSkin()
 	return nil
 end
 
-function ShipGroup:GetSkin(arg_27_1)
-	if not arg_27_1 then
+function ShipGroup:GetSkin(arg_26_1)
+	if not arg_26_1 then
 		return ShipGroup.getDefaultSkin(self.id)
 	else
 		return ShipGroup.getModSkin(self.id)
 	end
 end
 
-function ShipGroup:updateMaxIntimacy(arg_28_1)
-	self.maxIntimacy = math.max(arg_28_1, self.maxIntimacy)
+function ShipGroup:updateMaxIntimacy(arg_27_1)
+	self.maxIntimacy = math.max(arg_27_1, self.maxIntimacy)
 end
 
 function ShipGroup:updateMarriedFlag()
@@ -281,51 +277,51 @@ ShipGroup.CONDITION_CLEAR = 0
 ShipGroup.CONDITION_INTIMACY = 1
 ShipGroup.CONDITION_MARRIED = 2
 
-function ShipGroup:VoiceReplayCodition(arg_34_1)
-	local var_34_0 = true
-	local var_34_1 = ""
+function ShipGroup:VoiceReplayCodition(arg_33_1)
+	local var_33_0 = true
+	local var_33_1 = ""
 
 	if self:isBluePrintGroup() then
-		local var_34_2 = getProxy(TechnologyProxy):getBluePrintById(self.id)
+		local var_33_2 = getProxy(TechnologyProxy):getBluePrintById(self.id)
 
-		assert(var_34_2, "blueprint can not be nil >>" .. self.id)
+		assert(var_33_2, "blueprint can not be nil >>" .. self.id)
 
-		if not table.contains(var_34_2:getUnlockVoices(), arg_34_1.key) then
-			local var_34_3 = var_34_2:getUnlockLevel(arg_34_1.key)
+		if not table.contains(var_33_2:getUnlockVoices(), arg_33_1.key) then
+			local var_33_3 = var_33_2:getUnlockLevel(arg_33_1.key)
 
-			if var_34_3 > 0 then
-				var_34_0 = false
+			if var_33_3 > 0 then
+				var_33_0 = false
 
-				return false, i18n("ship_profile_voice_locked_design", var_34_3)
+				return false, i18n("ship_profile_voice_locked_design", var_33_3)
 			end
 		end
 	end
 
 	if self:isMetaGroup() then
-		local var_34_4 = getProxy(BayProxy):getMetaShipByGroupId(self.id):getMetaCharacter()
+		local var_33_4 = getProxy(BayProxy):getMetaShipByGroupId(self.id):getMetaCharacter()
 
-		if not table.contains(var_34_4:getUnlockedVoiceList(), arg_34_1.key) then
-			local var_34_5 = var_34_4:getUnlockVoiceRepairPercent(arg_34_1.key)
+		if not table.contains(var_33_4:getUnlockedVoiceList(), arg_33_1.key) then
+			local var_33_5 = var_33_4:getUnlockVoiceRepairPercent(arg_33_1.key)
 
-			if var_34_5 > 0 then
-				var_34_0 = false
+			if var_33_5 > 0 then
+				var_33_0 = false
 
-				return false, i18n("ship_profile_voice_locked_meta", var_34_5)
+				return false, i18n("ship_profile_voice_locked_meta", var_33_5)
 			end
 		end
 	end
 
-	if arg_34_1.unlock_condition[1] == ShipGroup.CONDITION_INTIMACY then
-		if self.maxIntimacy < arg_34_1.unlock_condition[2] then
-			var_34_0 = false
-			var_34_1 = i18n("ship_profile_voice_locked_intimacy", math.floor(arg_34_1.unlock_condition[2] / 100))
+	if arg_33_1.unlock_condition[1] == ShipGroup.CONDITION_INTIMACY then
+		if self.maxIntimacy < arg_33_1.unlock_condition[2] then
+			var_33_0 = false
+			var_33_1 = i18n("ship_profile_voice_locked_intimacy", math.floor(arg_33_1.unlock_condition[2] / 100))
 		end
-	elseif arg_34_1.unlock_condition[1] == ShipGroup.CONDITION_MARRIED and self.married == 0 then
-		var_34_0 = false
-		var_34_1 = self:IsXIdol() and i18n("ship_profile_voice_locked_propose_imas") or i18n("ship_profile_voice_locked_propose")
+	elseif arg_33_1.unlock_condition[1] == ShipGroup.CONDITION_MARRIED and self.married == 0 then
+		var_33_0 = false
+		var_33_1 = self:IsXIdol() and i18n("ship_profile_voice_locked_propose_imas") or i18n("ship_profile_voice_locked_propose")
 	end
 
-	return var_34_0, var_34_1
+	return var_33_0, var_33_1
 end
 
 function ShipGroup:GetMaxIntimacy()
@@ -333,8 +329,8 @@ function ShipGroup:GetMaxIntimacy()
 end
 
 function ShipGroup:isSpecialFilter()
-	for iter_36_0, iter_36_1 in ipairs(self.shipConfig.tag_list) do
-		if iter_36_1 == "special" then
+	for iter_35_0, iter_35_1 in ipairs(self.shipConfig.tag_list) do
+		if iter_35_1 == "special" then
 			return true
 		end
 	end
@@ -363,15 +359,15 @@ local var_0_2 = {
 	feeling1 = true
 }
 
-function ShipGroup:getIntimacyName(arg_40_1)
-	if not var_0_2[arg_40_1] then
+function ShipGroup:getIntimacyName(arg_39_1)
+	if not var_0_2[arg_39_1] then
 		return
 	end
 
 	if self:isMetaGroup() then
-		return i18n("meta_voice_name_" .. arg_40_1)
+		return i18n("meta_voice_name_" .. arg_39_1)
 	elseif self:IsXIdol() then
-		return i18n("idolmaster_voice_name_" .. arg_40_1)
+		return i18n("idolmaster_voice_name_" .. arg_39_1)
 	end
 end
 
@@ -393,16 +389,16 @@ function ShipGroup:CanUseShareSkin()
 	return self.groupConfig.share_group_id and #self.groupConfig.share_group_id > 0
 end
 
-function ShipGroup:rarity2bgPrint(arg_44_1)
-	return shipRarity2bgPrint(self:getRarity(arg_44_1), self:isBluePrintGroup(), self:isMetaGroup())
+function ShipGroup:rarity2bgPrint(arg_43_1)
+	return shipRarity2bgPrint(self:getRarity(arg_43_1), self:isBluePrintGroup(), self:isMetaGroup())
 end
 
-function ShipGroup:rarity2bgPrintForGet(arg_45_1, arg_45_2)
-	return skinId2bgPrint(arg_45_2 or self:GetSkin(arg_45_1).id) or self:rarity2bgPrint(arg_45_1)
+function ShipGroup:rarity2bgPrintForGet(arg_44_1, arg_44_2)
+	return skinId2bgPrint(arg_44_2 or self:GetSkin(arg_44_1).id) or self:rarity2bgPrint(arg_44_1)
 end
 
-function ShipGroup:setEquipCodes(arg_46_1)
-	self.equipCodes = arg_46_1
+function ShipGroup:setEquipCodes(arg_45_1)
+	self.equipCodes = arg_45_1
 end
 
 function ShipGroup:getEquipCodes()

@@ -31,7 +31,7 @@ function HeiYanPtPage:OnFirstFlush()
 			targets = self.ptData.targets,
 			level = self.ptData.level,
 			count = self.ptData.count,
-			resDrop = Drop.New(self.ptData:GetRes()),
+			resDrop = self.ptData:GetRes(),
 			unlockStamps = self.ptData:GetDayUnlockStamps()
 		})
 	end, SFX_PANEL)

@@ -32,42 +32,45 @@ function BillboardScene:getResource()
 	end
 
 	for iter_2_2, iter_2_3 in ipairs((getProxy(ActivityProxy):getActivitiesByType(ActivityConst.ACTIVITY_TYPE_PT_RANK))) do
-		if not iter_2_3:isEnd() and tonumber(iter_2_3:getConfig("config_data")) > 0 then
-			var_2_1((Drop.New({
-				type = DROP_TYPE_RESOURCE,
-				id = iter_2_3:getConfig("config_id")
-			}):getIcon()))
+		local var_2_2 = iter_2_3:getConfig("config_data")
+
+		if not iter_2_3:isEnd() then
+			local var_2_3 = iter_2_3:GetPTDrop()
+
+			if var_2_3 then
+				var_2_1(var_2_3:getIcon())
+			end
 		end
 	end
 
-	local var_2_2 = checkExist(self.contextData, {
+	local var_2_4 = checkExist(self.contextData, {
 		"page"
 	}) or PowerRank.TYPE_POWER
-	local var_2_3 = getProxy(BillboardProxy):getRankList(var_2_2, checkExist(self.contextData, {
+	local var_2_5 = getProxy(BillboardProxy):getRankList(var_2_4, checkExist(self.contextData, {
 		"act_id"
-	}) or checkExist(PowerRank:getActivityByRankType(var_2_2), {
+	}) or checkExist(PowerRank:getActivityByRankType(var_2_4), {
 		"id"
 	}))
 
-	for iter_2_4, iter_2_5 in ipairs(var_2_3 or {}) do
+	for iter_2_4, iter_2_5 in ipairs(var_2_5 or {}) do
 		var_2_1("emblem/" .. iter_2_5.arenaRank)
 		var_2_1("emblem/n_" .. iter_2_5.arenaRank)
 	end
 
-	if not var_2_3 then
+	if not var_2_5 then
 		for iter_2_6 = 1, #pg.arena_data_rank.all do
 			var_2_1("emblem/" .. iter_2_6)
 			var_2_1("emblem/n_" .. iter_2_6)
 		end
 	end
 
-	local var_2_4 = getProxy(MilitaryExerciseProxy):RawGetSeasonInfo()
+	local var_2_6 = getProxy(MilitaryExerciseProxy):RawGetSeasonInfo()
 
-	if var_2_4 then
-		local var_2_5 = SeasonInfo.getEmblem(var_2_4.score, var_2_4.rank)
+	if var_2_6 then
+		local var_2_7 = SeasonInfo.getEmblem(var_2_6.score, var_2_6.rank)
 
-		var_2_1("emblem/" .. var_2_5)
-		var_2_1("emblem/n_" .. var_2_5)
+		var_2_1("emblem/" .. var_2_7)
+		var_2_1("emblem/n_" .. var_2_7)
 	end
 
 	return table.insertto(var_2_0, BillboardScene.super.getResource(self))

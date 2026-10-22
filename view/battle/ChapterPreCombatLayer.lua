@@ -331,7 +331,7 @@ function ChapterPreCombatLayer:updateStageView(arg_33_1)
 		local var_33_5 = getProxy(ActivityProxy)
 
 		for iter_33_0 = #var_33_4, 1, -1 do
-			local var_33_6, var_33_7, var_33_8, var_33_9 = unpack(var_33_4)
+			local var_33_6, var_33_7, var_33_8, var_33_9 = unpack(var_33_4[iter_33_0])
 			local var_33_10 = var_33_5:getActivityById(var_33_6)
 
 			if var_33_10 and not var_33_10:isEnd() then

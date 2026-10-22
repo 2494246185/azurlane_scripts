@@ -7,7 +7,8 @@ function MainLeftPanel:GetBtns()
 		MainCameraBtn.New(findTF(self._tf, "cameraButton"), self.event),
 		MainWordBtn.New(findTF(self._tf, "wordBtn"), self.event),
 		MainChangeSkinBtn.New(findTF(self._tf, "changeBtn"), self.event),
-		MainL2dBoundBtn.New(findTF(self._tf, "l2d_bound"), self.event)
+		MainL2dBoundBtn.New(findTF(self._tf, "l2d_bound"), self.event),
+		MainPaintingLiteBtn.New(findTF(self._tf, "painting_lit"), self.event)
 	}
 end
 

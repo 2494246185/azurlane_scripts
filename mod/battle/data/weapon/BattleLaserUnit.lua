@@ -85,6 +85,7 @@ function BattleLaserUnit:DoAttack(arg_4_1)
 		end
 	end
 
+	self._host:CloakExpose(self._tmpData.expose)
 	var_0_0.Battle.PlayBattleSFX(self._tmpData.fire_sfx)
 	self:TriggerBuffOnFire()
 	self:CheckAndShake()

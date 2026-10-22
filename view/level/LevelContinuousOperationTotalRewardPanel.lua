@@ -10,6 +10,11 @@ end
 
 function LevelContinuousOperationTotalRewardPanel:didEnter()
 	LevelContinuousOperationTotalRewardPanel.super.didEnter(self)
+
+	if PlayerPrefs.GetInt(AUTO_BATTLE_LABEL, 0) > 0 then
+		pg.CriMgr.GetInstance():PlaySoundEffect_V3(SFX_AUTO_BATTLE)
+		LuaHelper.Vibrate()
+	end
 end
 
 function LevelContinuousOperationTotalRewardPanel:UpdateView()

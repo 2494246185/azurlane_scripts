@@ -345,7 +345,16 @@ function temp()
 			财 = {
 				富 = {
 					号 = {
-						this = true
+						this = true,
+						（ = {
+							前 = {
+								排 = {
+									） = {
+										this = true
+									}
+								}
+							}
+						}
 					}
 				}
 			},

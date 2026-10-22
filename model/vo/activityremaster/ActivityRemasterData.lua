@@ -180,56 +180,60 @@ function ActivityRemasterData:GetFurnitureTotalCnt()
 end
 
 function ActivityRemasterData:GetStartTime(arg_28_1)
-	return pg.TimeMgr.GetInstance():parseTimeFromConfig(pg.activity_re_timer[getProxy(ActivityRemasterProxy).actTimeID].timer[2])
+	return pg.TimeMgr.GetInstance():parseTimeFromConfig((self:GetStartTimeTable(arg_28_1)))
 end
 
-function ActivityRemasterData:GetActivityTimeDesc(arg_29_1, arg_29_2)
-	local var_29_0 = getProxy(ActivityRemasterProxy).actTimeID
-	local var_29_1
-
-	if not pg.activity_re_timer[var_29_0] then
-		return ""
-	end
-
-	for iter_29_0, iter_29_1 in ipairs((self:getConfig("act_time"))) do
-		if iter_29_1[1] == arg_29_1 then
-			var_29_1 = iter_29_1
-
-			break
-		end
-	end
-
-	if not var_29_1 then
-		return ""
-	end
-
-	local var_29_2 = getProxy(ActivityProxy):RawGetActivityById(arg_29_1)
-
-	if not var_29_2 or var_29_2:isEnd() then
-		return ""
-	end
-
-	local var_29_3 = string.split(pg.TimeMgr.GetInstance():STimeDescC(var_29_2.stopTime, "%Y/%m/%d/%H/%M/%S"), "/")
-
-	return GetActTimeDesc(arg_29_2, pg.activity_re_timer[var_29_0].is_maintain == ActivityRemasterData.MAINTAIN, pg.activity_re_timer[var_29_0].timer[2][1][2], pg.activity_re_timer[var_29_0].timer[2][1][3], var_29_3[2], var_29_3[3], var_29_3[4], var_29_3[5], var_29_3[6])
+function ActivityRemasterData:GetStartTimeTable(arg_29_1)
+	return pg.activity_re_timer[getProxy(ActivityRemasterProxy).actTimeID].timer[2]
 end
 
-function ActivityRemasterData:GetActivityTimeDescByBanner(arg_30_1, arg_30_2)
-	local var_30_0
+function ActivityRemasterData:GetActivityTimeDesc(arg_30_1, arg_30_2)
+	local var_30_0 = getProxy(ActivityRemasterProxy).actTimeID
+	local var_30_1
+
+	if not pg.activity_re_timer[var_30_0] then
+		return ""
+	end
 
 	for iter_30_0, iter_30_1 in ipairs((self:getConfig("act_time"))) do
-		if iter_30_1[3] == arg_30_1 then
-			var_30_0 = iter_30_1[1]
+		if iter_30_1[1] == arg_30_1 then
+			var_30_1 = iter_30_1
 
 			break
 		end
 	end
 
-	if not var_30_0 then
+	if not var_30_1 then
 		return ""
 	end
 
-	return self:GetActivityTimeDesc(var_30_0, arg_30_2)
+	local var_30_2 = getProxy(ActivityProxy):RawGetActivityById(arg_30_1)
+
+	if not var_30_2 or var_30_2:isEnd() then
+		return ""
+	end
+
+	local var_30_3 = string.split(pg.TimeMgr.GetInstance():STimeDescC(var_30_2.stopTime, "%Y/%m/%d/%H/%M/%S"), "/")
+
+	return GetActTimeDesc(arg_30_2, pg.activity_re_timer[var_30_0].is_maintain == ActivityRemasterData.MAINTAIN, pg.activity_re_timer[var_30_0].timer[2][1][2], pg.activity_re_timer[var_30_0].timer[2][1][3], var_30_3[2], var_30_3[3], var_30_3[4], var_30_3[5], var_30_3[6])
+end
+
+function ActivityRemasterData:GetActivityTimeDescByBanner(arg_31_1, arg_31_2)
+	local var_31_0
+
+	for iter_31_0, iter_31_1 in ipairs((self:getConfig("act_time"))) do
+		if iter_31_1[3] == arg_31_1 then
+			var_31_0 = iter_31_1[1]
+
+			break
+		end
+	end
+
+	if not var_31_0 then
+		return ""
+	end
+
+	return self:GetActivityTimeDesc(var_31_0, arg_31_2)
 end
 
 function ActivityRemasterData:GetName()

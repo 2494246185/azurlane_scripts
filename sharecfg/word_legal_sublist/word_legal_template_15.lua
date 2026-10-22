@@ -233,6 +233,27 @@ end
 temp()
 
 function temp()
+	var_0_0.铁 = {
+		角 = {
+			号 = {
+				this = true,
+				（ = {
+					前 = {
+						排 = {
+							） = {
+								this = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
 	var_0_0.兴 = {
 		登 = {
 			堡 = {
@@ -434,16 +455,6 @@ temp()
 function temp()
 	var_0_0["3"] = {
 		["3"] = {
-			this = true
-		}
-	}
-end
-
-temp()
-
-function temp()
-	var_0_0.久 = {
-		远 = {
 			this = true
 		}
 	}
