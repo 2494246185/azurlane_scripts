@@ -152,7 +152,7 @@ function PowerRank:getTitleWord(arg_6_1, arg_6_2)
 	end
 
 	if arg_6_1 == PowerRank.TYPE_PT then
-		var_6_0[4] = Item.getConfigData((id2ItemId((getProxy(ActivityProxy):getActivityById(arg_6_2):getConfig("config_id"))))).name
+		var_6_0[4] = getProxy(ActivityProxy):getActivityById(arg_6_2):GetPTDrop():getName()
 	end
 
 	return var_6_0
