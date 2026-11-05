@@ -38,4 +38,8 @@ function GraphApiHelper.IsUsingVulkan()
 	return string.find(string.lower((var_0_0.GetCurGraphApi())), "vulkan")
 end
 
+function GraphApiHelper.IsUsingOpenGL()
+	return string.find(string.lower(var_0_0.GetCurGraphApi() or ""), "opengl", 1, true) ~= nil
+end
+
 return GraphApiHelper

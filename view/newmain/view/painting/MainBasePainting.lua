@@ -36,7 +36,7 @@ function MainBasePainting:IsLoaded()
 end
 
 function MainBasePainting:SetOnceLoadedCall(arg_6_1)
-	self.loadedCallback = arg_6_1
+	return
 end
 
 function MainBasePainting:Load(arg_7_1)

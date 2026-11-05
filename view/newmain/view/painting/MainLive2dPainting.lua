@@ -322,7 +322,7 @@ function MainLive2dPainting:RemoveSeTimer()
 end
 
 function MainLive2dPainting:PlayChangeSkinActionIn(arg_25_1)
-	if self.live2dChar:IsLoaded() then
+	if self.live2dChar and self.live2dChar:IsLoaded() then
 		if self.live2dChar:checkActionExist("change_in") then
 			self:TriggerEvent("event_change_in")
 		else

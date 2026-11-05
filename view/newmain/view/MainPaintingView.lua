@@ -133,6 +133,7 @@ function MainPaintingView:MakePaintingFadeIn()
 
 		self._paintingManager:RevertPaintingContainer()
 		self._paintingManager:SetPaintingAlpha(1)
+		self.painting:OnPaintingFade(false)
 	else
 		self._paintingManager:SetPaintingFadeIn(function()
 			self.painting:OnPaintingFade(false)

@@ -1177,7 +1177,7 @@ function Live2DPainting:offsetL2dPositonDelay(arg_65_1, arg_65_2, arg_65_3)
 		LeanTween.cancel(go(self._tf))
 	end
 
-	self._tf.localPosition = Vector3(30000, 0, 0)
+	self._tf.localPosition = Vector3(60000, 0, 0)
 	self._animator.speed = arg_65_2
 
 	LeanTween.delayedCall(go(self._tf), arg_65_1, System.Action(function()

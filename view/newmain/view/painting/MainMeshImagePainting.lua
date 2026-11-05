@@ -45,6 +45,11 @@ function MainMeshImagePainting:OnLoad(arg_4_1)
 	local var_4_0 = self:GetPaintingName()
 
 	self:ClearScalePart()
+
+	if IsNil(self.container) then
+		return
+	end
+
 	LoadPaintingPrefabAsync(self.container, self.paintingName, var_4_0, "mainNormal", function(arg_5_0)
 		if self:IsExited() then
 			self:Unload()

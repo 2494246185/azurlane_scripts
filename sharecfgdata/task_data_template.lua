@@ -43521,7 +43521,6 @@ end)()
 		sub_type = 186,
 		task_fold = 0,
 		story_icon = "",
-		scene = "",
 		quick_finish = 0,
 		level = 10,
 		award_choice = "",
@@ -43558,6 +43557,9 @@ end)()
 				2,
 			},
 		},
+		scene = {
+			"LEVEL",
+		},
 	}
 end)()
 
@@ -43574,7 +43576,6 @@ end)()
 		sub_type = 185,
 		task_fold = 0,
 		story_icon = "",
-		scene = "",
 		quick_finish = 0,
 		level = 10,
 		award_choice = "",
@@ -43610,6 +43611,9 @@ end)()
 				59900,
 				5,
 			},
+		},
+		scene = {
+			"LEVEL",
 		},
 	}
 end)()
@@ -371870,7 +371874,6 @@ end)()
 		sub_type = 186,
 		task_fold = 0,
 		story_icon = "",
-		scene = "",
 		quick_finish = 0,
 		level = 1,
 		award_choice = "",
@@ -371897,6 +371900,9 @@ end)()
 				200,
 			},
 		},
+		scene = {
+			"LEVEL",
+		},
 	}
 end)()
 
@@ -371913,7 +371919,6 @@ end)()
 		sub_type = 185,
 		task_fold = 0,
 		story_icon = "",
-		scene = "",
 		quick_finish = 0,
 		level = 1,
 		award_choice = "",
@@ -371939,6 +371944,9 @@ end)()
 				660,
 				200,
 			},
+		},
+		scene = {
+			"LEVEL",
 		},
 	}
 end)()
