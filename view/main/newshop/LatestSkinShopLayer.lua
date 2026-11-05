@@ -1452,7 +1452,7 @@ function LatestSkinShopLayer:LoadMeshPainting(arg_85_1, arg_85_2)
 		self:CheckShowShopHx((arg_86_0.transform:Find("shop_hx")))
 		self:CheckShowShopHx((arg_86_0.transform:Find("shop_hx_ch" .. pg.SdkMgr.GetInstance():GetChannelUIDIncludeHarmony())))
 		self._paintingManager:SetOpacityPainting(tf(arg_86_0), PaintingFadeManager.PAINTING_TYPE.MESH)
-		self._paintingManager:RevertPaintingContainer(1)
+		self._paintingManager:RevertPaintingContainer()
 		self._paintingManager:SetPaintingAlpha(1)
 	end)
 end

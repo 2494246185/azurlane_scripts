@@ -61,6 +61,10 @@ function MainBasePainting:Load(arg_7_1)
 end
 
 function MainBasePainting:Unload()
+	if self.state == var_0_4 then
+		return
+	end
+
 	self.state = var_0_4
 
 	removeOnButton(self.container)

@@ -1,7 +1,7 @@
 local MainChangeSkinBtn = class("MainChangeSkinBtn", import(".MainBaseBtn"))
 
 function MainChangeSkinBtn:OnClick()
-	if self._clickTime and Time.realtimeSinceStartup - self._clickTime < 1 then
+	if self._clickTime and Time.realtimeSinceStartup - self._clickTime < 1.5 then
 		return
 	end
 

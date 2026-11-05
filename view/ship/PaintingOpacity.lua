@@ -25,25 +25,28 @@ function PaintingOpacity:step()
 		self._delayCallbackTime = self._delayCallbackTime - Time.deltaTime
 
 		if self._delayCallbackTime <= 0 then
-			if self._delayCallback then
-				self._delayCallback = nil
-
-				self._delayCallback()
-			end
-
-			self._delayCallbackTime = nil
+			self:InvokeDelayCallback()
 		end
 	end
 end
 
-function PaintingOpacity:ResizeRenderTexture(arg_4_1, arg_4_2)
-	if self._rt and self._rt.width == arg_4_1 and self._rt.height == arg_4_2 then
+function PaintingOpacity:InvokeDelayCallback()
+	self._delayCallback = nil
+	self._delayCallbackTime = nil
+
+	if self._delayCallback then
+		self._delayCallback()
+	end
+end
+
+function PaintingOpacity:ResizeRenderTexture(arg_5_1, arg_5_2)
+	if self._rt and self._rt.width == arg_5_1 and self._rt.height == arg_5_2 then
 		return
 	end
 
 	self:ClearRendererTexture()
 
-	self._rt = UnityEngine.RenderTexture.New(arg_4_1, arg_4_2, 0)
+	self._rt = UnityEngine.RenderTexture.New(arg_5_1, arg_5_2, 0)
 	self._camera.targetTexture = self._rt
 
 	if self._rawImage then
@@ -51,15 +54,15 @@ function PaintingOpacity:ResizeRenderTexture(arg_4_1, arg_4_2)
 	end
 end
 
-function PaintingOpacity:SetPaintingContainerOffset(arg_5_1, arg_5_2, arg_5_3)
-	self._meshContent.anchoredPosition = arg_5_3
-	self._spineContent.anchoredPosition = arg_5_2
-	self._live2dContent.anchoredPosition = arg_5_1
+function PaintingOpacity:SetPaintingContainerOffset(arg_6_1, arg_6_2, arg_6_3)
+	self._meshContent.anchoredPosition = arg_6_3
+	self._spineContent.anchoredPosition = arg_6_2
+	self._live2dContent.anchoredPosition = arg_6_1
 end
 
-function PaintingOpacity:SetContainerOffset(arg_6_1, arg_6_2)
-	self._paintingContainerTF.anchoredPosition = arg_6_1
-	self._paintingContainerTF.localScale = arg_6_2
+function PaintingOpacity:SetContainerOffset(arg_7_1, arg_7_2)
+	self._paintingContainerTF.anchoredPosition = arg_7_1
+	self._paintingContainerTF.localScale = arg_7_2
 end
 
 function PaintingOpacity:GetContainerTF()
@@ -71,73 +74,80 @@ function PaintingOpacity:GetSpinePaintingContainer()
 end
 
 function PaintingOpacity:DisablePainting()
-	if self._paintingTF then
-		SetParent(self._paintingTF, self._paintingPreParent, false)
+	print("disable painting")
 
-		self._paintingTF = nil
-		self._paintingPreParent = nil
+	if not IsNil(self._paintingTF) and not IsNil(self._paintingPreParent) then
+		SetParent(self._paintingTF, self._paintingPreParent, false)
 	end
+
+	self._paintingTF = nil
+	self._paintingPreParent = nil
+	self._paintingContent = nil
 end
 
-function PaintingOpacity:SetPaintingAlphaTween(arg_10_1, arg_10_2, arg_10_3)
-	if self._delayCallback then
-		self._delayCallback()
+function PaintingOpacity:SetPaintingAlphaTween(arg_11_1, arg_11_2, arg_11_3)
+	self:InvokeDelayCallback()
 
-		self._delayCallback = nil
-		self._delayCallbackTime = nil
+	if self._isDispose then
+		if arg_11_3 then
+			arg_11_3()
+		end
+
+		return
 	end
 
-	print("set painting alpha tween value = " .. arg_10_1 .. " time = " .. arg_10_2)
+	print("set painting alpha tween value = " .. arg_11_1 .. " time = " .. arg_11_2)
 
-	self._delayCallback = arg_10_3
-	self._delayCallbackTime = arg_10_2
+	self._delayCallback = arg_11_3
+	self._delayCallbackTime = arg_11_2
 
-	local var_10_0 = 0
+	local var_11_0 = 0
 
 	self:ClearAlphaTween()
 	self:SetPaitningAlphaContent()
-	LeanTween.value(self._go, self._rawImage.color.a, arg_10_1, arg_10_2):setEase(LeanTweenType.linear):setOnUpdate(System.Action_float(function(arg_11_0)
-		if var_10_0 > 0 then
-			self:SetRawImageAlpha(arg_11_0)
+	LeanTween.value(self._go, IsNil(self._rawImage) and arg_11_1 or self._rawImage.color.a, arg_11_1, arg_11_2):setEase(LeanTweenType.linear):setOnUpdate(System.Action_float(function(arg_12_0)
+		if var_11_0 > 0 then
+			self:SetRawImageAlpha(arg_12_0)
 		end
 
-		var_10_0 = var_10_0 + 1
+		var_11_0 = var_11_0 + 1
 	end)):setOnComplete(System.Action(function()
-		self:SetRawImageAlpha(arg_10_1)
+		self:SetRawImageAlpha(arg_11_1)
 
-		if arg_10_1 == 1 then
+		if arg_11_1 == 1 then
 			self:RevertPaintingContent()
 		end
 
-		if self._delayCallback then
-			self._delayCallback()
-
-			self._delayCallback = nil
-			self._delayCallbackTime = nil
-		end
+		self:InvokeDelayCallback()
 	end))
 end
 
 function PaintingOpacity:SetPaitningAlphaContent()
-	if self._paintingTF and self._paintingContent then
+	if not IsNil(self._paintingTF) and not IsNil(self._paintingContent) then
 		SetParent(self._paintingTF, self._paintingContent, false)
 	end
 end
 
 function PaintingOpacity:RevertPaintingContent()
-	if self._paintingTF and self._paintingPreParent then
+	if not IsNil(self._paintingTF) and not IsNil(self._paintingPreParent) then
 		SetParent(self._paintingTF, self._paintingPreParent, false)
 	end
 end
 
-function PaintingOpacity:SetRawImage(arg_15_1)
-	self._rawImage = arg_15_1
+function PaintingOpacity:SetRawImage(arg_16_1)
+	self._rawImage = arg_16_1
 	self._rawImage.texture = self._rt
 end
 
-function PaintingOpacity:SetRawImageAlpha(arg_16_1)
-	self._rawImage.color.a = Mathf.Clamp01(arg_16_1)
-	self._rawImage.color = self._rawImage.color
+function PaintingOpacity:SetRawImageAlpha(arg_17_1)
+	if IsNil(self._rawImage) then
+		return
+	end
+
+	local var_17_0 = self._rawImage.color
+
+	var_17_0.a = Mathf.Clamp01(arg_17_1)
+	self._rawImage.color = var_17_0
 end
 
 function PaintingOpacity:ClearAlphaTween()
@@ -146,42 +156,26 @@ function PaintingOpacity:ClearAlphaTween()
 	end
 end
 
-function PaintingOpacity:SetMeshPaintingFillter(arg_18_1)
-	local var_18_0 = GetOrAddComponent(self._meshContent, "PaintingScaler")
+function PaintingOpacity:SetMeshPaintingFillter(arg_19_1)
+	local var_19_0 = GetOrAddComponent(self._meshContent, "PaintingScaler")
 
-	var_18_0.FrameName = arg_18_1
-	var_18_0.Tween = 1
+	var_19_0.FrameName = arg_19_1
+	var_19_0.Tween = 1
 end
 
-function PaintingOpacity:SetMeshPainting(arg_19_1)
-	if arg_19_1 then
-		self._paintingTF = arg_19_1
-		self._paintingPreParent = arg_19_1.parent
-		self._paintingContent = self._meshContent
-
-		SetParent(arg_19_1, self._meshContent, false)
-	end
-
-	self:SetRawImageAlpha(1)
-end
-
-function PaintingOpacity:SetSpinePainting(arg_20_1)
+function PaintingOpacity:SetMeshPainting(arg_20_1)
 	if arg_20_1 then
 		self._paintingTF = arg_20_1
+		self._paintingPreParent = arg_20_1.parent
+		self._paintingContent = self._meshContent
 
-		if arg_20_1.parent then
-			self._paintingPreParent = arg_20_1.parent
-		end
-
-		self._paintingContent = self._spineContent
-
-		SetParent(arg_20_1, self._spineContent, false)
+		SetParent(arg_20_1, self._meshContent, false)
 	end
 
 	self:SetRawImageAlpha(1)
 end
 
-function PaintingOpacity:SetLive2DPainting(arg_21_1)
+function PaintingOpacity:SetSpinePainting(arg_21_1)
 	if arg_21_1 then
 		self._paintingTF = arg_21_1
 
@@ -189,9 +183,25 @@ function PaintingOpacity:SetLive2DPainting(arg_21_1)
 			self._paintingPreParent = arg_21_1.parent
 		end
 
+		self._paintingContent = self._spineContent
+
+		SetParent(arg_21_1, self._spineContent, false)
+	end
+
+	self:SetRawImageAlpha(1)
+end
+
+function PaintingOpacity:SetLive2DPainting(arg_22_1)
+	if arg_22_1 then
+		self._paintingTF = arg_22_1
+
+		if arg_22_1.parent then
+			self._paintingPreParent = arg_22_1.parent
+		end
+
 		self._paintingContent = self._live2dContent
 
-		SetParent(arg_21_1, self._live2dContent, false)
+		SetParent(arg_22_1, self._live2dContent, false)
 	end
 
 	self:SetRawImageAlpha(1)
@@ -215,11 +225,16 @@ function PaintingOpacity:GetCanvasTF()
 end
 
 function PaintingOpacity:Dispose()
-	if self._delayCallback then
-		self._delayCallback = nil
-
-		self._delayCallback()
+	if self._isDispose then
+		return
 	end
+
+	print("dispose opacity")
+
+	self._isDispose = true
+
+	self:DisablePainting()
+	self:InvokeDelayCallback()
 
 	if self.timer then
 		self.timer:Stop()

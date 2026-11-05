@@ -127,9 +127,17 @@ function MainPaintingView:MakePaintingFadeIn()
 	end
 
 	self._paintingManager:SetOpacityPainting(var_18_2, var_18_1)
-	self._paintingManager:SetPaintingFadeIn(function()
-		self.painting:OnPaintingFade(false)
-	end)
+
+	if self._firstPaintingLoading then
+		self._firstPaintingLoading = false
+
+		self._paintingManager:RevertPaintingContainer()
+		self._paintingManager:SetPaintingAlpha(1)
+	else
+		self._paintingManager:SetPaintingFadeIn(function()
+			self.painting:OnPaintingFade(false)
+		end)
+	end
 end
 
 function MainPaintingView:IsLive2DState()
@@ -153,6 +161,8 @@ function MainPaintingView:Init(arg_22_1, arg_22_2, arg_22_3)
 		for iter_22_0, iter_22_1 in pairs(self.paintings) do
 			iter_22_1:SetTargetContainer(self._paintingManager:GetPaintingContainer())
 		end
+
+		self._firstPaintingLoading = true
 	end
 
 	print("初始化舰船 = " .. arg_22_1:getPainting())
@@ -196,6 +206,10 @@ function MainPaintingView:Reload(arg_25_1)
 		print("开始加载舰船 = " .. self.ship:getPainting())
 
 		if self._loadingPainting then
+			if self._paintingManager then
+				self._paintingManager:DisablePainting()
+			end
+
 			self._loadingPainting:Unload()
 		end
 
@@ -232,15 +246,14 @@ function MainPaintingView:Refresh(arg_28_1, arg_28_2)
 end
 
 function MainPaintingView:Disable()
+	if self._paintingManager then
+		self._paintingManager:Dispose()
+
+		self._paintingManager = nil
+		self._paintingFadeFlag = false
+	end
+
 	if self.painting then
-		if self._paintingManager then
-			self._paintingManager:DisablePainting()
-			self._paintingManager:Dispose()
-
-			self._paintingManager = nil
-			self._paintingFadeFlag = false
-		end
-
 		self.painting:Pause()
 	end
 end
@@ -482,6 +495,11 @@ end
 
 function MainPaintingView:Dispose()
 	MainPaintingView.super.Dispose(self)
+
+	if self._paintingManager then
+		self._paintingManager:Dispose()
+	end
+
 	self:DisableDragAndZoom()
 
 	if self.painting then
@@ -489,13 +507,10 @@ function MainPaintingView:Dispose()
 	end
 
 	self.painting = nil
+	self._loadingPainting = nil
 
 	for iter_50_0, iter_50_1 in ipairs(self.paintings) do
 		iter_50_1:Dispose()
-	end
-
-	if self._paintingManager then
-		self._paintingManager:Dispose()
 	end
 
 	self.paintings = nil
