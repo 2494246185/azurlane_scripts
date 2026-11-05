@@ -1,0 +1,30 @@
+local BackYardExtendCard = class("BackYardExtendCard", import(".BackYardBaseCard"))
+
+function BackYardExtendCard:OnInit()
+	onButton(self, self._content, function()
+		self:Unlock()
+	end, SFX_PANEL)
+end
+
+function BackYardExtendCard:Unlock()
+	local var_3_0 = getProxy(DormProxy):getRawData():getExtendTrainPosShopId()
+
+	if var_3_0 then
+		local var_3_1 = ShopConst.GetShopConfig(var_3_0).resource_num
+
+		_BackyardMsgBoxMgr:Show({
+			content = i18n("backyard_backyardShipInfoLayer_quest_openPos", var_3_1),
+			onYes = function()
+				local var_4_0 = getProxy(PlayerProxy):getRawData()
+
+				if var_4_0 and var_4_0:getTotalGem() < var_3_1 then
+					GoShoppingMsgBox(i18n("switch_to_shop_tip_3", i18n("word_gem")), ChargeScene.TYPE_DIAMOND)
+				else
+					self:emit(NewBackYardShipInfoMediator.EXTEND, var_3_0, 1)
+				end
+			end
+		})
+	end
+end
+
+return BackYardExtendCard
