@@ -28,8 +28,19 @@ function BuildShipPoolsPage:getResource()
 	for iter_1_0, iter_1_1 in ipairs(getProxy(BuildShipProxy):GetPools() or {}) do
 		local var_1_5 = iter_1_1:getConfigTable()
 		local var_1_6 = iter_1_1:IsActivity() and var_1_4:getBuildActivityCfgByID(var_1_5.id) or var_1_4:getNoneActBuildActivityCfgByID(var_1_5.id)
+		local var_1_7
 
-		var_1_1(var_1_6 and var_1_6 and var_1_6.bg or ResPathSupport.CombinePath(ResPathSupport.ConstPath.BG.LoadingBG, "bg_" .. var_1_5.icon))
+		if var_1_6 then
+			var_1_7 = var_1_6 and var_1_6.bg
+
+			if HXSet.isHx() then
+				var_1_1(var_1_7 .. "_hx")
+			end
+		else
+			var_1_7 = ResPathSupport.CombinePath(ResPathSupport.ConstPath.BG.LoadingBG, "bg_" .. var_1_5.icon)
+		end
+
+		var_1_1(var_1_7)
 
 		local var_1_8 = var_1_4:getBuildPoolActivity(iter_1_1)
 
@@ -63,6 +74,10 @@ function BuildShipPoolsPage:getResource()
 	end
 
 	var_1_2(var_1_10 and var_1_10:getPainting())
+
+	if HXSet.isHx() then
+		var_1_2(pg.ship_skin_template[900284].painting)
+	end
 
 	return table.insertto(var_1_0, BuildShipPoolsPage.super.getResource(self))
 end
@@ -566,7 +581,9 @@ end
 function BuildShipPoolsPage:UpdateBuildPoolPaiting(arg_52_1)
 	local var_52_0
 
-	if self.buildPainting then
+	if HXSet.isHx() then
+		var_52_0 = pg.ship_skin_template[900284].painting
+	elseif self.buildPainting then
 		var_52_0 = self.buildPainting
 	elseif var_0_2(arg_52_1) then
 		local var_52_1 = pg.ship_data_statistics[pg.ship_data_create_exchange[arg_52_1:GetActivityId()].exchange_ship_id[1]]

@@ -12,6 +12,7 @@ function MainSequenceView:Ctor()
 		MainRequestActDataSequence.New(),
 		MainUrShipReFetchSequence.New(),
 		MainReFluxSequence.New(),
+		MainMaliVulkanWarningSequence.New(),
 		MainUrgencySceneSequence.New(),
 		MainEquipmentChangeSequence.New(),
 		MainServerNoticeSequence.New(),

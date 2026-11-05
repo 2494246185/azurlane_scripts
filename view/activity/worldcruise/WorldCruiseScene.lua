@@ -47,6 +47,10 @@ function WorldCruiseScene:getResource()
 		if pg.battlepass_event_pt[var_2_0.id] then
 			if noEmptyStr(pg.battlepass_event_pt[var_2_0.id].bg) then
 				table.insert(var_3_0, ResPathSupport.CombinePath(ResPathSupport.ConstPath.BG.Base, pg.battlepass_event_pt[var_2_0.id].bg))
+
+				if HXSet.isHx() then
+					table.insert(var_3_0, ResPathSupport.CombinePath(ResPathSupport.ConstPath.BG.Base, pg.battlepass_event_pt[var_2_0.id].bg) .. "_hx")
+				end
 			end
 
 			if noEmptyStr(pg.battlepass_event_pt[var_2_0.id].bg_tips) then

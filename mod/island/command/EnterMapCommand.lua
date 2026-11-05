@@ -9,8 +9,6 @@ function EnterMapCommand:execute(arg_1_1)
 		map_id = var_1_0.mapId
 	}, 21214, function(arg_2_0)
 		if arg_2_0.result == 0 then
-			getProxy(IslandProxy):SetSyncObjInitData(arg_2_0.object_list)
-
 			local var_2_0 = self:IsSelf(var_1_0.islandId)
 			local var_2_1
 
@@ -21,6 +19,7 @@ function EnterMapCommand:execute(arg_1_1)
 			var_2_1:GetWildCollectAgency():InitGatherData(arg_2_0, var_1_0.islandId, var_2_0)
 			var_2_1:GetVisitorAgency():InitMapVisitorList(var_1_0.mapId)
 			var_2_1:GetActivityNpcAgency():InitNpcList(arg_2_0.npc_list or {})
+			var_2_1:GetInteractSyncAgency():ApplyMapSnapshot(arg_2_0.object_list, var_1_0.mapId)
 			existCall(var_1_1)
 		else
 			pg.TipsMgr.GetInstance():ShowTips(ERROR_MESSAGE[arg_2_0.result] .. arg_2_0.result)

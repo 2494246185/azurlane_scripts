@@ -284,7 +284,14 @@ function NewMainClassicTheme:RegisterRedDots()
 	}, function(arg_39_0)
 		local var_39_0 = getProxy(EventProxy):hasFinishState()
 
-		var_39_0 = var_39_0 or LimitChallengeConst.IsShowRedPoint()
+		if not var_39_0 then
+			var_39_0 = LimitChallengeConst.IsShowRedPoint()
+
+			if not var_39_0 then
+				var_39_0 = getProxy(ChapterAutoProxy):IsAllCommissionFinish(ChapterAutoProxy.TYPE.WORLD)
+				var_39_0 = var_39_0 or getProxy(ChapterAutoProxy):IsShowTipInBattleUI()
+			end
+		end
 
 		setActive(arg_39_0, var_39_0)
 	end)

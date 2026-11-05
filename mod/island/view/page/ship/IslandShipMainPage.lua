@@ -329,6 +329,9 @@ function IslandShipMainPage:OnDestroy()
 end
 
 function IslandShipMainPage:OnHide()
+	self:ClosePage(IslandDockPage)
+	self:OnCloseDock()
+
 	if self.shipDressHelper then
 		self.shipDressHelper:Destroy()
 	end

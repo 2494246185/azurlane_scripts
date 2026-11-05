@@ -257,7 +257,7 @@ function PlayerProxy:IsShowCommssionTip()
 	local var_25_12 = CommissionMetaBossBtn.STATE_GET_AWARDS == var_25_11 or CommissionMetaBossBtn.STATE_FINSH_BATTLE == var_25_11
 	local var_25_13 = getProxy(ActivityProxy):getAliveActivityByType(ActivityConst.ACTIVITY_TYPE_PT_CRUSING)
 
-	return var_25_12 or var_25_0 or var_25_4 or var_25_5 or var_25_7 ~= 0 and var_25_6 > var_25_7 - 10 or var_25_8 or var_25_9 > 0 or var_25_10 > 0 or (var_25_13 and not var_25_13:isEnd() or nil) and #var_25_13:GetCrusingUnreceiveAward() > 0 or getProxy(ChapterAutoProxy):IsShowTip()
+	return var_25_12 or var_25_0 or var_25_4 or var_25_5 or var_25_7 ~= 0 and var_25_6 > var_25_7 - 10 or var_25_8 or var_25_9 > 0 or var_25_10 > 0 or (var_25_13 and not var_25_13:isEnd() or nil) and #var_25_13:GetCrusingUnreceiveAward() > 0 or getProxy(ChapterAutoProxy):IsShowTipInCommssionUI()
 end
 
 function PlayerProxy:SetDeviceMaxPlayerLevel()

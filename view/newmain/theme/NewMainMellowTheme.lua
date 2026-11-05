@@ -337,7 +337,11 @@ function NewMainMellowTheme:RegisterRedDots()
 
 		if not var_46_0 then
 			var_46_0 = LimitChallengeConst.IsShowRedPoint()
-			var_46_0 = var_46_0 or getProxy(ChapterAutoProxy):IsAllCommissionFinish(ChapterAutoProxy.TYPE.WORLD)
+
+			if not var_46_0 then
+				var_46_0 = getProxy(ChapterAutoProxy):IsAllCommissionFinish(ChapterAutoProxy.TYPE.WORLD)
+				var_46_0 = var_46_0 or getProxy(ChapterAutoProxy):IsShowTipInBattleUI()
+			end
 		end
 
 		setActive(arg_46_0, var_46_0)

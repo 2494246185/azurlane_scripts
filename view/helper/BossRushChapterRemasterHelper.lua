@@ -256,7 +256,7 @@ function BossRushChapterRemasterHelper:GetProgress()
 		local var_18_0 = pg.re_map_template[self] and getProxy(ActivityProxy):getActivityById(pg.re_map_template[self].activity_id)
 
 		if not var_18_0 then
-			return 0
+			return getProxy(ActivityPermanentProxy):GetActivityProgress(pg.re_map_template[self].activity_id)
 		end
 
 		local var_18_1 = 0

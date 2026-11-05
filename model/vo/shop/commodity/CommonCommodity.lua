@@ -46,17 +46,21 @@ function CommonCommodity:isDisCount()
 	end
 end
 
+function CommonCommodity:isShopDiscount()
+	return self:getConfig("discount") ~= 0 and CommonCommodity.InCommodityDiscountTime(self.id)
+end
+
 function CommonCommodity:GetDiscountEndTime()
-	local var_6_0, var_6_1 = unpack((self:getConfig("discount_time")))
-	local var_6_2, var_6_3, var_6_4 = unpack(var_6_1[1])
+	local var_7_0, var_7_1 = unpack((self:getConfig("discount_time")))
+	local var_7_2, var_7_3, var_7_4 = unpack(var_7_1[1])
 
 	return (pg.TimeMgr.GetInstance():Table2ServerTime({
-		year = var_6_2,
-		month = var_6_3,
-		day = var_6_4,
-		hour = var_6_1[2][1],
-		min = var_6_1[2][2],
-		sec = var_6_1[2][3]
+		year = var_7_2,
+		month = var_7_3,
+		day = var_7_4,
+		hour = var_7_1[2][1],
+		min = var_7_1[2][2],
+		sec = var_7_1[2][3]
 	}))
 end
 
@@ -64,19 +68,19 @@ function CommonCommodity:IsGroupSale()
 	return self.type == Goods.TYPE_MILITARY and self:getConfig("group") > 0 and self:getConfig("limit_args2")[1][1] == "purchase"
 end
 
-function CommonCommodity:IsShowWhenGroupSale(arg_8_1)
+function CommonCommodity:IsShowWhenGroupSale(arg_9_1)
 	if self:IsGroupSale() then
-		local var_8_0 = self:getConfig("limit_args2")[1]
-		local var_8_1 = var_8_0[2]
-		local var_8_2 = var_8_0[3]
+		local var_9_0 = self:getConfig("limit_args2")[1]
+		local var_9_1 = var_9_0[2]
+		local var_9_2 = var_9_0[3]
 
-		if arg_8_1 == var_8_0[3] and var_8_2 == self:getConfig("group_limit") then
+		if arg_9_1 == var_9_0[3] and var_9_2 == self:getConfig("group_limit") then
 			return true
 		end
 
-		arg_8_1 = arg_8_1 + 1
+		arg_9_1 = arg_9_1 + 1
 
-		return var_8_1 <= arg_8_1 and arg_8_1 <= var_8_2
+		return var_9_1 <= arg_9_1 and arg_9_1 <= var_9_2
 	end
 
 	return true
@@ -87,20 +91,19 @@ function CommonCommodity:GetOwnedCnt()
 end
 
 function CommonCommodity:GetPrice()
-	local var_10_0 = self:getConfig("resource_num")
-	local var_10_1 = 0
+	local var_11_0 = self:getConfig("resource_num")
+	local var_11_1 = var_11_0
+	local var_11_2 = 0
 
-	if self:isDisCount() then
-		if self:IsItemDiscountType() then
-			var_10_0 = SkinCouponActivity.GetBestReadySkinCouponAct(self.id):GetNewPrice(var_10_0)
-			var_10_1 = (var_10_0 - var_10_0) * 100 / var_10_0
-		else
-			var_10_1 = self:getConfig("discount")
-			var_10_0 = var_10_0 * (100 - var_10_1) / 100
-		end
+	if self:isShopDiscount() then
+		var_11_2 = self:getConfig("discount")
+		var_11_0 = var_11_1 * (100 - var_11_2) / 100
+	elseif self:isDisCount() and self:IsItemDiscountType() then
+		var_11_0 = SkinCouponActivity.GetBestReadySkinCouponAct(self.id):GetNewPrice(var_11_1)
+		var_11_2 = (var_11_1 - var_11_0) * 100 / var_11_1
 	end
 
-	return var_10_0, var_10_1, var_10_0
+	return var_11_0, var_11_2, var_11_1
 end
 
 function CommonCommodity:GetName()
@@ -112,11 +115,11 @@ function CommonCommodity:GetResType()
 end
 
 function CommonCommodity:GetResIcon()
-	local var_13_0 = self:GetResType()
+	local var_14_0 = self:GetResType()
 
-	if var_13_0 == 4 or var_13_0 == 14 then
+	if var_14_0 == 4 or var_14_0 == 14 then
 		return "diamond"
-	elseif var_13_0 == 1 then
+	elseif var_14_0 == 1 then
 		return "gold"
 	end
 end
@@ -141,13 +144,13 @@ function CommonCommodity:ExistExclusiveDiscountItem()
 	return #getProxy(BagProxy):GetExclusiveDiscountItem4Shop(self.id) > 0
 end
 
-function CommonCommodity:StaticCanUseVoucherType(arg_18_1)
-	if #arg_18_1 <= 0 then
+function CommonCommodity:StaticCanUseVoucherType(arg_19_1)
+	if #arg_19_1 <= 0 then
 		return false
 	end
 
-	for iter_18_0, iter_18_1 in ipairs(arg_18_1) do
-		if iter_18_1:CanUseForShop(self.id) then
+	for iter_19_0, iter_19_1 in ipairs(arg_19_1) do
+		if iter_19_1:CanUseForShop(self.id) then
 			return true
 		end
 	end
@@ -156,21 +159,21 @@ function CommonCommodity:StaticCanUseVoucherType(arg_18_1)
 end
 
 function CommonCommodity:GetVoucherIdList()
-	local var_19_0 = {}
+	local var_20_0 = {}
 
-	for iter_19_0, iter_19_1 in pairs((getProxy(BagProxy):GetSkinShopDiscountItemList())) do
-		if iter_19_1:CanUseForShop(self.id) then
-			table.insert(var_19_0, iter_19_1.id)
+	for iter_20_0, iter_20_1 in pairs((getProxy(BagProxy):GetSkinShopDiscountItemList())) do
+		if iter_20_1:CanUseForShop(self.id) then
+			table.insert(var_20_0, iter_20_1.id)
 		end
 	end
 
-	return var_19_0
+	return var_20_0
 end
 
 function CommonCommodity:getLimitCount()
-	for iter_20_0, iter_20_1 in ipairs(self:getConfig("limit_args") or {}) do
-		if iter_20_1[1] == "time" then
-			return iter_20_1[2]
+	for iter_21_0, iter_21_1 in ipairs(self:getConfig("limit_args") or {}) do
+		if iter_21_1[1] == "time" then
+			return iter_21_1[2]
 		end
 	end
 
@@ -185,20 +188,20 @@ function CommonCommodity:GetDiscountItem()
 	return nil
 end
 
-function CommonCommodity:isLevelLimit(arg_22_1, arg_22_2)
-	local var_22_0, var_22_1 = self:getLevelLimit()
+function CommonCommodity:isLevelLimit(arg_23_1, arg_23_2)
+	local var_23_0, var_23_1 = self:getLevelLimit()
 
-	if arg_22_2 and var_22_1 then
+	if arg_23_2 and var_23_1 then
 		return false
 	end
 
-	return var_22_0 > 0 and arg_22_1 < var_22_0
+	return var_23_0 > 0 and arg_23_1 < var_23_0
 end
 
 function CommonCommodity:getLevelLimit()
-	for iter_23_0, iter_23_1 in ipairs((self:getConfig("limit_args"))) do
-		if type(iter_23_1) == "table" and iter_23_1[1] == "level" then
-			return iter_23_1[2], iter_23_1[3]
+	for iter_24_0, iter_24_1 in ipairs((self:getConfig("limit_args"))) do
+		if type(iter_24_1) == "table" and iter_24_1[1] == "level" then
+			return iter_24_1[2], iter_24_1[3]
 		end
 	end
 
@@ -287,20 +290,20 @@ function CommonCommodity:getDropInfo()
 end
 
 function CommonCommodity:GetDropList()
-	local var_33_0 = {}
-	local var_33_1 = Item.getConfigData(self:getConfig("effect_args")[1]).display_icon
+	local var_34_0 = {}
+	local var_34_1 = Item.getConfigData(self:getConfig("effect_args")[1]).display_icon
 
-	if type(var_33_1) == "table" then
-		for iter_33_0, iter_33_1 in ipairs(var_33_1) do
-			table.insert(var_33_0, {
-				type = iter_33_1[1],
-				id = iter_33_1[2],
-				count = iter_33_1[3]
+	if type(var_34_1) == "table" then
+		for iter_34_0, iter_34_1 in ipairs(var_34_1) do
+			table.insert(var_34_0, {
+				type = iter_34_1[1],
+				id = iter_34_1[2],
+				count = iter_34_1[3]
 			})
 		end
 	end
 
-	return var_33_0
+	return var_34_0
 end
 
 function CommonCommodity:IsGroupLimit()
@@ -308,40 +311,40 @@ function CommonCommodity:IsGroupLimit()
 		return false
 	end
 
-	local var_34_0 = self:getConfig("group_limit")
-	local var_34_2
+	local var_35_0 = self:getConfig("group_limit")
+	local var_35_2
 
-	if var_34_0 > 0 then
-		if var_34_0 > (self.groupCount or 0) then
-			var_34_2 = false
+	if var_35_0 > 0 then
+		if var_35_0 > (self.groupCount or 0) then
+			var_35_2 = false
 
-			goto label_34_0
+			goto label_35_0
 		end
 	end
 
-	::label_34_0::
+	::label_35_0::
 
 	return true
 end
 
 function CommonCommodity:GetLimitDesc()
-	local var_35_0 = self:getLimitCount()
+	local var_36_0 = self:getLimitCount()
 
-	if var_35_0 > 0 then
-		return i18n("charge_limit_all", var_35_0 - self:getBuyCount(), var_35_0)
+	if var_36_0 > 0 then
+		return i18n("charge_limit_all", var_36_0 - self:getBuyCount(), var_36_0)
 	end
 
-	local var_35_1 = self:getConfig("group_limit")
+	local var_36_1 = self:getConfig("group_limit")
 
-	if var_35_1 > 0 then
-		local var_35_2 = self:getConfig("group_type") or 0
+	if var_36_1 > 0 then
+		local var_36_2 = self:getConfig("group_type") or 0
 
-		if var_35_2 == 1 then
-			return i18n("charge_limit_daily", var_35_1 - self.groupCount, var_35_1)
-		elseif var_35_2 == 2 then
-			return i18n("charge_limit_weekly", var_35_1 - self.groupCount, var_35_1)
-		elseif var_35_2 == 3 then
-			return i18n("charge_limit_monthly", var_35_1 - self.groupCount, var_35_1)
+		if var_36_2 == 1 then
+			return i18n("charge_limit_daily", var_36_1 - self.groupCount, var_36_1)
+		elseif var_36_2 == 2 then
+			return i18n("charge_limit_weekly", var_36_1 - self.groupCount, var_36_1)
+		elseif var_36_2 == 3 then
+			return i18n("charge_limit_monthly", var_36_1 - self.groupCount, var_36_1)
 		end
 	end
 
@@ -368,10 +371,10 @@ end
 
 function CommonCommodity:isTip()
 	if self:isGiftPackage() or self:isActGiftPackage() then
-		local var_38_0 = self:getConfig("akashi_pick") > 0 and "payshop_pack_red_dot" or "gemshop_pack_red_dot"
-		local var_38_1, var_38_2 = unpack(getGameset(var_38_0))
+		local var_39_0 = self:getConfig("akashi_pick") > 0 and "payshop_pack_red_dot" or "gemshop_pack_red_dot"
+		local var_39_1, var_39_2 = unpack(getGameset(var_39_0))
 
-		if PlayerPrefs.GetInt(var_38_0, 0) ~= var_38_1 and table.contains(var_38_2[1], self.id) then
+		if PlayerPrefs.GetInt(var_39_0, 0) ~= var_39_1 and table.contains(var_39_2[1], self.id) then
 			return true
 		end
 

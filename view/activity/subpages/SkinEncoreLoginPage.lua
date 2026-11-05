@@ -67,37 +67,42 @@ function SkinEncoreLoginPage:OnFirstFlush()
 	end
 
 	onButton(self, self.rtSkinCoupon:Find("icon/get"), function()
-		self:emit(ActivityMediator.EVENT_OPERATION, {
-			cmd = 1,
-			activity_id = self.activity.id
+		pg.MsgboxMgr.GetInstance():ShowMsgBox({
+			content = i18n("shop_new_coupon_tip3"),
+			onYes = function()
+				self:emit(ActivityMediator.EVENT_OPERATION, {
+					cmd = 1,
+					activity_id = self.activity.id
+				})
+			end
 		})
 	end, SFX_CONFIRM)
 end
 
 function SkinEncoreLoginPage:OnUpdateFlush()
-	for iter_11_0, iter_11_1 in ipairs(self.taskGroup) do
-		local var_11_0 = self.taskProxy:getTaskVO(iter_11_1[1]) or Task.New({
-			id = iter_11_1[1]
+	for iter_12_0, iter_12_1 in ipairs(self.taskGroup) do
+		local var_12_0 = self.taskProxy:getTaskVO(iter_12_1[1]) or Task.New({
+			id = iter_12_1[1]
 		})
-		local var_11_1 = self.rtLogin:GetChild(iter_11_0 - 1)
-		local var_11_2 = var_11_0:isReceive()
+		local var_12_1 = self.rtLogin:GetChild(iter_12_0 - 1)
+		local var_12_2 = var_12_0:isReceive()
 
-		setActive(var_11_1:Find("got"), var_11_2 or iter_11_0 < self.nday)
-		setActive(var_11_1:Find("get"), not false and not var_11_2 and iter_11_0 == self.nday)
+		setActive(var_12_1:Find("got"), var_12_2 or iter_12_0 < self.nday)
+		setActive(var_12_1:Find("get"), not false and not var_12_2 and iter_12_0 == self.nday)
 
-		local var_11_3 = false or isActive(var_11_1:Find("get"))
+		local var_12_3 = false or isActive(var_12_1:Find("get"))
 	end
 
-	local var_11_4 = Drop.New({
+	local var_12_4 = Drop.New({
 		type = 8,
 		id = self.couponItemId,
 		count = self.couponGet
 	})
 
 	onButton(self, self.rtSkinCoupon:Find("icon"), function()
-		self:emit(BaseUI.ON_DROP, var_11_4)
+		self:emit(BaseUI.ON_DROP, var_12_4)
 	end, SFX_CONFIRM)
-	updateDrop(self.rtSkinCoupon:Find("icon/IconTpl"), var_11_4)
+	updateDrop(self.rtSkinCoupon:Find("icon/IconTpl"), var_12_4)
 	setActive(self.rtSkinCoupon:Find("icon/get"), self.couponGet > 0)
 	setText(self.rtSkinCoupon:Find("count"), i18n("SkinDiscount_Got", self:GetCouponCountText()))
 	setActive(self.rtSkinCoupon:Find("icon/get"), self.couponGet > 0)

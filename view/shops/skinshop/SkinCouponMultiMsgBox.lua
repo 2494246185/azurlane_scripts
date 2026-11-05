@@ -35,6 +35,13 @@ function SkinCouponMultiMsgBox:OnLoaded()
 
 	setText(self._tf:Find("window/frame/option/nonuse/Text"), i18n("skin_shop_nonuse_label"))
 	setText(self._tf:Find("window/frame/option/use/Text"), i18n("skin_shop_use_label"))
+
+	self.uiTipBar2 = self._tf:Find("window/frame/tipBar2")
+
+	setText(self.uiTipBar2:Find("Text"), i18n("shop_new_only_use_one_coupon"))
+	setActive(self.uiTipBar2, false)
+	setActive(self.tipBar, false)
+	setActive(self.nonUseBtn, false)
 end
 
 function SkinCouponMultiMsgBox:RegisterBtn(arg_3_1)
@@ -57,6 +64,10 @@ function SkinCouponMultiMsgBox:RegisterBtn(arg_3_1)
 		self:Hide()
 	end, SFX_PANEL)
 	onButton(self, self.switchBtn, function()
+		if SkinCouponActivity.GetSkinCouponTotalCnt(arg_3_1.commodityID) <= 1 then
+			return
+		end
+
 		self:UpdateStyle(1 - self.style)
 	end, SFX_PANEL)
 	onButton(self, self.confirmBtn, function()
@@ -114,23 +125,33 @@ end
 function SkinCouponMultiMsgBox:UpdateItem(arg_14_1)
 	self.itemTrs = {}
 
-	local var_14_0 = arg_14_1.itemList
-
-	UIItemList.StaticAlign(self._tf:Find("window/frame/scrollrect/list"), self._tf:Find("window/frame/left"), #arg_14_1.itemList, function(arg_15_0, arg_15_1, arg_15_2)
+	UIItemList.StaticAlign(self._tf:Find("window/frame/scrollrect/list"), self._tf:Find("window/frame/left"), #arg_14_1.itemList + #arg_14_1.unuseItemList, function(arg_15_0, arg_15_1, arg_15_2)
 		if arg_15_0 == UIItemList.EventUpdate then
-			self:FlushItem(var_14_0[arg_15_1 + 1], arg_15_2)
+			if arg_15_1 + 1 <= #arg_14_1.itemList then
+				self:FlushItem(arg_14_1.itemList[arg_15_1 + 1], arg_15_2, true)
+			else
+				self:FlushItem(arg_14_1.unuseItemList[arg_15_1 + 1 - #arg_14_1.itemList], arg_15_2, false)
+			end
 		end
 	end)
 end
 
-function SkinCouponMultiMsgBox:FlushItem(arg_16_1, arg_16_2)
+function SkinCouponMultiMsgBox:FlushItem(arg_16_1, arg_16_2, arg_16_3)
 	updateDrop(arg_16_2, arg_16_1.drop)
-	setText(arg_16_2:Find("name_bg/Text"), arg_16_1.drop:getName())
-	onToggle(self, arg_16_2, function(arg_17_0)
-		if arg_17_0 then
-			self.selectedItem = arg_16_1
-		end
-	end, SFX_PANEL)
+	setScrollText(arg_16_2:Find("name_bg/Text"), arg_16_1.drop:getName())
+
+	if arg_16_3 then
+		setActive(arg_16_2:Find("lock"), false)
+		onToggle(self, arg_16_2, function(arg_17_0)
+			if arg_17_0 then
+				self.selectedItem = arg_16_1
+			end
+		end, SFX_PANEL)
+		setToggleEnabled(arg_16_2, true)
+	else
+		setToggleEnabled(arg_16_2, false)
+		setActive(arg_16_2:Find("lock"), true)
+	end
 
 	self.itemTrs[arg_16_1] = arg_16_2
 end
@@ -159,6 +180,7 @@ function SkinCouponMultiMsgBox:UpdateStyle(arg_20_1)
 	setActive(self.discountPriceBtn, arg_20_1 == var_0_1 and self.prevSelected)
 	setActive(self.confirmBtn, arg_20_1 == var_0_2)
 	setActive(self.scrollrect, arg_20_1 == var_0_2)
+	setActive(self.uiTipBar2, arg_20_1 == var_0_2)
 	triggerToggle(self.itemTrs[self:GetDefaultItem()], true)
 
 	self.style = arg_20_1
@@ -191,8 +213,6 @@ function SkinCouponMultiMsgBox:SetTipText(arg_22_1)
 			end
 		end
 	end
-
-	setActive(self.tipBar, var_22_1)
 
 	if var_22_1 then
 		local var_22_2 = ""

@@ -130,17 +130,35 @@ function FormationSuggestionShipInfoScene:didEnter()
 		end
 	end)
 	self.skillList:align(#var_5_0.skill_lv)
+
+	local var_5_6 = pg.ship_data_group[pg.ship_data_group.get_id_list_by_group_type[var_5_1:getGroupId()][1]].description
+
 	self.obtainList:make(function(arg_7_0, arg_7_1, arg_7_2)
 		if arg_7_0 == UIItemList.EventUpdate then
-			local var_7_0 = var_5_0.source[arg_7_1 + 1]
+			local var_7_0 = var_5_6[arg_7_1 + 1]
 
-			setScrollText(findTF(arg_7_2, "text/text"), i18n("formation_suggestion_info_obtain", var_5_0.source[arg_7_1 + 1][2]))
-			onButton(self, findTF(arg_7_2, "goBtn"), function()
-				self:emit(FormationSuggestionShipInfoMediator.JUMP_TO_SCENE, var_7_0[1])
-			end)
+			setScrollText(findTF(arg_7_2, "text/text"), i18n("formation_suggestion_info_obtain", HXSet.hxLan(var_5_6[arg_7_1 + 1][1])))
+
+			local var_7_1 = findTF(arg_7_2, "goBtn")
+			local var_7_2 = var_7_0[2][1] == ""
+
+			setGray(var_7_1, var_7_0[2][1] == "")
+
+			if not var_7_2 then
+				onButton(self, var_7_1, function()
+					if var_7_0[2][1] == "" then
+						return
+					end
+
+					self:emit(FormationSuggestionShipInfoMediator.JUMP_TO_SCENE, {
+						sceneData = var_7_0[2],
+						activityID = var_7_0[3]
+					})
+				end, SFX_PANEL)
+			end
 		end
 	end)
-	self.obtainList:align(#var_5_0.source)
+	self.obtainList:align(#var_5_6)
 end
 
 function FormationSuggestionShipInfoScene:willExit()

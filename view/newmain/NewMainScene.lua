@@ -21,6 +21,7 @@ NewMainScene.EXIT_SILENT_VIEW = "NewMainScene.EXIT_SILENT_VIEW"
 NewMainScene.L2D_BOUND_CHANGE = "NewMainScene.L2D_BOUND_CHANGE"
 NewMainScene.STORY_BEGIN = "NewMainScene.STORY_BEGIN"
 NewMainScene.STORY_END = "NewMainScene.STORY_END"
+NewMainScene.PAINTING_LOAD_COMPLETE = "NewMainScene.PAINTING_LOAD_COMPLETE"
 NewMainScene.RESET_L2D = "NewMainScene.RESET_L2D"
 
 function NewMainScene:getUIName()

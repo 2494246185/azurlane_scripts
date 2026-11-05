@@ -45,7 +45,7 @@ function MainMeshImagePainting:OnLoad(arg_4_1)
 	local var_4_0 = self:GetPaintingName()
 
 	self:ClearScalePart()
-	LoadPaintingPrefabAsync(self.container, self.paintingName, var_4_0, "mainNormal", function()
+	LoadPaintingPrefabAsync(self.container, self.paintingName, var_4_0, "mainNormal", function(arg_5_0)
 		if self:IsExited() then
 			self:Unload()
 
@@ -53,14 +53,14 @@ function MainMeshImagePainting:OnLoad(arg_4_1)
 		end
 
 		self.loadPaintingName = var_4_0
+		self._paintingGO = arg_5_0
 
 		self:InitSpecialDrag((self:InitSpecialTouch()))
 
 		if self.expression then
-			ShipExpressionHelper.UpdateExpression(findTF(self.container, "fitter"):GetChild(0), self.paintingName, self.expression)
+			ShipExpressionHelper.UpdateExpression(self._paintingGO, self.paintingName, self.expression)
 		end
 
-		self:Breath()
 		self:InitScalePart()
 		arg_4_1()
 	end)
@@ -68,9 +68,7 @@ end
 
 function MainMeshImagePainting:GetCenterPos()
 	if self:IsLoaded() then
-		local var_6_0 = self.container:Find("fitter"):GetChild(0)
-
-		return (var_6_0:TransformPoint(var_6_0.localPosition + Vector3((0.5 - var_6_0.pivot.x) * var_6_0.sizeDelta.x, 0, 0)))
+		return (self._paintingGO:TransformPoint(self._paintingGO.localPosition + Vector3((0.5 - self._paintingGO.pivot.x) * self._paintingGO.sizeDelta.x, 0, 0)))
 	else
 		return MainMeshImagePainting.super.GetCenterPos(self)
 	end
@@ -93,7 +91,7 @@ function MainMeshImagePainting:PlayChangeSkinActionOut(arg_8_1)
 end
 
 function MainMeshImagePainting:InitSpecialTouch()
-	local var_9_0 = findTF(findTF(self.container, "fitter"):GetChild(0), "Touch")
+	local var_9_0 = findTF(self._paintingGO, "Touch")
 
 	if not var_9_0 then
 		return
@@ -116,7 +114,7 @@ function MainMeshImagePainting:InitSpecialTouch()
 end
 
 function MainMeshImagePainting:InitSpecialDrag(arg_12_1)
-	local var_12_0 = findTF(findTF(self.container, "fitter"):GetChild(0), "Drag")
+	local var_12_0 = findTF(self._paintingGO, "Drag")
 
 	if not var_12_0 then
 		return
@@ -252,7 +250,7 @@ function MainMeshImagePainting:ClearSpecialDrag()
 		return
 	end
 
-	local var_26_0 = findTF(findTF(self.container, "fitter"):GetChild(0), "Drag")
+	local var_26_0 = findTF(self._paintingGO, "Drag")
 
 	if not var_26_0 then
 		return
@@ -283,7 +281,7 @@ function MainMeshImagePainting:OnLongPress()
 end
 
 function MainMeshImagePainting:OnDisplayWorld(arg_29_1)
-	local var_29_0, var_29_1 = ShipExpressionHelper.SetExpression(findTF(self.container, "fitter"):GetChild(0), self.paintingName, arg_29_1, self.ship:getCVIntimacy(), self.ship:getSkinId())
+	local var_29_0, var_29_1 = ShipExpressionHelper.SetExpression(self._paintingGO, self.paintingName, arg_29_1, self.ship:getCVIntimacy(), self.ship:getSkinId())
 
 	self.expression = var_29_1
 end
@@ -296,71 +294,71 @@ function MainMeshImagePainting:OnTriggerEventAuto()
 	self:Shake(MainMeshImagePainting.CHAT_HEIGHT, MainMeshImagePainting.CHAT_DURATION)
 end
 
-function MainMeshImagePainting:GetMeshPainting()
-	local var_32_0 = findTF(self.container, "fitter")
-
-	if var_32_0.childCount <= 0 then
-		return nil
-	end
-
-	return (var_32_0:GetChild(0))
-end
-
-function MainMeshImagePainting:Shake(arg_33_1, arg_33_2, arg_33_3)
-	local var_33_0 = arg_33_1
+function MainMeshImagePainting:Shake(arg_32_1, arg_32_2, arg_32_3)
+	local var_32_0 = arg_32_1
 
 	if nil then
-		var_33_0 = arg_33_1 - MainMeshImagePainting.DEFAULT_HEIGHT + nil
+		var_32_0 = arg_32_1 - MainMeshImagePainting.DEFAULT_HEIGHT + nil
 	end
 
-	arg_33_3 = arg_33_3 or math.random(3) - 1
+	arg_32_3 = arg_32_3 or math.random(3) - 1
 
-	if arg_33_3 == 0 then
+	if arg_32_3 == 0 then
 		return
 	end
 
-	local var_33_1 = self:GetMeshPainting()
+	local var_32_1 = self._paintingGO
 
-	if not var_33_1 then
+	if not self._paintingGO then
 		return
 	end
 
-	LeanTween.cancel(go(var_33_1))
-	LeanTween.moveY(rtf(var_33_1), var_33_0, 0.1):setLoopPingPong(arg_33_3):setOnComplete(System.Action(function()
+	LeanTween.cancel(go(var_32_1))
+	LeanTween.moveY(rtf(var_32_1), var_32_0, 0.1):setLoopPingPong(arg_32_3):setOnComplete(System.Action(function()
 		self:Breath()
 	end))
 end
 
 function MainMeshImagePainting:Breath()
-	local var_35_0 = self:GetMeshPainting()
-
-	if not var_35_0 then
+	if not self._paintingGO then
 		return
 	end
 
-	local var_35_1
-	local var_35_2 = var_35_1 or MainMeshImagePainting.BREATH_HEIGHT
-	local var_35_3
+	print("start breath")
 
-	if var_35_1 then
-		var_35_3 = var_35_1 - 10 or MainMeshImagePainting.DEFAULT_HEIGHT
+	local var_34_0 = nil or MainMeshImagePainting.BREATH_HEIGHT
+	local var_34_1
+
+	if nil then
+		var_34_1 = nil - 10 or MainMeshImagePainting.DEFAULT_HEIGHT
 	end
 
-	LeanTween.cancel(go(var_35_0))
-	LeanTween.moveY(rtf(var_35_0), var_35_3, MainMeshImagePainting.BREATH_DURATION):setLoopPingPong():setEase(LeanTweenType.easeInOutCubic):setFrom(var_35_2)
+	LeanTween.cancel(go(self._paintingGO))
+	LeanTween.moveY(rtf(self._paintingGO), var_34_1, MainMeshImagePainting.BREATH_DURATION):setLoopPingPong():setEase(LeanTweenType.easeInOutCubic):setFrom(var_34_0)
 end
 
 function MainMeshImagePainting:StopBreath()
-	local var_36_0 = self:GetMeshPainting()
-
-	if not var_36_0 then
+	if not self._paintingGO then
 		return
 	end
 
-	LeanTween.cancel(go(var_36_0))
+	print("stop breath")
+	LeanTween.cancel(go(self._paintingGO))
 end
 
-function MainMeshImagePainting:OnEnableOrDisableDragAndZoom(arg_37_1)
+function MainMeshImagePainting:OnEnableOrDisableDragAndZoom(arg_36_1)
+	if arg_36_1 then
+		self:StopBreath()
+	else
+		self:Breath()
+	end
+end
+
+function MainMeshImagePainting:OnPaintingFade(arg_37_1)
+	if not self:IsLoaded() then
+		return
+	end
+
 	if arg_37_1 then
 		self:StopBreath()
 	else
@@ -369,7 +367,7 @@ function MainMeshImagePainting:OnEnableOrDisableDragAndZoom(arg_37_1)
 end
 
 function MainMeshImagePainting:GetPaintingTransform()
-	return self:GetMeshPainting()
+	return tf(self._paintingGO)
 end
 
 function MainMeshImagePainting:GetPartScaleData()
@@ -391,8 +389,9 @@ function MainMeshImagePainting:GetOffset()
 end
 
 function MainMeshImagePainting:OnResume()
-	checkCullResume(self.container:Find("fitter"):GetChild(0))
+	checkCullResume(self._paintingGO)
 	self:Breath()
+	self:emit(NewMainScene.PAINTING_LOAD_COMPLETE)
 end
 
 function MainMeshImagePainting:Unload()
@@ -402,11 +401,14 @@ function MainMeshImagePainting:Unload()
 end
 
 function MainMeshImagePainting:OnUnload()
-	self:StopBreath()
 	self:ClearSpecialDrag()
 
-	if self.loadPaintingName then
-		retPaintingPrefab(self.container, self.loadPaintingName)
+	if self.loadPaintingName and self._paintingGO then
+		if self._paintingGO.transform.parent.parent then
+			retPaintingPrefab(self._paintingGO.transform.parent.parent, self.loadPaintingName)
+		else
+			Destroy(self._paintingGO)
+		end
 
 		self.loadPaintingName = nil
 	end

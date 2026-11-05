@@ -96,6 +96,7 @@ function NewShipLayer:init()
 	self._viewBtn = self._left:Find("view_btn")
 	self._evaluationBtn = self._left:Find("evaluation_btn")
 	self._shareBtn = self._left:Find("share_btn")
+	self._displayBtn = self._shake:Find("display_ship_toggle")
 	self.audioBtn = self._shake:Find("property_btn")
 	self.clickTF = self._shake:Find("click")
 	self.npc = self._tf:Find("shake_panel/npc")
@@ -111,6 +112,7 @@ function NewShipLayer:init()
 	setActive(self._skipButton, self.contextData.canSkipBatch)
 	setActive(self._left, true)
 	setActive(self.audioBtn, true)
+	setText(self._displayBtn:Find("bg/Text"), i18n("display_ship_get_repeat"))
 	pg.UIMgr.GetInstance():OverlayPanel(self._tf)
 
 	self.metaRepeatTF = self.rarityTF:Find("MetaRepeat")
@@ -155,6 +157,8 @@ function NewShipLayer:setShip(arg_14_1)
 
 	self._shipVO = arg_14_1
 	self.isRemoulded = arg_14_1:isRemoulded()
+
+	triggerToggle(self._displayBtn, PlayerPrefs.GetInt(DISPLAY_SHIP_GET_EFFECT) == 1)
 
 	local var_14_0 = arg_14_1:isBluePrintShip()
 
@@ -594,6 +598,19 @@ function NewShipLayer:didEnter()
 			self:emit(NewShipMediator.ON_SKIP_BATCH, self.contextData.skipBatchType or NewShipMediator.SKIP_TYPE.BUILD)
 		end)
 	end, SFX_PANEL)
+	onToggle(self, self._displayBtn, function(arg_47_0)
+		if PlayerPrefs.GetInt(DISPLAY_SHIP_GET_EFFECT) == arg_47_0 then
+			return
+		end
+
+		SettingsOtherPanel.OnCommonSwitchByKey(DISPLAY_SHIP_GET_EFFECT, arg_47_0)
+
+		if arg_47_0 then
+			pg.TipsMgr.GetInstance():ShowTips(i18n("trun_on_display_ship_get_repeat"))
+		else
+			pg.TipsMgr.GetInstance():ShowTips(i18n("trun_off_display_ship_get_repeat"))
+		end
+	end, SFX_CONFIRM)
 	pg.CriMgr.GetInstance():PlaySoundEffect_V3(SFX_UI_DOCKYARD_CHARGET)
 	pg.SystemGuideMgr.GetInstance():Play(self)
 end
@@ -616,92 +633,92 @@ function NewShipLayer:onBackPressed()
 end
 
 function NewShipLayer:paintView()
-	local var_48_0 = {}
+	local var_49_0 = {}
 
 	while 0 < self._shake.childCount do
-		local var_48_1 = self._shake:GetChild(0)
+		local var_49_1 = self._shake:GetChild(0)
 
-		if var_48_1.gameObject.activeSelf and var_48_1 ~= self._paintingTF and var_48_1 ~= self._bg and var_48_1 ~= self._drag then
-			var_48_0[#var_48_0 + 1] = var_48_1
+		if var_49_1.gameObject.activeSelf and var_49_1 ~= self._paintingTF and var_49_1 ~= self._bg and var_49_1 ~= self._drag then
+			var_49_0[#var_49_0 + 1] = var_49_1
 
-			setActive(var_48_1, false)
+			setActive(var_49_1, false)
 		end
 	end
 
 	setActive(self._paintingShadowTF, false)
 	openPortrait()
 
-	local var_48_3 = self._paintingTF
-	local var_48_4 = self._paintingTF.anchoredPosition.x
-	local var_48_5 = self._paintingTF.anchoredPosition.y
-	local var_48_6 = self._tf.rect.width / UnityEngine.Screen.width
-	local var_48_7 = self._tf.rect.height / UnityEngine.Screen.height
-	local var_48_8 = self._paintingTF.rect.width / 2
-	local var_48_9 = self._paintingTF.rect.height / 2
-	local var_48_10
-	local var_48_11
+	local var_49_3 = self._paintingTF
+	local var_49_4 = self._paintingTF.anchoredPosition.x
+	local var_49_5 = self._paintingTF.anchoredPosition.y
+	local var_49_6 = self._tf.rect.width / UnityEngine.Screen.width
+	local var_49_7 = self._tf.rect.height / UnityEngine.Screen.height
+	local var_49_8 = self._paintingTF.rect.width / 2
+	local var_49_9 = self._paintingTF.rect.height / 2
+	local var_49_10
+	local var_49_11
 
 	if not LeanTween.isTweening(go(self._paintingTF)) then
 		self:AddLeanTween(function()
-			return LeanTween.moveX(rtf(var_48_3), 150, 0.5):setEase(LeanTweenType.easeInOutSine)
+			return LeanTween.moveX(rtf(var_49_3), 150, 0.5):setEase(LeanTweenType.easeInOutSine)
 		end)
 	end
 
-	local var_48_12 = GetOrAddComponent(self._drag, "MultiTouchZoom")
+	local var_49_12 = GetOrAddComponent(self._drag, "MultiTouchZoom")
 
-	var_48_12:SetZoomTarget(self._paintingTF)
+	var_49_12:SetZoomTarget(self._paintingTF)
 
-	local var_48_13 = GetOrAddComponent(self._drag, "EventTriggerListener")
+	local var_49_13 = GetOrAddComponent(self._drag, "EventTriggerListener")
 
-	self.dragTrigger = var_48_13
+	self.dragTrigger = var_49_13
 
-	local var_48_14 = true
+	local var_49_14 = true
 
-	var_48_12.enabled = true
-	var_48_13.enabled = true
+	var_49_12.enabled = true
+	var_49_13.enabled = true
 
-	local var_48_15 = false
+	local var_49_15 = false
 
-	var_48_13:AddPointDownFunc(function(arg_50_0)
+	var_49_13:AddPointDownFunc(function(arg_51_0)
 		if Input.touchCount == 1 or IsUnityEditor then
-			var_48_15 = true
-			var_48_14 = true
+			var_49_15 = true
+			var_49_14 = true
 		elseif Input.touchCount >= 2 then
-			var_48_14 = false
-			var_48_15 = false
+			var_49_14 = false
+			var_49_15 = false
 		end
 	end)
-	var_48_13:AddPointUpFunc(function(arg_51_0)
+	var_49_13:AddPointUpFunc(function(arg_52_0)
 		if Input.touchCount <= 2 then
-			var_48_14 = true
+			var_49_14 = true
 		end
 	end)
-	var_48_13:AddBeginDragFunc(function(arg_52_0, arg_52_1)
-		var_48_15 = false
-		var_48_10 = arg_52_1.position.x * var_48_6 - var_48_8 - tf(self._paintingTF).localPosition.x
-		var_48_11 = arg_52_1.position.y * var_48_7 - var_48_9 - tf(self._paintingTF).localPosition.y
+	var_49_13:AddBeginDragFunc(function(arg_53_0, arg_53_1)
+		var_49_15 = false
+		var_49_10 = arg_53_1.position.x * var_49_6 - var_49_8 - tf(self._paintingTF).localPosition.x
+		var_49_11 = arg_53_1.position.y * var_49_7 - var_49_9 - tf(self._paintingTF).localPosition.y
 	end)
-	var_48_13:AddDragFunc(function(arg_53_0, arg_53_1)
-		if var_48_14 then
-			local var_53_0 = tf(self._paintingTF).localPosition
+	var_49_13:AddDragFunc(function(arg_54_0, arg_54_1)
+		if var_49_14 then
+			local var_54_0 = tf(self._paintingTF).localPosition
 
-			tf(self._paintingTF).localPosition = Vector3(arg_53_1.position.x * var_48_6 - var_48_8 - var_48_10, arg_53_1.position.y * var_48_7 - var_48_9 - var_48_11, -22)
+			tf(self._paintingTF).localPosition = Vector3(arg_54_1.position.x * var_49_6 - var_49_8 - var_49_10, arg_54_1.position.y * var_49_7 - var_49_9 - var_49_11, -22)
 		end
 	end)
 	onButton(self, self._drag, function()
 		self:hidePaintView()
 	end, SFX_CANCEL)
 
-	function NewShipLayer:hidePaintView(arg_55_1)
-		if not arg_55_1 and not var_48_15 then
+	function NewShipLayer:hidePaintView(arg_56_1)
+		if not arg_56_1 and not var_49_15 then
 			return
 		end
 
-		var_48_13.enabled = false
-		var_48_12.enabled = false
+		var_49_13.enabled = false
+		var_49_12.enabled = false
 
-		for iter_55_0, iter_55_1 in ipairs(var_48_0) do
-			setActive(iter_55_1, true)
+		for iter_56_0, iter_56_1 in ipairs(var_49_0) do
+			setActive(iter_56_1, true)
 		end
 
 		setActive(self._paintingShadowTF, true)
@@ -711,8 +728,8 @@ function NewShipLayer:paintView()
 		self._paintingTF.localScale = Vector3(1, 1, 1)
 
 		setAnchoredPosition(self._paintingTF, {
-			x = var_48_4,
-			y = var_48_5
+			x = var_49_4,
+			y = var_49_5
 		})
 
 		self.isInView = false
@@ -739,86 +756,86 @@ function NewShipLayer:starsAnimation()
 
 	setActive(self.starsCont, false)
 
-	local var_57_0 = self._tf:GetComponent(typeof(DftAniEvent))
+	local var_58_0 = self._tf:GetComponent(typeof(DftAniEvent))
 
-	var_57_0:SetTriggerEvent(function(arg_58_0)
+	var_58_0:SetTriggerEvent(function(arg_59_0)
 		self:AddLeanTween(function()
 			return LeanTween.scale(rtf(self.starsCont), Vector3.one, 0):setOnComplete(System.Action(function()
 				setActive(self.starsCont, true)
 			end))
 		end)
 
-		local var_58_0 = self.STAR_ANIMATION_DUR1
+		local var_59_0 = self.STAR_ANIMATION_DUR1
 
-		for iter_58_0 = 0, self.starsCont.childCount - 1 do
-			local var_58_1 = self.starsCont:GetChild(iter_58_0)
-			local var_58_2 = var_58_1:Find("star_empty")
-			local var_58_3 = var_58_1:Find("star")
+		for iter_59_0 = 0, self.starsCont.childCount - 1 do
+			local var_59_1 = self.starsCont:GetChild(iter_59_0)
+			local var_59_2 = var_59_1:Find("star_empty")
+			local var_59_3 = var_59_1:Find("star")
 
-			setActive(var_58_2, false)
-			setActive(var_58_3, false)
+			setActive(var_59_2, false)
+			setActive(var_59_3, false)
 
-			local var_58_4 = iter_58_0 * self.STAR_ANIMATION_DUR1
+			local var_59_4 = iter_59_0 * self.STAR_ANIMATION_DUR1
 
 			self:AddLeanTween(function()
-				return LeanTween.scale(rtf(var_58_2), Vector3(1.8, 1.8, 1.8), 0):setDelay(var_58_4):setOnComplete(System.Action(function()
-					setActive(var_58_2, true)
+				return LeanTween.scale(rtf(var_59_2), Vector3(1.8, 1.8, 1.8), 0):setDelay(var_59_4):setOnComplete(System.Action(function()
+					setActive(var_59_2, true)
 					self:AddLeanTween(function()
-						return LeanTween.scale(rtf(var_58_2), Vector3(1, 1, 1), var_58_0)
+						return LeanTween.scale(rtf(var_59_2), Vector3(1, 1, 1), var_59_0)
 					end)
 				end))
 			end)
 		end
 
-		local var_58_5 = self.STAR_ANIMATION_DUR2
-		local var_58_6 = self.STAR_ANIMATION_DUR3
+		local var_59_5 = self.STAR_ANIMATION_DUR2
+		local var_59_6 = self.STAR_ANIMATION_DUR3
 
-		for iter_58_1 = 0, self._shipVO:getStar() - 1 do
-			local var_58_7 = self.starsCont:GetChild(iter_58_1)
-			local var_58_8 = var_58_7:Find("star_empty")
-			local var_58_9 = var_58_7:Find("star")
-			local var_58_10 = self.STAR_ANIMATION_DUR1 * self.starsCont.childCount + iter_58_1 * self.STAR_ANIMATION_DUR2
+		for iter_59_1 = 0, self._shipVO:getStar() - 1 do
+			local var_59_7 = self.starsCont:GetChild(iter_59_1)
+			local var_59_8 = var_59_7:Find("star_empty")
+			local var_59_9 = var_59_7:Find("star")
+			local var_59_10 = self.STAR_ANIMATION_DUR1 * self.starsCont.childCount + iter_59_1 * self.STAR_ANIMATION_DUR2
 
 			self:AddLeanTween(function()
-				return LeanTween.scale(rtf(var_58_9), Vector3(1.8, 1.8, 1.8), 0):setDelay(var_58_10):setOnStart(System.Action(function()
+				return LeanTween.scale(rtf(var_59_9), Vector3(1.8, 1.8, 1.8), 0):setDelay(var_59_10):setOnStart(System.Action(function()
 					pg.CriMgr.GetInstance():PlaySoundEffect_V3(SFX_UI_DOCKYARD_STAR)
 				end)):setOnComplete(System.Action(function()
-					setActive(var_58_8, false)
-					setActive(var_58_9, true)
+					setActive(var_59_8, false)
+					setActive(var_59_9, true)
 					self:AddLeanTween(function()
-						return LeanTween.scale(rtf(var_58_9), Vector3(1, 1, 1), var_58_5)
+						return LeanTween.scale(rtf(var_59_9), Vector3(1, 1, 1), var_59_5)
 					end)
 				end))
 			end)
 
-			local var_58_11 = var_58_7:Find("light")
+			local var_59_11 = var_59_7:Find("light")
 
-			if var_58_11 then
+			if var_59_11 then
 				self:AddLeanTween(function()
-					return LeanTween.delayedCall(var_58_10, System.Action(function()
+					return LeanTween.delayedCall(var_59_10, System.Action(function()
 						if self.exited then
 							return
 						end
 
-						setActive(var_58_11, true)
+						setActive(var_59_11, true)
 					end))
 				end)
 				self:AddLeanTween(function()
-					return LeanTween.alpha(rtf(var_58_11), 0, var_58_6):setDelay(var_58_10):setOnComplete(System.Action(function()
-						SetActive(var_58_11, false)
-						LeanTween.alpha(rtf(var_58_11), 1, 0)
+					return LeanTween.alpha(rtf(var_59_11), 0, var_59_6):setDelay(var_59_10):setOnComplete(System.Action(function()
+						SetActive(var_59_11, false)
+						LeanTween.alpha(rtf(var_59_11), 1, 0)
 					end))
 				end)
 
-				var_58_11.transform.localScale = Vector3(1, 1, 1)
+				var_59_11.transform.localScale = Vector3(1, 1, 1)
 
 				self:AddLeanTween(function()
-					return LeanTween.scale(rtf(var_58_11), Vector3(0.5, 1, 1), self.STAR_ANIMATION_DUR4):setDelay(var_58_10 + var_58_6 * 1 / 3)
+					return LeanTween.scale(rtf(var_59_11), Vector3(0.5, 1, 1), self.STAR_ANIMATION_DUR4):setDelay(var_59_10 + var_59_6 * 1 / 3)
 				end)
 			end
 		end
 	end)
-	var_57_0:SetEndEvent(function(arg_73_0)
+	var_58_0:SetEndEvent(function(arg_74_0)
 		if self._shipVO:getReMetaSpecialItemVO() then
 			GetComponent(self.metaRepeatTF, "CanvasGroup").alpha = 1
 
@@ -831,9 +848,9 @@ function NewShipLayer:starsAnimation()
 
 				setActive(self.npc, self._shipVO:isActivityNpc())
 				setActive(self._shade, false)
-			end, go(self.metaRepeatTF), self.metaRepeatTF.rect.width, 0, 1):setOnUpdate(System.Action_float(function(arg_75_0)
+			end, go(self.metaRepeatTF), self.metaRepeatTF.rect.width, 0, 1):setOnUpdate(System.Action_float(function(arg_76_0)
 				setAnchoredPosition(self.metaRepeatTF, {
-					x = arg_75_0
+					x = arg_76_0
 				})
 			end))
 			setAnchoredPosition(self.metaRepeatTF, {
@@ -849,11 +866,11 @@ function NewShipLayer:starsAnimation()
 	end)
 end
 
-function NewShipLayer:playOpening(arg_76_1)
+function NewShipLayer:playOpening(arg_77_1)
 	if self._shipVO:isMetaShip() then
 		if not getProxy(ContextProxy):getContextByMediator(BuildShipMediator) then
-			if arg_76_1 then
-				arg_76_1()
+			if arg_77_1 then
+				arg_77_1()
 			end
 
 			return
@@ -864,16 +881,16 @@ function NewShipLayer:playOpening(arg_76_1)
 		pg.CpkPlayMgr.GetInstance():PlayCpkMovie(function()
 			return
 		end, function()
-			if arg_76_1 then
-				arg_76_1()
+			if arg_77_1 then
+				arg_77_1()
 			end
 		end, "ui/skinunlockanim", "star_level_unlock_anim_" .. (self._shipVO:isRemoulded() and ShipGroup.GetGroupConfig(self._shipVO:getGroupId()).trans_skin or ShipGroup.getDefaultSkin(self._shipVO:getGroupId()).id), true, false)
-	elseif arg_76_1 then
-		arg_76_1()
+	elseif arg_77_1 then
+		arg_77_1()
 	end
 end
 
-function NewShipLayer:ClearTweens(arg_79_1)
+function NewShipLayer:ClearTweens(arg_80_1)
 	self:cleanManagedTween(true)
 end
 
@@ -890,9 +907,9 @@ function NewShipLayer:willExit()
 		PoolMgr.GetInstance():ReturnUI(self.metaName, self.metaBg)
 	end
 
-	for iter_80_0, iter_80_1 in pairs(self.rarityEffect) do
-		if iter_80_1 then
-			PoolMgr.GetInstance():ReturnUI("getrole_" .. iter_80_0, iter_80_1)
+	for iter_81_0, iter_81_1 in pairs(self.rarityEffect) do
+		if iter_81_1 then
+			PoolMgr.GetInstance():ReturnUI("getrole_" .. iter_81_0, iter_81_1)
 		end
 	end
 

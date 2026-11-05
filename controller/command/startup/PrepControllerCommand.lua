@@ -616,6 +616,7 @@ function PrepControllerCommand:execute(arg_1_1)
 	self.facade:registerCommand(GAME.ISLAND_EXCHANGE_ITEM, IslandExchangeItemCommand)
 	self.facade:registerCommand(GAME.ISLAND_SYNC_DATA, IslandSyncCommand)
 	self.facade:registerCommand(GAME.ISLAND_SYNC_CONTROL, IslandSyncControlCommand)
+	self.facade:registerCommand(GAME.ISLAND_HEART_BEAT, IslandHeartBeatCommand)
 	self.facade:registerCommand(GAME.ISLAND_RECONNECT, IslandReconnectCommand)
 	self.facade:registerCommand(GAME.ISLAND_ENTER, EnterIslandCommand)
 	self.facade:registerCommand(GAME.ISLAND_CHANGE_ENTER, ChangeToIslandCommand)
@@ -736,6 +737,7 @@ function PrepControllerCommand:execute(arg_1_1)
 	self.facade:registerCommand(GAME.REVERSE_PACMAN_PASS_LEVEL, ReversePacmanPassLevelCommand)
 	self.facade:registerCommand(GAME.ACT_REMASTER_ACTIVE, ActiveActReamsterCommand)
 	self.facade:registerCommand(GAME.JUMP_TO_SCENE, JumpToSceneCommand)
+	self.facade:registerCommand(GAME.RECORD_ACTIVITY_PERMANENT_PROGRESS, RecordActivityPermanentProgressCommand)
 end
 
 return PrepControllerCommand

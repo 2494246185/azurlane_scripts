@@ -2,7 +2,6 @@ local Live2dConst = class("Live2dConst")
 
 Live2dConst.l2d_bound_open = false
 Live2dConst.l2d_arm_32 = false
-Live2dConst.UnLoadL2dPating = nil
 Live2dConst.PAINTING_BGM_VOLUME = "painting_bgm_volume"
 
 function Live2dConst:SaveL2dIdle(arg_1_1, arg_1_2)

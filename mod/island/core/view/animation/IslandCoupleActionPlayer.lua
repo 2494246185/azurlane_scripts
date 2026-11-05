@@ -2,6 +2,8 @@ local IslandCoupleActionPlayer = class("IslandCoupleActionPlayer", import("..Isl
 local var_0_1 = 0
 local var_0_2 = 1
 local var_0_3 = 2
+local var_0_4 = 0
+local var_0_5 = 1
 
 function IslandCoupleActionPlayer:Ctor(arg_1_1)
 	IslandCoupleActionPlayer.super.Ctor(self, arg_1_1)
@@ -94,7 +96,7 @@ function IslandCoupleActionPlayer:Play(arg_5_1, arg_5_2, arg_5_3)
 				return
 			end
 
-			self:Face2Face(var_5_1, arg_5_2, arg_5_1, arg_8_0)
+			self:Face2Face(arg_5_3, var_5_1, arg_5_2, arg_5_1, arg_8_0)
 		end,
 		function(arg_9_0)
 			if not self.playing then
@@ -225,19 +227,27 @@ function IslandCoupleActionPlayer:OnNavigateToPointFailed()
 	pg.TipsMgr.GetInstance():ShowTips(i18n("island_no_position_to_reponse_action"))
 end
 
-function IslandCoupleActionPlayer:Face2Face(arg_19_1, arg_19_2, arg_19_3, arg_19_4)
-	arg_19_3._go.transform.rotation = Quaternion.Euler(0, Quaternion.LookRotation(arg_19_2._go.transform.position - arg_19_3._go.transform.position).eulerAngles.y, 0)
-	arg_19_2._go.transform.rotation = arg_19_1 * arg_19_2._go.transform.rotation
+function IslandCoupleActionPlayer:Face2Face(arg_19_1, arg_19_2, arg_19_3, arg_19_4, arg_19_5)
+	local var_19_0 = arg_19_4._go.transform
+	local var_19_1 = arg_19_3._go.transform
+
+	if arg_19_1.respond_dir == var_0_4 then
+		var_19_0.rotation = Quaternion.Euler(0, Quaternion.LookRotation(var_19_1.position - var_19_0.position).eulerAngles.y, 0)
+	elseif arg_19_1.respond_dir == var_0_5 then
+		var_19_0.rotation = Quaternion.Euler(0, var_19_1.eulerAngles.y, 0)
+	end
+
+	var_19_1.rotation = arg_19_2 * var_19_1.rotation
+
+	if isa(arg_19_4, IslandPlayerUnit) then
+		arg_19_4.targetRotation = var_19_0.rotation
+	end
 
 	if isa(arg_19_3, IslandPlayerUnit) then
-		arg_19_3.targetRotation = arg_19_3._go.transform.rotation
+		arg_19_3.targetRotation = var_19_1.rotation
 	end
 
-	if isa(arg_19_2, IslandPlayerUnit) then
-		arg_19_2.targetRotation = arg_19_2._go.transform.rotation
-	end
-
-	arg_19_4()
+	arg_19_5()
 end
 
 function IslandCoupleActionPlayer:PlayCoupleActions(arg_20_1, arg_20_2, arg_20_3, arg_20_4)

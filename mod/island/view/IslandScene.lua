@@ -322,6 +322,8 @@ end
 
 function IslandScene:OnSetUpCore(arg_46_1, arg_46_2)
 	self.approachSpawnPointId = arg_46_2
+
+	self.btnContainer:ActiveOrDisactive(true)
 end
 
 function IslandScene:OnAgoraEnterEditMode()

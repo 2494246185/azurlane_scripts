@@ -334,7 +334,7 @@ function BattleWorldBossResultLayer:showRewardInfo(arg_19_1)
 				local var_21_4 = var_21_3[iter_21_4]
 
 				if PlayerPrefs.GetInt(DISPLAY_SHIP_GET_EFFECT) ~= 1 then
-					if var_21_4.virgin or var_21_4:getRarity() >= ShipRarity.Purple then
+					if var_21_4.virgin or (pg.gameset.skip_duplicate_characters_rarity.key_value or ShipRarity.Gold) <= var_21_4:getRarity() then
 						self:emit(BattleResultMediator.GET_NEW_SHIP, var_21_4, var_19_1)
 						coroutine.yield()
 					end

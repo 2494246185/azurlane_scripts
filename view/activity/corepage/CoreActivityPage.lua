@@ -16,8 +16,18 @@ function CoreActivityPage:getUIName()
 	return self._uiName
 end
 
-function CoreActivityPage:Flush(arg_5_1)
-	self.activity = arg_5_1
+function CoreActivityPage:Init()
+	CoreActivityPage.super.Init(self)
+
+	local var_5_0, var_5_1, var_5_2 = self:GetBgParams()
+
+	if var_5_0 then
+		GetImageSpriteFromAtlasAsync(var_5_1, var_5_2, var_5_0)
+	end
+end
+
+function CoreActivityPage:Flush(arg_6_1)
+	self.activity = arg_6_1
 
 	if self:OnDataSetting() then
 		return
@@ -41,16 +51,16 @@ function CoreActivityPage:GetAwardPreviewPos()
 	return self.activity:getConfig("config_client").AwardPreviewPos
 end
 
-function CoreActivityPage:ShowOrHide(arg_7_1)
-	SetActive(self._go, arg_7_1)
+function CoreActivityPage:ShowOrHide(arg_8_1)
+	SetActive(self._go, arg_8_1)
 
-	if arg_7_1 then
-		local var_7_0 = {}
+	if arg_8_1 then
+		local var_8_0 = {}
 
-		self:emit(ActivityMainScene.GET_PAGE_BGM, self.__cname, var_7_0)
+		self:emit(ActivityMainScene.GET_PAGE_BGM, self.__cname, var_8_0)
 
-		if var_7_0.bgm then
-			pg.BgmMgr.GetInstance():Push(ActivityMainScene.__cname, var_7_0.bgm)
+		if var_8_0.bgm then
+			pg.BgmMgr.GetInstance():Push(ActivityMainScene.__cname, var_8_0.bgm)
 		end
 
 		self:OnShowFlush()
@@ -60,13 +70,13 @@ function CoreActivityPage:ShowOrHide(arg_7_1)
 end
 
 function CoreActivityPage:BindPageLink()
-	for iter_8_0, iter_8_1 in ipairs(self:GetPageLink()) do
-		ActivityConst.PageIdLink[iter_8_1] = self.activity.id
+	for iter_9_0, iter_9_1 in ipairs(self:GetPageLink()) do
+		ActivityConst.PageIdLink[iter_9_1] = self.activity.id
 	end
 end
 
-function CoreActivityPage:SwitchOut(arg_9_1)
-	arg_9_1()
+function CoreActivityPage:SwitchOut(arg_10_1)
+	arg_10_1()
 end
 
 function CoreActivityPage:OnInit()
@@ -101,7 +111,7 @@ function CoreActivityPage:OnDestroy()
 	return
 end
 
-function CoreActivityPage:UseSecondPage(arg_18_1)
+function CoreActivityPage:UseSecondPage(arg_19_1)
 	return false
 end
 
@@ -115,6 +125,10 @@ end
 
 function CoreActivityPage:IsShowReminder()
 	return nil
+end
+
+function CoreActivityPage:GetBgParams()
+	return nil, nil, nil
 end
 
 return CoreActivityPage

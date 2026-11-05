@@ -33,22 +33,18 @@ function IslandVirtualInteractUnit:GetTargetRoot()
 	end
 end
 
-function IslandVirtualInteractUnit:GetPlayerParent()
-	if self.tempPlayerParentPath == nil then
+function IslandVirtualInteractUnit:GetPlayerParent(arg_7_1)
+	local var_7_0 = self.data:GetPlayerParentPath(arg_7_1)
+
+	if var_7_0 == nil then
 		return self:GetTargetRoot()
 	else
-		local var_7_0 = self:GetTargetRoot():Find(self.tempPlayerParentPath)
+		local var_7_1 = self:GetTargetRoot():Find(var_7_0)
 
-		assert(var_7_0, "can't find player parent with path: " .. self.tempPlayerParentPath)
+		assert(var_7_1, "can't find player parent with path: " .. var_7_0)
 
-		return var_7_0
+		return var_7_1
 	end
-end
-
-function IslandVirtualInteractUnit:StartInteract(arg_8_1, arg_8_2, arg_8_3, arg_8_4, arg_8_5, arg_8_6, arg_8_7, arg_8_8)
-	self.tempPlayerParentPath = arg_8_8
-
-	IslandVirtualInteractUnit.super.StartInteract(self, arg_8_1, arg_8_2, arg_8_3, arg_8_4, arg_8_5, arg_8_6, arg_8_7)
 end
 
 return IslandVirtualInteractUnit

@@ -295,37 +295,45 @@ function InstagramChatLayer:UpdateChatContent(arg_15_1, arg_15_2, arg_15_3)
 
 	local var_15_0 = self.rightPanel:Find("chat/paintingMask")
 	local var_15_1 = var_15_0:Find("painting")
-	local var_15_2 = self.rightPanel:Find("chat/groupBackground")
+	local var_15_2 = self.rightPanel:Find("chat/paintingMask/hx")
+	local var_15_3 = self.rightPanel:Find("chat/groupBackground")
 
 	if arg_15_1.type == 1 then
 		SetActive(var_15_0, true)
-		SetActive(var_15_2, false)
+		SetActive(var_15_3, false)
 
-		local var_15_3 = "unknown"
+		local var_15_4 = "unknown"
 
 		if arg_15_1.skinId == 0 then
-			var_15_3 = arg_15_1:GetPainting()
+			var_15_4 = arg_15_1:GetPainting()
 		else
 			for iter_15_0, iter_15_1 in ipairs(arg_15_1.skins) do
 				if iter_15_1.id == arg_15_1.skinId then
-					var_15_3 = iter_15_1.painting
+					var_15_4 = iter_15_1.painting
 				end
 			end
 		end
 
-		if not self.paintingName then
-			setPaintingPrefabAsync(var_15_1, var_15_3, "pifu")
+		if HXSet.isHx() then
+			SetActive(var_15_1, false)
+			SetActive(var_15_2, true)
+		else
+			if not self.paintingName then
+				setPaintingPrefabAsync(var_15_1, var_15_4, "pifu")
 
-			self.paintingName = var_15_3
-		elseif self.paintingName and self.paintingName ~= var_15_3 then
-			retPaintingPrefab(var_15_1, self.paintingName)
-			setPaintingPrefabAsync(var_15_1, var_15_3, "pifu")
+				self.paintingName = var_15_4
+			elseif self.paintingName and self.paintingName ~= var_15_4 then
+				retPaintingPrefab(var_15_1, self.paintingName)
+				setPaintingPrefabAsync(var_15_1, var_15_4, "pifu")
 
-			self.paintingName = var_15_3
+				self.paintingName = var_15_4
+			end
+
+			SetActive(var_15_2, false)
 		end
 	else
 		SetActive(var_15_0, false)
-		SetActive(var_15_2, true)
+		SetActive(var_15_3, true)
 
 		if self.paintingName then
 			retPaintingPrefab(var_15_1, self.paintingName)
@@ -333,14 +341,14 @@ function InstagramChatLayer:UpdateChatContent(arg_15_1, arg_15_2, arg_15_3)
 			self.paintingName = nil
 		end
 
-		setImageSprite(var_15_2, LoadSprite("ui/InstagramChatBackgrounds_atlas", arg_15_1.groupBackground), true)
+		setImageSprite(var_15_3, LoadSprite("ui/InstagramChatBackgrounds_atlas", arg_15_1.groupBackground), true)
 	end
 
-	local var_15_4 = arg_15_1.currentTopic:GetDisplayWordList()
+	local var_15_5 = arg_15_1.currentTopic:GetDisplayWordList()
 
 	if not arg_15_3 then
-		self:UpdateOptionPanel(arg_15_1.currentTopic, var_15_4)
-		self:UpdateMessageList(arg_15_1.currentTopic, var_15_4, arg_15_2, arg_15_1.characterId, arg_15_1.type)
+		self:UpdateOptionPanel(arg_15_1.currentTopic, var_15_5)
+		self:UpdateMessageList(arg_15_1.currentTopic, var_15_5, arg_15_2, arg_15_1.characterId, arg_15_1.type)
 	end
 
 	if not arg_15_2 and arg_15_1.currentTopic.readFlag == 0 then

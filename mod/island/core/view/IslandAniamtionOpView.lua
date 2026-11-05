@@ -449,6 +449,7 @@ function IslandAniamtionOpView:OnDisable()
 end
 
 function IslandAniamtionOpView:OnDispose()
+	self:OnDisable()
 	IslandAniamtionOpView.super.OnDispose(self)
 	ClearLScrollrect(self.scrollrect)
 	self.chatView:Dispose()

@@ -383,6 +383,10 @@ function IslandShipDressHelperNew:SetCommanderHairBlendShape(arg_19_1)
 		return
 	end
 
+	if var_19_0.type == IslandShipDressHelperNew.DressType.Body and pg.island_dress_template.get_id_list_by_related_dress[arg_19_1] then
+		return
+	end
+
 	local var_19_1 = var_19_0.sub_type - 1
 
 	GraphicsInterface.Instance:SetCharacterBlendShape(self, IslandShipDressHelperNew.ComponentType.Hair, var_19_0.sub_type - 1, 100)
@@ -453,6 +457,7 @@ function IslandShipDressHelperNew:BuildCommanderCustomParts(arg_25_1, arg_25_2, 
 			local var_26_1 = arg_25_1(IslandShipDressHelperNew.DressType.Body) or 0
 
 			IslandShipDressHelperNew.RefreshCommanderHatState(self, var_26_0)
+			IslandShipDressHelperNew.SetCommanderHairBlendShape(self, var_26_1)
 			existCall(arg_25_3, var_25_0, var_26_1)
 		end
 	end
@@ -509,6 +514,7 @@ function IslandShipDressHelperNew:ChangeCommanderPart(arg_27_1, arg_27_2, arg_27
 					IslandShipDressHelperNew.RefreshCommanderHatState(var_27_1, var_27_0)
 				elseif arg_27_1 == IslandShipDressHelperNew.DressType.Hair then
 					IslandShipDressHelperNew.RefreshCommanderHatState(var_27_1, self.commanderDressDic[IslandShipDressHelperNew.DressType.Hat] or 0)
+					IslandShipDressHelperNew.SetCommanderHairBlendShape(var_27_1, self.commanderDressDic[IslandShipDressHelperNew.DressType.Body] or 0)
 				elseif arg_27_1 == IslandShipDressHelperNew.DressType.Face then
 					local var_28_2 = pg.island_dress_template[var_27_0].face_clip == "" and "idle" or pg.island_dress_template[var_27_0].face_clip
 					local var_28_3 = var_27_1:GetComponent(typeof(Animator))
@@ -517,6 +523,7 @@ function IslandShipDressHelperNew:ChangeCommanderPart(arg_27_1, arg_27_2, arg_27
 						var_28_3:Play(var_28_2, 4)
 					end
 				elseif arg_27_1 == IslandShipDressHelperNew.DressType.Body then
+					IslandShipDressHelperNew.SetCommanderHairBlendShape(var_27_1, var_27_0)
 					self:ApplyAnimatorOverride(var_27_0, arg_27_3)
 				end
 			end
@@ -530,6 +537,7 @@ function IslandShipDressHelperNew:ChangeCommanderPart(arg_27_1, arg_27_2, arg_27
 			existCall(arg_27_3)
 		end
 	elseif arg_27_1 == IslandShipDressHelperNew.DressType.Body and var_27_0 == 0 then
+		IslandShipDressHelperNew.SetCommanderHairBlendShape(var_27_1, var_27_0)
 		self:ApplyAnimatorOverride(0, arg_27_3)
 	end
 end

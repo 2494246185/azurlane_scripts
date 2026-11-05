@@ -79,11 +79,13 @@ function NewRecommendationShopLayer:getResource()
 			if not var_3_0:inTime(var_0_1[iter_3_3[iter_3_4]].time) then
 				table.remove(iter_3_3, iter_3_4)
 			elseif var_0_1[iter_3_3[iter_3_4]].relation_param ~= "" then
+				local var_3_13 = var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]]
+
 				if var_0_1[iter_3_3[iter_3_4]].relation_param[1] == 1 then
-					if not var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]] or not var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]]:inTime() or not var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]]:canPurchase() then
+					if not var_3_13 or not var_3_13:inTime() or not var_3_13:canPurchase() then
 						table.remove(iter_3_3, iter_3_4)
 					end
-				elseif (var_0_1[iter_3_3[iter_3_4]].relation_param[1] == 2 or var_0_1[iter_3_3[iter_3_4]].relation_param[1] == 3) and (not var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]] or not var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]]:inTime() or not var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]]:canPurchase() or var_3_6[var_0_1[iter_3_3[iter_3_4]].relation_param[1]][var_0_1[iter_3_3[iter_3_4]].relation_param[2]]:IsGroupLimit()) then
+				elseif (var_0_1[iter_3_3[iter_3_4]].relation_param[1] == 2 or var_0_1[iter_3_3[iter_3_4]].relation_param[1] == 3) and (not var_3_13 or not var_3_13:inTime() or not var_3_13:canPurchase() or var_3_13:IsGroupLimit()) then
 					table.remove(iter_3_3, iter_3_4)
 				end
 			end
@@ -102,14 +104,18 @@ function NewRecommendationShopLayer:getResource()
 		for iter_3_6, iter_3_7 in ipairs(iter_3_3) do
 			if noEmptyStr(var_0_1[iter_3_7].pic) then
 				table.insert(var_3_10, var_0_1[iter_3_7].pic)
+
+				if HXSet.isHx() then
+					table.insert(var_3_10, var_0_1[iter_3_7].pic .. "_hx")
+				end
 			end
 
 			if var_0_1[iter_3_7].relation_param ~= "" then
 				if var_0_1[iter_3_7].relation_param[1] == 1 and var_3_6[var_0_1[iter_3_7].relation_param[1]][var_0_1[iter_3_7].relation_param[2]] then
-					local var_3_13 = var_3_6[var_0_1[iter_3_7].relation_param[1]][var_0_1[iter_3_7].relation_param[2]]:getConfig("picture")
+					local var_3_14 = var_3_6[var_0_1[iter_3_7].relation_param[1]][var_0_1[iter_3_7].relation_param[2]]:getConfig("picture")
 
-					if noEmptyStr(var_3_13) then
-						table.insert(var_3_11, ResPathSupport.CombinePath("chargeicon", var_3_13))
+					if noEmptyStr(var_3_14) then
+						table.insert(var_3_11, ResPathSupport.CombinePath("chargeicon", var_3_14))
 					end
 				end
 			end

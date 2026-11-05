@@ -5,6 +5,10 @@ function SupportShipPoolPage:getResource()
 
 	if pg.gametip.honor_medal_support_tips_display.tip and noEmptyStr(pg.gametip.honor_medal_support_tips_display.tip.bg) then
 		table.insert(var_1_0, pg.gametip.honor_medal_support_tips_display.tip.bg)
+
+		if HXSet.isHx() then
+			table.insert(var_1_0, pg.gametip.honor_medal_support_tips_display.tip.bg .. "_hx")
+		end
 	end
 
 	if self.contextData then
@@ -12,6 +16,10 @@ function SupportShipPoolPage:getResource()
 
 		if var_1_1 then
 			table.insertto(var_1_0, ResPathSupport.GetPaintingListByPaintingName(var_1_1:getPainting()))
+		end
+
+		if HXSet.isHx() then
+			table.insertto(var_1_0, pg.ship_skin_template[900284].painting)
 		end
 	end
 
@@ -84,6 +92,10 @@ end
 
 function SupportShipPoolPage:UpdateBuildPoolPaiting()
 	local var_11_0 = self.contextData.falgShip:getPainting()
+
+	if HXSet.isHx() then
+		var_11_0 = pg.ship_skin_template[900284].painting
+	end
 
 	if self.painting ~= var_11_0 then
 		pg.UIMgr.GetInstance():LoadingOn()

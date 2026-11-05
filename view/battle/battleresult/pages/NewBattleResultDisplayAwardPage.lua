@@ -65,7 +65,7 @@ function NewBattleResultDisplayAwardPage:ShowShips(arg_6_1, arg_6_2)
 		local var_6_3 = var_6_0[iter_6_0]
 
 		if PlayerPrefs.GetInt(DISPLAY_SHIP_GET_EFFECT) ~= 1 then
-			if var_6_0[iter_6_0].virgin or var_6_0[iter_6_0]:getRarity() >= ShipRarity.Purple then
+			if var_6_0[iter_6_0].virgin or (pg.gameset.skip_duplicate_characters_rarity.key_value or ShipRarity.Gold) <= var_6_0[iter_6_0]:getRarity() then
 				local var_6_5 = self.contextData.system == SYSTEM_SCENARIO and self.contextData.autoSkipFlag
 
 				table.insert(var_6_2, function(arg_10_0)

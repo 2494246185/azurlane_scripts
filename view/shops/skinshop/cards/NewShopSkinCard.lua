@@ -85,7 +85,9 @@ function NewShopSkinCard:GetTagId(arg_2_1)
 
 	local var_2_1 = self:getConfig("tag")
 
-	if (self:isDisCount() or var_2_1 == var_0_1) and not self:IsItemDiscountType() then
+	if self:isShopDiscount() then
+		return var_0_1
+	elseif (self:isDisCount() or var_2_1 == var_0_1) and not self:IsItemDiscountType() then
 		return var_0_1
 	elseif var_0_7[var_2_1] then
 		return var_2_1

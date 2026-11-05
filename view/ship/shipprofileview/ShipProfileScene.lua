@@ -589,10 +589,6 @@ function ShipProfileScene:CreateLive2D()
 			y = -40
 		})
 	end
-
-	if Live2dConst.UnLoadL2dPating then
-		Live2dConst.UnLoadL2dPating()
-	end
 end
 
 function ShipProfileScene:GetModelAction(arg_53_1)

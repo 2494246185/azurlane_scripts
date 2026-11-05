@@ -19,7 +19,7 @@ function IslandProxy:register()
 	self.cahce = {}
 	self.giftCache = {}
 	self.chatMsgs = {}
-	self.islandHeartBeatMgr = IslandHearBeatMgr.New()
+	self.islandHeartBeatMgr = IslandHeartBeatMgr.New()
 
 	self:on(21216, function(arg_2_0)
 		local var_2_0 = self:GetIsland()
@@ -61,52 +61,48 @@ function IslandProxy:GetIsland()
 	return self.island
 end
 
-function IslandProxy:remove()
-	self.island = nil
-end
-
 function IslandProxy:ShouldTip()
 	return (function()
+		local var_8_0 = self:GetIsland()
+
+		return var_8_0 and var_8_0:CanLevelUp()
+	end)() or (function()
 		local var_9_0 = self:GetIsland()
 
-		return var_9_0 and var_9_0:CanLevelUp()
-	end)() or (function()
-		local var_10_0 = self:GetIsland()
-
-		return var_10_0 and var_10_0:AnyProsperityAwardCanGet()
+		return var_9_0 and var_9_0:AnyProsperityAwardCanGet()
 	end)()
 end
 
-function IslandProxy:AddPlayerDataCache(arg_11_1)
-	self.cahce[arg_11_1.id] = arg_11_1
+function IslandProxy:AddPlayerDataCache(arg_10_1)
+	self.cahce[arg_10_1.id] = arg_10_1
 end
 
-function IslandProxy:GetPlayerDataCache(arg_12_1)
-	return self.cahce[arg_12_1]
+function IslandProxy:GetPlayerDataCache(arg_11_1)
+	return self.cahce[arg_11_1]
 end
 
 function IslandProxy:ClearAllPlayerDataCache()
 	self.cahce = {}
 end
 
-function IslandProxy:AddGiftTagInfoCache(arg_14_1)
-	self.giftCache[arg_14_1.playerId] = arg_14_1
+function IslandProxy:AddGiftTagInfoCache(arg_13_1)
+	self.giftCache[arg_13_1.playerId] = arg_13_1
 end
 
-function IslandProxy:GetGiftTagInfoCache(arg_15_1)
-	return self.giftCache[arg_15_1]
+function IslandProxy:GetGiftTagInfoCache(arg_14_1)
+	return self.giftCache[arg_14_1]
 end
 
-function IslandProxy:UpdateGiftTagCache(arg_16_1, arg_16_2, arg_16_3)
-	local var_16_0 = self:GetGiftTagInfoCache(arg_16_1)
+function IslandProxy:UpdateGiftTagCache(arg_15_1, arg_15_2, arg_15_3)
+	local var_15_0 = self:GetGiftTagInfoCache(arg_15_1)
 
-	if var_16_0 then
-		var_16_0:Flush(arg_16_2, arg_16_3)
+	if var_15_0 then
+		var_15_0:Flush(arg_15_2, arg_15_3)
 	else
 		self:AddGiftTagInfoCache((IslandGiftTagInfo.New({
-			key = arg_16_1,
-			value1 = arg_16_3,
-			value2 = arg_16_2
+			key = arg_15_1,
+			value1 = arg_15_3,
+			value2 = arg_15_2
 		})))
 	end
 end
@@ -115,25 +111,17 @@ function IslandProxy:ClearAllGiftTagInfo()
 	self.giftCache = {}
 end
 
-function IslandProxy:SetSharedIsland(arg_18_1)
-	self.sharedIsland = arg_18_1
+function IslandProxy:SetSharedIsland(arg_17_1)
+	self.sharedIsland = arg_17_1
 end
 
 function IslandProxy:GetSharedIsland()
 	return self.sharedIsland
 end
 
-function IslandProxy:SetSyncObjInitData(arg_20_1)
-	self.syncObjInitData = arg_20_1
-end
-
-function IslandProxy:GetSyncObjInitData()
-	return (self.syncObjInitData or nil) and (self.syncObjInitData or {})
-end
-
 function IslandProxy:timeCall()
 	return {
-		[ProxyRegister.SecondCall] = function(arg_23_0)
+		[ProxyRegister.SecondCall] = function(arg_20_0)
 			if not self.island then
 				return
 			end
@@ -146,20 +134,20 @@ function IslandProxy:timeCall()
 
 			self.sharedIsland:UpdatePerSecond()
 		end,
-		[ProxyRegister.HourCall] = function(arg_24_0)
+		[ProxyRegister.HourCall] = function(arg_21_0)
 			if not self.island then
 				return
 			end
 
-			self.island:UpdatePerHour(arg_24_0)
+			self.island:UpdatePerHour(arg_21_0)
 
 			if not self.sharedIsland then
 				return
 			end
 
-			self.sharedIsland:UpdatePerHour(arg_24_0)
+			self.sharedIsland:UpdatePerHour(arg_21_0)
 		end,
-		[ProxyRegister.DayCall] = function(arg_25_0)
+		[ProxyRegister.DayCall] = function(arg_22_0)
 			if not self.island then
 				return
 			end
@@ -177,11 +165,11 @@ function IslandProxy:GetEnterTime()
 	return self.enterTimeStamp
 end
 
-function IslandProxy:RecordTempPlayerPosition(arg_28_1, arg_28_2, arg_28_3)
+function IslandProxy:RecordTempPlayerPosition(arg_25_1, arg_25_2, arg_25_3)
 	self.tempPlayerPosition = {
-		arg_28_1,
-		arg_28_2,
-		arg_28_3
+		arg_25_1,
+		arg_25_2,
+		arg_25_3
 	}
 end
 
@@ -189,8 +177,8 @@ function IslandProxy:GetTempPlayerPosition()
 	return self.tempPlayerPosition
 end
 
-function IslandProxy:EnterIsland(arg_30_1)
-	self.islandHeartBeatMgr:EnterIsland(arg_30_1)
+function IslandProxy:EnterIsland(arg_27_1)
+	self.islandHeartBeatMgr:EnterIsland(arg_27_1)
 end
 
 function IslandProxy:ExitIsland()
@@ -198,6 +186,8 @@ function IslandProxy:ExitIsland()
 end
 
 function IslandProxy:remove()
+	self.island = nil
+
 	self.islandHeartBeatMgr:Dispose()
 
 	self.islandHeartBeatMgr = nil

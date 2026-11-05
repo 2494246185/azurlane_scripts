@@ -31,9 +31,18 @@ function WorldInformationLayer:init()
 
 	self.rtRightPanel = self._tf:Find("adapt/right_panel")
 	self.rtNothingTip = self.rtRightPanel:Find("nothing_tip")
+
+	setText(self.rtNothingTip:Find("Text"), i18n("world_task_notask"))
+
 	self.btnClose = self.rtRightPanel:Find("title/close_btn")
 	self.toggleAll = self.rtRightPanel:Find("title/task_all")
+
+	setText(self.toggleAll, i18n("world_task_all"))
+
 	self.toggleMain = self.rtRightPanel:Find("title/task_main")
+
+	setText(self.toggleAll, i18n("world_task_main"))
+
 	self.rtContainer = self.rtRightPanel:Find("main/viewport/content")
 	self.taskItemList = UIItemList.New(self.rtContainer, self.rtContainer:Find("task_tpl"))
 
@@ -44,6 +53,11 @@ function WorldInformationLayer:init()
 	end)
 
 	self.btnDailyTask = self.rtLeftPanel:Find("world_info/task_btn")
+
+	local var_2_0 = self.rtContainer:Find("task_tpl")
+
+	setText(var_2_0:Find("base_panel/btn_go/Text"), i18n("world_task_view"))
+	setText(var_2_0:Find("base_panel/btn_get/Text"), i18n("world_task_get"))
 end
 
 function WorldInformationLayer:didEnter()

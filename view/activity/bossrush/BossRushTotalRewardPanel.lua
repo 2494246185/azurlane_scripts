@@ -122,7 +122,7 @@ function BossRushTotalRewardPanel:ShowShips(arg_11_1, arg_11_2)
 		local var_11_3
 
 		if PlayerPrefs.GetInt(DISPLAY_SHIP_GET_EFFECT) ~= 1 then
-			var_11_3 = var_11_0[iter_11_0].virgin or var_11_0[iter_11_0]:getRarity() >= ShipRarity.Purple
+			var_11_3 = var_11_0[iter_11_0].virgin or (pg.gameset.skip_duplicate_characters_rarity.key_value or ShipRarity.Gold) <= var_11_0[iter_11_0]:getRarity()
 		end
 
 		print(var_11_3)

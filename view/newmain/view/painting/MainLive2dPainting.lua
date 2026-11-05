@@ -26,23 +26,30 @@ function MainLive2dPainting:GetHalfBodyOffsetY()
 end
 
 function MainLive2dPainting:OnLoad(arg_4_1)
+	local var_4_0
+
 	if self.live2dChar then
 		self:OnUnload()
+
+		var_4_0 = {
+			loadPrefs = true,
+			ship = self.ship,
+			position = Vector3(0, 0, 100)
+		}
 	end
 
-	local var_4_0 = Live2DPainting.GenerateData({
-		loadPrefs = true,
-		ship = self.ship,
-		position = Vector3(0, 0, 100),
-		parent = self.live2dContainer
-	})
-
+	var_4_0.parent = self.live2dContainer
 	self.actionWaiting = false
-
-	self:SetContainerVisible(true)
-
 	self.cg.blocksRaycasts = true
-	self.live2dChar = Live2DPainting.New(var_4_0, function(arg_5_0)
+	self.live2dChar = Live2DPainting.New(Live2DPainting.GenerateData(var_4_0), function(arg_5_0)
+		if arg_5_0:IsDispose() then
+			print("live2d已经被释放,不再初始化")
+
+			return
+		end
+
+		self.live2dChar = self.live2dChar or arg_5_0
+
 		self:AdJustOrderInLayer(arg_5_0)
 
 		if Live2dConst.l2d_bound_open then
@@ -65,7 +72,11 @@ function MainLive2dPainting:OnLoad(arg_4_1)
 			self._initTriggerAction = nil
 		end
 
-		arg_4_1()
+		if arg_4_1 then
+			arg_4_1()
+
+			arg_4_1 = nil
+		end
 	end)
 	self.shipGroup = getProxy(CollectionProxy):getShipGroup(self.ship.groupId)
 
@@ -183,6 +194,7 @@ end
 
 function MainLive2dPainting:OnUnload()
 	if self.live2dChar then
+		print("释放live2d")
 		self:RemoveScreenChangeTimer()
 		self:ResetContainerPosition()
 
@@ -397,10 +409,6 @@ function MainLive2dPainting:OnUpdateShip(arg_34_1)
 	end
 end
 
-function MainLive2dPainting:SetContainerVisible(arg_35_1)
-	return
-end
-
 function MainLive2dPainting:IsLoaded()
 	if not self.live2dChar then
 		return false
@@ -410,7 +418,6 @@ function MainLive2dPainting:IsLoaded()
 end
 
 function MainLive2dPainting:OnResume()
-	self:SetContainerVisible(true)
 	self:AddScreenChangeTimer()
 	self:UpdateContainerPosition()
 	onNextTick(function()
@@ -434,6 +441,14 @@ function MainLive2dPainting:Dispose()
 	if self.eventTrigger then
 		ClearEventTrigger(self.eventTrigger)
 	end
+end
+
+function MainLive2dPainting:GetPaintingTransform()
+	if self.live2dChar then
+		return self.live2dChar:GetLive2dTransform()
+	end
+
+	return nil
 end
 
 function MainLive2dPainting:GetOffset()

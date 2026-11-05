@@ -141,6 +141,7 @@ function NewMainMediator:register()
 		}))
 	end)
 	self:bind(NewMainMediator.OPEN_COMMISION, function(arg_17_0)
+		getProxy(ChapterAutoProxy):MarkCommssionExpiredTip()
 		self:addSubLayers(Context.New({
 			viewComponent = CommissionInfoLayer,
 			mediator = CommissionInfoMediator

@@ -1,6 +1,7 @@
 local ChapterAutoProxy = class("ChapterAutoProxy", import("model.proxy.NetProxy"))
 
 ChapterAutoProxy.FINISH_UPDATE = "ChapterAutoProxy.FINISH_UPDATE"
+ChapterAutoProxy.EXPIRED_TIP_MARK = "ChapterAutoProxy.EXPIRED_TIP_MARK"
 ChapterAutoProxy.TYPE = {
 	WORLD = 2,
 	SLG = 1
@@ -29,6 +30,9 @@ function ChapterAutoProxy:register()
 		self.dailyExtraTime = arg_2_0.extra_time_max
 	end)
 	self:ClearEventIds()
+
+	self.commssionExpiredTipMark = false
+	self.battleExpiredTipMark = false
 end
 
 function ChapterAutoProxy:UpdateRecord(arg_3_1, arg_3_2, arg_3_3)
@@ -273,44 +277,72 @@ function ChapterAutoProxy:IsAllCommissionFinish(arg_33_1)
 	return true
 end
 
-function ChapterAutoProxy:IsShowTip()
+function ChapterAutoProxy:IsShowTipInCommssionUI()
 	if self.finishedCnt > 0 then
 		return true
 	end
 
-	if self:GetWillExpireTicketCnt() > 0 then
+	if not self.commssionExpiredTipMark and self:GetWillExpireTicketCnt() > 0 then
 		return true
 	end
 
 	return false
 end
 
+function ChapterAutoProxy:IsShowTipInBattleUI()
+	if self.finishedCnt > 0 then
+		return true
+	end
+
+	if not self.battleExpiredTipMark and self:GetWillExpireTicketCnt() > 0 then
+		return true
+	end
+
+	return false
+end
+
+function ChapterAutoProxy:MarkCommssionExpiredTip()
+	if not self.commssionExpiredTipMark then
+		self.commssionExpiredTipMark = true
+
+		self:sendNotification(ChapterAutoProxy.EXPIRED_TIP_MARK)
+	end
+end
+
+function ChapterAutoProxy:MarkBattleExpiredTip()
+	if not self.battleExpiredTipMark then
+		self.battleExpiredTipMark = true
+
+		self:sendNotification(ChapterAutoProxy.EXPIRED_TIP_MARK)
+	end
+end
+
 function ChapterAutoProxy:timeCall()
 	return {
-		[ProxyRegister.SecondCall] = function(arg_36_0)
+		[ProxyRegister.SecondCall] = function(arg_39_0)
 			self:UpdatePerSecond()
 		end,
-		[ProxyRegister.DayCall] = function(arg_37_0)
+		[ProxyRegister.DayCall] = function(arg_40_0)
 			self:UpdatePerDay()
 		end
 	}
 end
 
 function ChapterAutoProxy:UpdatePerSecond()
-	local var_38_0 = self:GetFinishedCnt()
+	local var_41_0 = self:GetFinishedCnt()
 
-	if var_38_0 ~= self.finishedCnt then
-		self.finishedCnt = var_38_0
+	if var_41_0 ~= self.finishedCnt then
+		self.finishedCnt = var_41_0
 
 		self:sendNotification(ChapterAutoProxy.FINISH_UPDATE)
 	end
 end
 
 function ChapterAutoProxy:UpdatePerDay()
-	for iter_39_0, iter_39_1 in pairs(self.ticketData) do
-		for iter_39_2, iter_39_3 in ipairs(iter_39_1) do
-			if iter_39_3:IsExpired() then
-				self.ticketData[iter_39_3.id] = nil
+	for iter_42_0, iter_42_1 in pairs(self.ticketData) do
+		for iter_42_2, iter_42_3 in ipairs(iter_42_1) do
+			if iter_42_3:IsExpired() then
+				self.ticketData[iter_42_3.id] = nil
 			end
 		end
 	end
@@ -322,17 +354,17 @@ function ChapterAutoProxy:GetSkipBatchBuildFlag()
 	return self.skipBatchFlag or false
 end
 
-function ChapterAutoProxy:SetSkipBatchBuildFlag(arg_41_1)
-	self.skipBatchFlag = arg_41_1
+function ChapterAutoProxy:SetSkipBatchBuildFlag(arg_44_1)
+	self.skipBatchFlag = arg_44_1
 end
 
-function ChapterAutoProxy:SetRecordEventFlag(arg_42_1)
-	self.recordEventFlag = arg_42_1
+function ChapterAutoProxy:SetRecordEventFlag(arg_45_1)
+	self.recordEventFlag = arg_45_1
 end
 
-function ChapterAutoProxy:RecordNewEventIds(arg_43_1)
+function ChapterAutoProxy:RecordNewEventIds(arg_46_1)
 	if self.recordEventFlag then
-		self.newEventIds = table.mergeArray(self.newEventIds, arg_43_1)
+		self.newEventIds = table.mergeArray(self.newEventIds, arg_46_1)
 	end
 end
 
@@ -340,7 +372,7 @@ function ChapterAutoProxy:GetNewEventIds()
 	return self.newEventIds
 end
 
-function ChapterAutoProxy:ClearEventIds(arg_45_1)
+function ChapterAutoProxy:ClearEventIds(arg_48_1)
 	self.newEventIds = {}
 end
 
@@ -348,17 +380,17 @@ function ChapterAutoProxy:remove()
 	return
 end
 
-function ChapterAutoProxy:GetFixTime(arg_47_1, arg_47_2)
+function ChapterAutoProxy:GetFixTime(arg_50_1, arg_50_2)
 	return switch(self, {
 		[ChapterAutoProxy.TYPE.SLG] = function()
-			if not pg.chapter_auto_statistics[arg_47_1] then
-				return arg_47_2
+			if not pg.chapter_auto_statistics[arg_50_1] then
+				return arg_50_2
 			end
 
-			return math.floor(arg_47_2 * pg.chapter_auto_statistics[arg_47_1].time_rate) + pg.chapter_auto_statistics[arg_47_1].time_correction
+			return math.floor(arg_50_2 * pg.chapter_auto_statistics[arg_50_1].time_rate) + pg.chapter_auto_statistics[arg_50_1].time_correction
 		end
 	}, function()
-		return arg_47_2
+		return arg_50_2
 	end)
 end
 

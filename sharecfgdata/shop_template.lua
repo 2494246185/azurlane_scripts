@@ -11422,6 +11422,43 @@ end)()
 end)()
 
 (function()
+	_G.pg.base.shop_template[43064] = {
+		group_type = 0,
+		package_sort_id = 0,
+		type = 4,
+		second_text = "",
+		type_order = 0,
+		first_icon = "",
+		desc = "8000功勋兑换凯尔圣",
+		group_limit = 0,
+		package_tag = "",
+		resource_num = 8000,
+		group_buy_count = 0,
+		tag = 0,
+		limit_args2 = "",
+		collaboration_skin_time = "",
+		order = 4,
+		akashi_pick = 0,
+		time = "always",
+		group = 0,
+		num = 1,
+		first_text = "",
+		package_tag_open = 0,
+		time_second = 0,
+		discount = 0,
+		resource_type = 3,
+		id = 43064,
+		genre = "arena_shop",
+		discount_time = {},
+		limit_args = {},
+		effect_args = {
+			901041,
+		},
+		time_new = {},
+	}
+end)()
+
+(function()
 	_G.pg.base.shop_template[50002] = {
 		group_type = 0,
 		package_sort_id = 0,
@@ -91845,8 +91882,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 10,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -91860,32 +91898,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			905021,
-		},
-		time = {
-			{
-				{
-					2026,
-					5,
-					20,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2026,
-					5,
-					27,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -91907,8 +91919,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 5,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -91922,32 +91935,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			802031,
-		},
-		time = {
-			{
-				{
-					2025,
-					10,
-					16,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2025,
-					10,
-					22,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -91969,8 +91956,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 10,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -91984,32 +91972,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			807021,
-		},
-		time = {
-			{
-				{
-					2026,
-					5,
-					20,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2026,
-					5,
-					27,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -92031,8 +91993,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 10,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -92046,32 +92009,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			805021,
-		},
-		time = {
-			{
-				{
-					2025,
-					10,
-					16,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2025,
-					10,
-					22,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -92093,8 +92030,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 10,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -92108,32 +92046,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			803011,
-		},
-		time = {
-			{
-				{
-					2025,
-					10,
-					16,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2025,
-					10,
-					22,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -92155,8 +92067,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 5,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -92170,32 +92083,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			901041,
-		},
-		time = {
-			{
-				{
-					2025,
-					10,
-					16,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2025,
-					10,
-					22,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -92217,8 +92104,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 10,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -92232,32 +92120,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			105112,
-		},
-		time = {
-			{
-				{
-					2025,
-					9,
-					25,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2025,
-					10,
-					22,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -92279,8 +92141,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 10,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -92294,32 +92157,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			137060,
-		},
-		time = {
-			{
-				{
-					2026,
-					5,
-					20,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2026,
-					5,
-					27,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -92341,8 +92178,9 @@ end)()
 		tag = 1,
 		limit_args2 = "",
 		collaboration_skin_time = "",
-		order = 10,
+		order = 12,
 		akashi_pick = 0,
+		time = "stop",
 		group = 0,
 		num = 1,
 		first_text = "",
@@ -92356,32 +92194,6 @@ end)()
 		limit_args = {},
 		effect_args = {
 			102053,
-		},
-		time = {
-			{
-				{
-					2026,
-					5,
-					20,
-				},
-				{
-					0,
-					0,
-					0,
-				},
-			},
-			{
-				{
-					2026,
-					5,
-					27,
-				},
-				{
-					23,
-					59,
-					59,
-				},
-			},
 		},
 		time_new = {},
 	}
@@ -151749,6 +151561,43 @@ end)()
 		limit_args = {},
 		effect_args = {
 			170007,
+		},
+		time_new = {},
+	}
+end)()
+
+(function()
+	_G.pg.base.shop_template[500004] = {
+		group_type = 0,
+		package_sort_id = 0,
+		type = 8,
+		second_text = "",
+		type_order = 0,
+		first_icon = "",
+		desc = "一番赏抽卡券钻石购买",
+		group_limit = 0,
+		package_tag = "",
+		resource_num = 30,
+		group_buy_count = 0,
+		tag = 0,
+		limit_args2 = "",
+		collaboration_skin_time = "",
+		order = 1,
+		akashi_pick = 0,
+		time = "always",
+		group = 0,
+		num = 1,
+		first_text = "",
+		package_tag_open = 0,
+		time_second = 0,
+		discount = 0,
+		resource_type = 14,
+		id = 500004,
+		genre = "",
+		discount_time = {},
+		limit_args = {},
+		effect_args = {
+			170009,
 		},
 		time_new = {},
 	}

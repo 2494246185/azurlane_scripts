@@ -309,6 +309,8 @@ function LevelScene:initUI()
 
 	self.rtRightPanel = self._tf:Find("entrance/enters/right_panel")
 	self.actBtnTpl = self.rtRightPanel:Find("content/tpl")
+	self.expiredTF = self.rtRightPanel:Find("expired")
+	self.expireText = self.expiredTF:Find("count/Text"):GetComponent(typeof(Text))
 
 	local var_15_0 = pg.UIMgr.GetInstance()
 
@@ -377,6 +379,10 @@ function LevelScene:LoadEntranceActivityBg()
 
 	if string.sub(var_16_0, 1, #"activitybanner") == "activitybanner" then
 		var_16_0 = "MainUIBanner" .. string.sub(var_16_0, #"activitybanner" + 1)
+	end
+
+	if HXSet.isHx() and checkABExist(var_16_0 .. "_hx") then
+		var_16_0 = var_16_0 .. "_hx"
 	end
 
 	self.entranceActivityBgPath = var_16_0
@@ -810,6 +816,12 @@ function LevelScene:updateRightPanel()
 	for iter_66_4, iter_66_5 in ipairs(var_66_1) do
 		iter_66_5:Clear()
 	end
+
+	local var_66_2 = getProxy(ChapterAutoProxy):GetWillExpireTicketCnt()
+
+	self.expireText.text = "x" .. var_66_2
+
+	setActive(self.expiredTF, var_66_2 > 0)
 end
 
 function LevelScene:checkChallengeOpen()

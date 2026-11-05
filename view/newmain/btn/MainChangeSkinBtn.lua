@@ -1,6 +1,12 @@
 local MainChangeSkinBtn = class("MainChangeSkinBtn", import(".MainBaseBtn"))
 
 function MainChangeSkinBtn:OnClick()
+	if self._clickTime and Time.realtimeSinceStartup - self._clickTime < 1 then
+		return
+	end
+
+	self._clickTime = Time.realtimeSinceStartup
+
 	self:emit(NewMainScene.ON_CHANGE_SKIN)
 end
 

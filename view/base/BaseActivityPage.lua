@@ -12,8 +12,18 @@ function BaseActivityPage:getUIName()
 	return self._uiName
 end
 
-function BaseActivityPage:Flush(arg_4_1)
-	self.activity = arg_4_1
+function BaseActivityPage:Init()
+	BaseActivityPage.super.Init(self)
+
+	local var_4_0, var_4_1, var_4_2 = self:GetBgParams()
+
+	if var_4_0 then
+		GetImageSpriteFromAtlasAsync(var_4_1, var_4_2, var_4_0)
+	end
+end
+
+function BaseActivityPage:Flush(arg_5_1)
+	self.activity = arg_5_1
 
 	if self:OnDataSetting() then
 		return
@@ -29,16 +39,16 @@ function BaseActivityPage:Flush(arg_4_1)
 	self:OnUpdateFlush()
 end
 
-function BaseActivityPage:ShowOrHide(arg_5_1)
-	SetActive(self._go, arg_5_1)
+function BaseActivityPage:ShowOrHide(arg_6_1)
+	SetActive(self._go, arg_6_1)
 
-	if arg_5_1 then
-		local var_5_0 = {}
+	if arg_6_1 then
+		local var_6_0 = {}
 
-		self:emit(ActivityMainScene.GET_PAGE_BGM, self.__cname, var_5_0)
+		self:emit(ActivityMainScene.GET_PAGE_BGM, self.__cname, var_6_0)
 
-		if var_5_0.bgm then
-			pg.BgmMgr.GetInstance():Push(ActivityMainScene.__cname, var_5_0.bgm)
+		if var_6_0.bgm then
+			pg.BgmMgr.GetInstance():Push(ActivityMainScene.__cname, var_6_0.bgm)
 		end
 
 		self:OnShowFlush()
@@ -48,30 +58,30 @@ function BaseActivityPage:ShowOrHide(arg_5_1)
 end
 
 function BaseActivityPage:BindPageLink()
-	for iter_6_0, iter_6_1 in ipairs(self:GetPageLink()) do
-		ActivityConst.PageIdLink[iter_6_1] = self.activity.id
+	for iter_7_0, iter_7_1 in ipairs(self:GetPageLink()) do
+		ActivityConst.PageIdLink[iter_7_1] = self.activity.id
 	end
 end
 
-function BaseActivityPage:SwitchOut(arg_7_1)
-	arg_7_1()
+function BaseActivityPage:SwitchOut(arg_8_1)
+	arg_8_1()
 end
 
 function BaseActivityPage:getResource()
-	local var_8_0 = {
+	local var_9_0 = {
 		"ui/" .. self:getUIName()
 	}
-	local var_8_1 = {}
+	local var_9_1 = {}
 
-	self:emit(ActivityMainScene.GET_PAGE_BGM, self.__cname, var_8_1)
+	self:emit(ActivityMainScene.GET_PAGE_BGM, self.__cname, var_9_1)
 
-	if var_8_1.bgm then
-		_.each(ResPathSupport.GetSoundResList(var_8_1.bgm), function(arg_9_0)
-			table.insert(var_8_0, arg_9_0)
+	if var_9_1.bgm then
+		_.each(ResPathSupport.GetSoundResList(var_9_1.bgm), function(arg_10_0)
+			table.insert(var_9_0, arg_10_0)
 		end)
 	end
 
-	return var_8_0
+	return var_9_0
 end
 
 function BaseActivityPage:OnInit()
@@ -106,8 +116,12 @@ function BaseActivityPage:OnDestroy()
 	return
 end
 
-function BaseActivityPage:UseSecondPage(arg_18_1)
+function BaseActivityPage:UseSecondPage(arg_19_1)
 	return false
+end
+
+function BaseActivityPage:GetBgParams()
+	return nil, nil, nil
 end
 
 return BaseActivityPage

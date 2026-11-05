@@ -121,7 +121,7 @@ function ChapterAutoTotalRewardLayer:ShowShips(arg_11_1, arg_11_2)
 		local var_11_3 = var_11_0[iter_11_0]
 
 		if PlayerPrefs.GetInt(DISPLAY_SHIP_GET_EFFECT) ~= 1 then
-			if var_11_3.virgin or var_11_3:getRarity() >= ShipRarity.Purple then
+			if var_11_3.virgin or (pg.gameset.skip_duplicate_characters_rarity.key_value or ShipRarity.Gold) <= var_11_3:getRarity() then
 				table.insert(var_11_1, function(arg_13_0)
 					if getProxy(ChapterAutoProxy):GetSkipBatchBuildFlag() then
 						arg_13_0()

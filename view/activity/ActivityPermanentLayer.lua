@@ -5,6 +5,10 @@ function ActivityPermanentLayer:getResource()
 
 	for iter_1_0, iter_1_1 in ipairs((getProxy(ActivityPermanentProxy):getActivityIdsByType(ActivityPermanentProxy.TYPE_NORMAL_ACTIVITY))) do
 		table.insert(var_1_0, "activitybanner/" .. pg.activity_task_permanent[iter_1_1].banner_route)
+
+		if HXSet.isHx() then
+			table.insert(var_1_0, "activitybanner/" .. pg.activity_task_permanent[iter_1_1].banner_route .. "_hx")
+		end
 	end
 
 	table.insertto(var_1_0, ActivityPermanentLayer.super.getResource(self))

@@ -109,6 +109,9 @@ function IslandShipDressUpPageNew:OnLoaded()
 	self.hatOn = self.hatTF:Find("hatOn")
 	self.hatOff = self.hatTF:Find("hatOff")
 	self.morphTF = self._tf:Find("adapt/btns/morph")
+
+	setActive(self.morphTF, false)
+
 	self.morphBtn = self.morphTF and self.morphTF:Find("morphBtn")
 	self.morphBlocker = self._tf:Find("adapt/morph_blocker")
 

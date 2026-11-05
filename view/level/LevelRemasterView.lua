@@ -44,7 +44,13 @@ function LevelRemasterView:getResource()
 
 	_.each(pg.re_map_template.all, function(arg_7_0)
 		if pg.re_map_template[arg_7_0] and noEmptyStr(pg.re_map_template[arg_7_0].bg) then
-			table.insert(var_2_0, (ResPathSupport.CombinePath(ResPathSupport.ConstPath.UI.ActivityBanner, pg.re_map_template[arg_7_0].bg)))
+			local var_7_0 = ResPathSupport.CombinePath(ResPathSupport.ConstPath.UI.ActivityBanner, pg.re_map_template[arg_7_0].bg)
+
+			table.insert(var_2_0, var_7_0)
+
+			if HXSet.isHx() then
+				table.insert(var_2_0, var_7_0 .. "_hx")
+			end
 		end
 
 		_.each(pg.re_map_template[arg_7_0].drop_gain or {}, function(arg_8_0)
@@ -300,7 +306,16 @@ function LevelRemasterView:HandleActTypeRemaster(arg_26_1)
 	if var_26_3 and var_26_3 ~= arg_26_1.activity_id then
 		pg.MsgboxMgr.GetInstance():ShowMsgBox({
 			content = i18n("bossrush_act_remaster_close_prev_one_tip"),
-			onYes = var_26_4
+			onYes = function()
+				seriesAsync({
+					function(arg_29_0)
+						local var_29_0 = BossRushChapterRemasterHelper.GetRemasterByActivityId(var_26_3)
+
+						assert(var_29_0, "oldTempplate is nil, activityId: " .. var_26_3)
+						self:emit(LevelMediator2.RECORD_ACTIVITY_PERMANENT_PROGRESS, var_29_0.id, arg_29_0)
+					end
+				}, var_26_4)
+			end
 		})
 
 		return
@@ -327,19 +342,19 @@ function LevelRemasterView:Hide()
 	pg.UIMgr.GetInstance():UnOverlayPanel(self._tf, self._parentTf)
 end
 
-function LevelRemasterView:set(arg_31_1, arg_31_2)
+function LevelRemasterView:set(arg_33_1, arg_33_2)
 	self.templates = {}
 
-	for iter_31_0, iter_31_1 in ipairs(pg.re_map_template.all) do
-		table.insert(self.templates, pg.re_map_template[iter_31_1])
+	for iter_33_0, iter_33_1 in ipairs(pg.re_map_template.all) do
+		table.insert(self.templates, pg.re_map_template[iter_33_1])
 	end
 
-	self.onSelectMap = arg_31_1
+	self.onSelectMap = arg_33_1
 
-	self:flush(arg_31_2)
+	self:flush(arg_33_2)
 end
 
-function LevelRemasterView:flush(arg_32_1)
+function LevelRemasterView:flush(arg_34_1)
 	onButton(self, self._tf:Find("bg"), function()
 		self:Hide()
 	end, SFX_CANCEL)
@@ -351,31 +366,31 @@ function LevelRemasterView:flush(arg_32_1)
 	end, SFX_PANEL)
 	self:updateTicketDisplay()
 
-	local var_32_0 = {
+	local var_34_0 = {
 		self.exToggle,
 		self.spToggle
 	}
-	local var_32_1 = getProxy(ChapterProxy)
+	local var_34_1 = getProxy(ChapterProxy)
 
-	for iter_32_0, iter_32_1 in ipairs(var_32_0) do
-		onToggle(self, iter_32_1, function(arg_35_0)
-			if arg_35_0 then
-				self.temp = underscore.filter(self.templates, function(arg_36_0)
-					return BossRushChapterRemasterHelper.GetExOrSp4Filter(arg_36_0.activity_type) == iter_32_0
+	for iter_34_0, iter_34_1 in ipairs(var_34_0) do
+		onToggle(self, iter_34_1, function(arg_37_0)
+			if arg_37_0 then
+				self.temp = underscore.filter(self.templates, function(arg_38_0)
+					return BossRushChapterRemasterHelper.GetExOrSp4Filter(arg_38_0.activity_type) == iter_34_0
 				end)
 
-				local var_35_0 = {}
+				local var_37_0 = {}
 
-				for iter_35_0, iter_35_1 in ipairs(self.temp) do
-					var_35_0[iter_35_1.id] = BossRushChapterRemasterHelper.ExistCanGetAward(iter_35_1.id) and 0 or 1
+				for iter_37_0, iter_37_1 in ipairs(self.temp) do
+					var_37_0[iter_37_1.id] = BossRushChapterRemasterHelper.ExistCanGetAward(iter_37_1.id) and 0 or 1
 				end
 
 				table.sort(self.temp, CompareFuncs({
-					function(arg_37_0)
-						return var_35_0[arg_37_0.id] or 1
+					function(arg_39_0)
+						return var_37_0[arg_39_0.id] or 1
 					end,
-					function(arg_38_0)
-						return arg_38_0.order
+					function(arg_40_0)
+						return arg_40_0.order
 					end
 				}))
 				self.itemList:align(math.max(math.ceil(#self.temp / 2) * 2, 4))
@@ -383,11 +398,11 @@ function LevelRemasterView:flush(arg_32_1)
 		end, SFX_PANEL)
 	end
 
-	triggerToggle(var_32_0[arg_32_1 and 2 or 1], true)
+	triggerToggle(var_34_0[arg_34_1 and 2 or 1], true)
 end
 
-function LevelRemasterView:MatchType(arg_39_1, arg_39_2)
-	return arg_39_1 == arg_39_2
+function LevelRemasterView:MatchType(arg_41_1, arg_41_2)
+	return arg_41_1 == arg_41_2
 end
 
 function LevelRemasterView:flushOnly()
@@ -395,12 +410,12 @@ function LevelRemasterView:flushOnly()
 end
 
 function LevelRemasterView:updateTicketDisplay()
-	local var_41_0 = getProxy(ChapterProxy)
-	local var_41_1 = var_41_0.remasterDailyCount > 0
+	local var_43_0 = getProxy(ChapterProxy)
+	local var_43_1 = var_43_0.remasterDailyCount > 0
 
-	SetActive(self.getRemasterTF, not (var_41_0.remasterDailyCount > 0))
-	SetActive(self.gotRemasterTF, var_41_1)
-	setText(self.numsTxt, var_41_0.remasterTickets .. "/" .. pg.gameset.reactivity_ticket_max.key_value)
+	SetActive(self.getRemasterTF, not (var_43_0.remasterDailyCount > 0))
+	SetActive(self.gotRemasterTF, var_43_1)
+	setText(self.numsTxt, var_43_0.remasterTickets .. "/" .. pg.gameset.reactivity_ticket_max.key_value)
 end
 
 return LevelRemasterView

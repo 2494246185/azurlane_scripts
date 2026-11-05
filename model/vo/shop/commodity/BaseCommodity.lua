@@ -69,6 +69,10 @@ function BaseCommodity:isDisCount()
 	return false
 end
 
+function BaseCommodity:isShopDiscount()
+	return false
+end
+
 function BaseCommodity:isChargeType()
 	return false
 end
@@ -97,12 +101,12 @@ function BaseCommodity:getBuyCount()
 	return self.buyCount or 0
 end
 
-function BaseCommodity:updateBuyCount(arg_23_1)
-	self.buyCount = arg_23_1
+function BaseCommodity:updateBuyCount(arg_24_1)
+	self.buyCount = arg_24_1
 end
 
-function BaseCommodity:updateGroupCount(arg_24_1)
-	self.groupCount = arg_24_1
+function BaseCommodity:updateGroupCount(arg_25_1)
+	self.groupCount = arg_25_1
 end
 
 function BaseCommodity:firstPayDouble()
@@ -111,30 +115,30 @@ end
 
 function BaseCommodity:inTime()
 	if self.type == Goods.TYPE_NEW_SERVER then
-		local var_26_0 = getProxy(ActivityProxy):getActivityByType(ActivityConst.ACTIVITY_TYPE_NEWSERVER_GIFT)
+		local var_27_0 = getProxy(ActivityProxy):getActivityByType(ActivityConst.ACTIVITY_TYPE_NEWSERVER_GIFT)
 
-		if var_26_0 and not var_26_0:isEnd() then
-			return true, var_26_0.stopTime - pg.TimeMgr.GetInstance():GetServerTime()
+		if var_27_0 and not var_27_0:isEnd() then
+			return true, var_27_0.stopTime - pg.TimeMgr.GetInstance():GetServerTime()
 		else
 			return false
 		end
 	end
 
-	local var_26_1 = self:getConfig("time")
+	local var_27_1 = self:getConfig("time")
 
-	if not var_26_1 then
+	if not var_27_1 then
 		return true
 	end
 
-	if type(var_26_1) == "string" then
-		return var_26_1 == "always"
+	if type(var_27_1) == "string" then
+		return var_27_1 == "always"
 	else
-		local var_26_2, var_26_3 = self:getTimeStamp()
+		local var_27_2, var_27_3 = self:getTimeStamp()
 
-		if var_26_2 and var_26_3 then
-			local var_26_4 = pg.TimeMgr.GetInstance():GetServerTime()
+		if var_27_2 and var_27_3 then
+			local var_27_4 = pg.TimeMgr.GetInstance():GetServerTime()
 
-			return var_26_2 <= var_26_4 and var_26_4 <= var_26_3, var_26_3 - var_26_4
+			return var_27_2 <= var_27_4 and var_27_4 <= var_27_3, var_27_3 - var_27_4
 		else
 			return true
 		end
@@ -142,31 +146,31 @@ function BaseCommodity:inTime()
 end
 
 function BaseCommodity:getTimeStamp()
-	local var_27_0 = self:getConfig("time")
+	local var_28_0 = self:getConfig("time")
 
-	if var_27_0 and type(var_27_0) == "table" then
-		local var_27_1
-		local var_27_2
+	if var_28_0 and type(var_28_0) == "table" then
+		local var_28_1
+		local var_28_2
 
-		if #var_27_0 > 0 then
-			var_27_1 = pg.TimeMgr.GetInstance():ParseTimeEx(var_27_0[1][1][1] .. "-" .. var_27_0[1][1][2] .. "-" .. var_27_0[1][1][3] .. " " .. var_27_0[1][2][1] .. ":" .. var_27_0[1][2][2] .. ":" .. var_27_0[1][2][3], nil, true)
+		if #var_28_0 > 0 then
+			var_28_1 = pg.TimeMgr.GetInstance():ParseTimeEx(var_28_0[1][1][1] .. "-" .. var_28_0[1][1][2] .. "-" .. var_28_0[1][1][3] .. " " .. var_28_0[1][2][1] .. ":" .. var_28_0[1][2][2] .. ":" .. var_28_0[1][2][3], nil, true)
 		end
 
-		if #var_27_0 > 1 then
-			var_27_2 = pg.TimeMgr.GetInstance():ParseTimeEx(var_27_0[2][1][1] .. "-" .. var_27_0[2][1][2] .. "-" .. var_27_0[2][1][3] .. " " .. var_27_0[2][2][1] .. ":" .. var_27_0[2][2][2] .. ":" .. var_27_0[2][2][3], nil, true)
+		if #var_28_0 > 1 then
+			var_28_2 = pg.TimeMgr.GetInstance():ParseTimeEx(var_28_0[2][1][1] .. "-" .. var_28_0[2][1][2] .. "-" .. var_28_0[2][1][3] .. " " .. var_28_0[2][2][1] .. ":" .. var_28_0[2][2][2] .. ":" .. var_28_0[2][2][3], nil, true)
 		end
 
-		if var_27_1 and var_27_2 then
-			return var_27_1, var_27_2
+		if var_28_1 and var_28_2 then
+			return var_28_1, var_28_2
 		end
 	end
 end
 
 function BaseCommodity:calDayLeft()
-	local var_28_0, var_28_1 = self:inTime()
+	local var_29_0, var_29_1 = self:inTime()
 
-	if var_28_0 and var_28_1 and var_28_1 > 0 then
-		return var_28_0, pg.TimeMgr.GetInstance():parseTimeFrom(var_28_1) + 1
+	if var_29_0 and var_29_1 and var_29_1 > 0 then
+		return var_29_0, pg.TimeMgr.GetInstance():parseTimeFrom(var_29_1) + 1
 	end
 end
 
@@ -190,7 +194,7 @@ function BaseCommodity:ExistExclusiveDiscountItem()
 	return false
 end
 
-function BaseCommodity:StaticCanUseVoucherType(arg_34_1)
+function BaseCommodity:StaticCanUseVoucherType(arg_35_1)
 	return false
 end
 

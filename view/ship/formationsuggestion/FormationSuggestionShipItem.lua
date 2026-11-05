@@ -22,7 +22,7 @@ function FormationSuggestionShipItem:didEnter()
 	return
 end
 
-function FormationSuggestionShipItem:SetData(arg_4_1, arg_4_2)
+function FormationSuggestionShipItem:SetData(arg_4_1, arg_4_2, arg_4_3)
 	self.id = arg_4_1
 
 	if self.shipVO then
@@ -72,6 +72,10 @@ function FormationSuggestionShipItem:SetData(arg_4_1, arg_4_2)
 	self.shipVO = var_4_1
 
 	setActive(self.uiFlagGo, arg_4_2)
+
+	if arg_4_2 then
+		setImageSprite(self.uiFlagGo, GetSpriteFromAtlas("ui/formationsuggestionui_atlas", arg_4_3 and "main_ship_leading" or "main_ship_main"))
+	end
 
 	local var_4_6 = getProxy(BayProxy):findShipsByGroup(pg.ship_data_template[var_4_0.char_id].group_type)
 

@@ -45,6 +45,10 @@ function ActivityMainScene:getResource()
 
 	for iter_1_4, iter_1_5 in ipairs(ActivityMainScene.GetOnShowEntranceData()) do
 		var_1_1("activitybanner/" .. iter_1_5.banner)
+
+		if HXSet.isHx() then
+			var_1_1("activitybanner/" .. iter_1_5.banner .. "_hx")
+		end
 	end
 
 	table.insertto(var_1_0, ActivityMainScene.super.getResource(self))

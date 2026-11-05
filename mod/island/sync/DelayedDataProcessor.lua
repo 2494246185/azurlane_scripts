@@ -1,6 +1,6 @@
-local DelayedDataProcesseor = class("DelayedDataProcesseor")
+local DelayedDataProcessor = class("DelayedDataProcessor")
 
-function DelayedDataProcesseor:Ctor(arg_1_1, arg_1_2, arg_1_3)
+function DelayedDataProcessor:Ctor(arg_1_1, arg_1_2, arg_1_3)
 	self.delayedDataDic = {}
 	self.preTimeStampDic = {}
 	self.delayedTime = arg_1_1
@@ -8,25 +8,21 @@ function DelayedDataProcesseor:Ctor(arg_1_1, arg_1_2, arg_1_3)
 	self.func = arg_1_3
 end
 
-function DelayedDataProcesseor:Add(arg_2_1, arg_2_2)
-	local var_2_0
+function DelayedDataProcessor:Add(arg_2_1, arg_2_2)
+	self.delayedDataDic[arg_2_1] = self.delayedDataDic[arg_2_1] or {}
 
-	if self.preTimeStampDic[arg_2_1] then
-		var_2_0 = math.min(self.preTimeStampDic[arg_2_1] + self.intervalTime, pg.TimeMgr.GetInstance():GetServerTimeMs() + self.delayedTime)
-	else
-		self.delayedDataDic[arg_2_1] = {}
-		var_2_0 = pg.TimeMgr.GetInstance():GetServerTimeMs() + self.delayedTime
-	end
+	local var_2_0 = pg.TimeMgr.GetInstance():GetServerTimeMs()
+	local var_2_1 = self.preTimeStampDic[arg_2_1] and math.min(self.preTimeStampDic[arg_2_1] + self.intervalTime, var_2_0 + self.delayedTime) or var_2_0 + self.delayedTime
 
 	table.insert(self.delayedDataDic[arg_2_1], {
 		data = arg_2_2,
-		timeStamp = var_2_0
+		timeStamp = var_2_1
 	})
 
-	self.preTimeStampDic[arg_2_1] = var_2_0
+	self.preTimeStampDic[arg_2_1] = var_2_1
 end
 
-function DelayedDataProcesseor:Update()
+function DelayedDataProcessor:Update()
 	local var_3_0 = pg.TimeMgr.GetInstance():GetServerTimeMs()
 
 	for iter_3_0, iter_3_1 in pairs(self.delayedDataDic) do
@@ -41,7 +37,7 @@ function DelayedDataProcesseor:Update()
 	end
 end
 
-function DelayedDataProcesseor:RemoveDataById(arg_6_1)
+function DelayedDataProcessor:RemoveDataById(arg_6_1)
 	if self.delayedDataDic[arg_6_1] then
 		self.delayedDataDic[arg_6_1] = nil
 	end
@@ -51,8 +47,9 @@ function DelayedDataProcesseor:RemoveDataById(arg_6_1)
 	end
 end
 
-function DelayedDataProcesseor:Dispose()
-	return
+function DelayedDataProcessor:Dispose()
+	self.delayedDataDic = {}
+	self.preTimeStampDic = {}
 end
 
-return DelayedDataProcesseor
+return DelayedDataProcessor

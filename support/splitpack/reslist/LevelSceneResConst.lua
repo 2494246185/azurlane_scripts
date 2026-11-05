@@ -143,7 +143,12 @@ function ResList.LevelSceneResConst.GetEntranceActivityResList()
 		local var_7_2 = var_7_1:getConfig("config_client").entrance_bg
 
 		if noEmptyStr(var_7_2) then
+			if string.sub(var_7_2, 1, #"activitybanner") == "activitybanner" then
+				var_7_2 = "MainUIBanner" .. string.sub(var_7_2, #"activitybanner" + 1)
+			end
+
 			table.insert(var_7_0, var_7_2)
+			table.insert(var_7_0, var_7_2 .. "_hx")
 		end
 	end
 

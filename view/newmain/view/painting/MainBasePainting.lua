@@ -56,6 +56,7 @@ function MainBasePainting:Load(arg_7_1)
 		end
 
 		self:InitClickEvent()
+		self:emit(NewMainScene.PAINTING_LOAD_COMPLETE)
 	end)
 end
 
@@ -264,6 +265,14 @@ function MainBasePainting:OnTimerTriggerEvent()
 	end
 end
 
+function MainBasePainting:SetTargetContainer(arg_30_1)
+	self._renderTargetContainer = arg_30_1
+end
+
+function MainBasePainting:GetTargetContainer()
+	return (self._renderTargetContainer or nil) and (self._renderTargetContainer or self.container)
+end
+
 function MainBasePainting:OnEnableTimerEvent()
 	return true
 end
@@ -276,62 +285,62 @@ function MainBasePainting:OnEndChatting()
 	self.chatting = false
 end
 
-function MainBasePainting:GetWordAndCv(arg_33_1, arg_33_2)
-	local var_33_0, var_33_1, var_33_2, var_33_3, var_33_4, var_33_5 = ShipWordHelper.GetCvDataForShip(self.ship, arg_33_2)
+function MainBasePainting:GetWordAndCv(arg_35_1, arg_35_2)
+	local var_35_0, var_35_1, var_35_2, var_35_3, var_35_4, var_35_5 = ShipWordHelper.GetCvDataForShip(self.ship, arg_35_2)
 
-	return var_33_0, var_33_1, var_33_2, var_33_3, var_33_4, var_33_5
+	return var_35_0, var_35_1, var_35_2, var_35_3, var_35_4, var_35_5
 end
 
-function MainBasePainting:DisplayWord(arg_34_1)
+function MainBasePainting:DisplayWord(arg_36_1)
 	self:OnStartChatting()
 
-	local var_34_0, var_34_1, var_34_2, var_34_3, var_34_4, var_34_5 = self:GetWordAndCv(self.ship, arg_34_1)
+	local var_36_0, var_36_1, var_36_2, var_36_3, var_36_4, var_36_5 = self:GetWordAndCv(self.ship, arg_36_1)
 
-	if not var_34_2 or var_34_2 == nil or var_34_2 == "" or var_34_2 == "nil" then
+	if not var_36_2 or var_36_2 == nil or var_36_2 == "" or var_36_2 == "nil" then
 		self:OnEndChatting()
 		self:OnDisplayWordEnd()
 
 		return
 	end
 
-	self:OnDisplayWorld(arg_34_1)
+	self:OnDisplayWorld(arg_36_1)
 
 	if self._asmrFlag then
-		self:emit(MainAsmrChatView.SET_CONTENT, arg_34_1, var_34_2)
+		self:emit(MainAsmrChatView.SET_CONTENT, arg_36_1, var_36_2)
 	else
-		self:emit(MainWordView.SET_CONTENT, arg_34_1, var_34_2)
+		self:emit(MainWordView.SET_CONTENT, arg_36_1, var_36_2)
 	end
 
-	self:PlayCvAndAnimation(var_34_4, var_34_3, var_34_1)
+	self:PlayCvAndAnimation(var_36_4, var_36_3, var_36_1)
 end
 
-function MainBasePainting:PlayCvAndAnimation(arg_35_1, arg_35_2, arg_35_3)
+function MainBasePainting:PlayCvAndAnimation(arg_37_1, arg_37_2, arg_37_3)
 	if getProxy(ContextProxy):getContextByMediator(NewShipMediator) then
 		self:OnEndChatting()
 
 		return
 	end
 
-	local var_35_0 = -1
+	local var_37_0 = -1
 
 	seriesAsync({
-		function(arg_36_0)
-			if arg_35_3 then
+		function(arg_38_0)
+			if arg_37_3 then
 				if not not pg.NewStoryMgr.GetInstance():IsRunning() then
-					arg_36_0()
+					arg_38_0()
 
 					return
 				end
 			end
 
-			self:PlayCV(arg_35_1, arg_35_2, arg_35_3, function(arg_37_0)
-				var_35_0 = arg_37_0
+			self:PlayCV(arg_37_1, arg_37_2, arg_37_3, function(arg_39_0)
+				var_37_0 = arg_39_0
 
-				arg_36_0()
+				arg_38_0()
 			end)
 		end,
-		function(arg_38_0)
-			self:StartChatAnimtion(var_35_0, arg_38_0)
+		function(arg_40_0)
+			self:StartChatAnimtion(var_37_0, arg_40_0)
 		end
 	}, function()
 		self:OnDisplayWordEnd()
@@ -342,33 +351,33 @@ function MainBasePainting:OnDisplayWordEnd()
 	self:TriggerNextEventAuto()
 end
 
-function MainBasePainting:PlayCV(arg_41_1, arg_41_2, arg_41_3, arg_41_4)
-	self.cvLoader:Load(pg.CriMgr.GetCVBankName((ShipWordHelper.RawGetCVKey(self.ship:getSkinId()))), arg_41_3, 0, arg_41_4)
+function MainBasePainting:PlayCV(arg_43_1, arg_43_2, arg_43_3, arg_43_4)
+	self.cvLoader:Load(pg.CriMgr.GetCVBankName((ShipWordHelper.RawGetCVKey(self.ship:getSkinId()))), arg_43_3, 0, arg_43_4)
 end
 
-function MainBasePainting:preloadCv(arg_42_1)
-	self.cvLoader:preloadCv(pg.CriMgr.GetCVBankName((ShipWordHelper.RawGetCVKey(self.ship:getSkinId()))), arg_42_1)
+function MainBasePainting:preloadCv(arg_44_1)
+	self.cvLoader:preloadCv(pg.CriMgr.GetCVBankName((ShipWordHelper.RawGetCVKey(self.ship:getSkinId()))), arg_44_1)
 end
 
-function MainBasePainting:OnAsmrTurnning(arg_43_1)
-	self._asmrFlag = arg_43_1
+function MainBasePainting:OnAsmrTurnning(arg_45_1)
+	self._asmrFlag = arg_45_1
 end
 
-function MainBasePainting:setReplaceWord(arg_44_1)
-	self.replaceWord = arg_44_1
+function MainBasePainting:setReplaceWord(arg_46_1)
+	self.replaceWord = arg_46_1
 end
 
 function MainBasePainting:getReplaceWord()
 	return self.replaceWord
 end
 
-function MainBasePainting:StartChatAnimtion(arg_46_1, arg_46_2)
-	local var_46_0 = arg_46_1 > 0 and arg_46_1 or 3
+function MainBasePainting:StartChatAnimtion(arg_48_1, arg_48_2)
+	local var_48_0 = arg_48_1 > 0 and arg_48_1 or 3
 
 	if self._asmrFlag then
-		self:emit(MainAsmrChatView.START_CHAT, 0.3, var_46_0)
+		self:emit(MainAsmrChatView.START_CHAT, 0.3, var_48_0)
 	else
-		self:emit(MainWordView.START_ANIMATION, 0.3, var_46_0)
+		self:emit(MainWordView.START_ANIMATION, 0.3, var_48_0)
 	end
 
 	self:AddCharTimer(function()
@@ -376,14 +385,14 @@ function MainBasePainting:StartChatAnimtion(arg_46_1, arg_46_2)
 			return
 		end
 
-		arg_46_2()
-	end, 0.3 * 3 + var_46_0)
+		arg_48_2()
+	end, 0.3 * 3 + var_48_0)
 end
 
-function MainBasePainting:AddCharTimer(arg_48_1, arg_48_2)
+function MainBasePainting:AddCharTimer(arg_50_1, arg_50_2)
 	self:RemoveChatTimer()
 
-	self.chatTimer = Timer.New(arg_48_1, arg_48_2, 1)
+	self.chatTimer = Timer.New(arg_50_1, arg_50_2, 1)
 
 	self.chatTimer:Start()
 end
@@ -408,58 +417,58 @@ function MainBasePainting:OnStopVoice()
 	self.cvLoader:Stop()
 end
 
-function MainBasePainting:CollectIdleEvents(arg_52_1)
-	local var_52_0 = {}
+function MainBasePainting:CollectIdleEvents(arg_54_1)
+	local var_54_0 = {}
 
-	if getProxy(EventProxy):hasFinishState() and arg_52_1 ~= "event_complete" then
-		table.insert(var_52_0, "event_complete")
+	if getProxy(EventProxy):hasFinishState() and arg_54_1 ~= "event_complete" then
+		table.insert(var_54_0, "event_complete")
 	else
-		if getProxy(TaskProxy):getCanReceiveCount() > 0 and arg_52_1 ~= "mission_complete" then
-			table.insert(var_52_0, "mission_complete")
+		if getProxy(TaskProxy):getCanReceiveCount() > 0 and arg_54_1 ~= "mission_complete" then
+			table.insert(var_54_0, "mission_complete")
 		end
 
-		if getProxy(MailProxy):GetUnreadCount() > 0 and arg_52_1 ~= "mail" then
-			table.insert(var_52_0, "mail")
+		if getProxy(MailProxy):GetUnreadCount() > 0 and arg_54_1 ~= "mail" then
+			table.insert(var_54_0, "mail")
 		end
 
-		if #var_52_0 == 0 then
-			var_52_0 = var_0_5.GetShipMainEvents(self.ship:getSkinId(), self.ship:getCVIntimacy())
+		if #var_54_0 == 0 then
+			var_54_0 = var_0_5.GetShipMainEvents(self.ship:getSkinId(), self.ship:getCVIntimacy())
 
 			if getProxy(TaskProxy):getNotFinishCount() then
-				if getProxy(TaskProxy):getNotFinishCount() > 0 and arg_52_1 ~= "mission" then
-					table.insert(var_52_0, "mission")
+				if getProxy(TaskProxy):getNotFinishCount() > 0 and arg_54_1 ~= "mission" then
+					table.insert(var_54_0, "mission")
 				end
 			end
 		end
 	end
 
-	return var_52_0
+	return var_54_0
 end
 
 function MainBasePainting:CollectTouchEvents()
-	local var_53_0 = self.ship:getCVIntimacy()
+	local var_55_0 = self.ship:getCVIntimacy()
 
-	return (var_0_5.filterAssistantEvents(var_0_5.GetShipTouchEvents(self.ship:getSkinId(), var_53_0), self.ship:getSkinId(), var_53_0))
+	return (var_0_5.filterAssistantEvents(var_0_5.GetShipTouchEvents(self.ship:getSkinId(), var_55_0), self.ship:getSkinId(), var_55_0))
 end
 
-function MainBasePainting:GetTouchEvent(arg_54_1)
-	local var_54_0 = self.ship:getCVIntimacy()
+function MainBasePainting:GetTouchEvent(arg_56_1)
+	local var_56_0 = self.ship:getCVIntimacy()
 
-	return (var_0_5.filterAssistantEvents(var_0_5.getAssistantTouchEvents(arg_54_1, self.ship:getSkinId()), self.ship:getSkinId(), 0))
+	return (var_0_5.filterAssistantEvents(var_0_5.getAssistantTouchEvents(arg_56_1, self.ship:getSkinId()), self.ship:getSkinId(), 0))
 end
 
 function MainBasePainting:GetIdleEvents()
-	local var_55_0 = self.ship:getCVIntimacy()
+	local var_57_0 = self.ship:getCVIntimacy()
 
 	return (var_0_5.filterAssistantEvents(var_0_5.GetShipMainEvents(self.ship:getSkinId(), 0), self.ship:getSkinId(), 0))
 end
 
-function MainBasePainting:GetEventConfig(arg_56_1)
-	return pg.AssistantInfo.GetAssistantEvents(arg_56_1)
+function MainBasePainting:GetEventConfig(arg_58_1)
+	return pg.AssistantInfo.GetAssistantEvents(arg_58_1)
 end
 
-function MainBasePainting:GetSpecialTouchEvent(arg_57_1)
-	return var_0_5.getPaintingTouchEvents(arg_57_1)
+function MainBasePainting:GetSpecialTouchEvent(arg_59_1)
+	return var_0_5.getPaintingTouchEvents(arg_59_1)
 end
 
 function MainBasePainting:RemoveTimer()
@@ -474,11 +483,11 @@ function MainBasePainting:IsExited()
 	return self.isExited
 end
 
-function MainBasePainting:Fold(arg_60_1, arg_60_2)
-	self.isFoldState = arg_60_1
+function MainBasePainting:Fold(arg_62_1, arg_62_2)
+	self.isFoldState = arg_62_1
 
 	self:RemoveMoveTimer()
-	self:OnFold(arg_60_1)
+	self:OnFold(arg_62_1)
 end
 
 function MainBasePainting:RemoveMoveTimer()
@@ -489,12 +498,12 @@ function MainBasePainting:RemoveMoveTimer()
 	end
 end
 
-function MainBasePainting:EnableOrDisableMove(arg_62_1)
-	self.isDragAndZoomState = arg_62_1
+function MainBasePainting:EnableOrDisableMove(arg_64_1)
+	self.isDragAndZoomState = arg_64_1
 
 	self:RemoveMoveTimer()
 
-	if arg_62_1 then
+	if arg_64_1 then
 		self:StopChatAnimtion()
 		self:RemoveTimer()
 		self.cvLoader:Stop()
@@ -502,7 +511,7 @@ function MainBasePainting:EnableOrDisableMove(arg_62_1)
 		self:TriggerNextEventAuto()
 	end
 
-	self:OnEnableOrDisableDragAndZoom(arg_62_1)
+	self:OnEnableOrDisableDragAndZoom(arg_64_1)
 end
 
 function MainBasePainting:GetOffset()
@@ -517,11 +526,11 @@ function MainBasePainting:IslimitYPos()
 	return false
 end
 
-function MainBasePainting:PlayChangeSkinActionIn(arg_66_1)
+function MainBasePainting:PlayChangeSkinActionIn(arg_68_1)
 	return
 end
 
-function MainBasePainting:PlayChangeSkinActionOut(arg_67_1)
+function MainBasePainting:PlayChangeSkinActionOut(arg_69_1)
 	return
 end
 
@@ -571,56 +580,60 @@ function MainBasePainting:Resume()
 	self:OnResume()
 end
 
-function MainBasePainting:updateShip(arg_74_1)
-	if arg_74_1 and self.ship.id == arg_74_1.id then
-		self.ship = arg_74_1
+function MainBasePainting:updateShip(arg_76_1)
+	if arg_76_1 and self.ship.id == arg_76_1.id then
+		self.ship = arg_76_1
 	end
 
-	self:OnUpdateShip(arg_74_1)
+	self:OnUpdateShip(arg_76_1)
 end
 
-function MainBasePainting:OnUpdateShip(arg_75_1)
+function MainBasePainting:OnUpdateShip(arg_77_1)
+	return
+end
+
+function MainBasePainting:OnPaintingFade(arg_78_1)
 	return
 end
 
 function MainBasePainting:InitScalePart()
-	local var_76_0 = self:GetPartScaleData()
+	local var_79_0 = self:GetPartScaleData()
 
-	if var_76_0 and #var_76_0 > 0 then
+	if var_79_0 and #var_79_0 > 0 then
 		self.partScaleList = {}
 		self.partScaleSelectList = {}
 
-		local var_76_1 = self:GetPaintingTransform()
+		local var_79_1 = self:GetPaintingTransform()
 
-		if var_76_1 then
-			for iter_76_0, iter_76_1 in ipairs(var_76_0) do
-				local var_76_2 = findTF(var_76_1, iter_76_1)
+		if var_79_1 then
+			for iter_79_0, iter_79_1 in ipairs(var_79_0) do
+				local var_79_2 = findTF(var_79_1, iter_79_1)
 
-				if var_76_2 then
-					local var_76_3 = GetOrAddComponent(var_76_2, typeof(PinchZoom))
+				if var_79_2 then
+					local var_79_3 = GetOrAddComponent(var_79_2, typeof(PinchZoom))
 
-					var_76_3.enabled = false
+					var_79_3.enabled = false
 
-					PoolMgr.GetInstance():GetUI("mainuiscalepart", false, function(arg_77_0)
-						SetParent(arg_77_0, var_76_2)
-						setActive(arg_77_0, false)
+					PoolMgr.GetInstance():GetUI("mainuiscalepart", false, function(arg_80_0)
+						SetParent(arg_80_0, var_79_2)
+						setActive(arg_80_0, false)
 						table.insert(self.partScaleSelectList, {
-							tf = tf(arg_77_0),
-							name = iter_76_1
+							tf = tf(arg_80_0),
+							name = iter_79_1
 						})
 					end)
-					onButton(self._event, var_76_2, function()
+					onButton(self._event, var_79_2, function()
 						if self.partScaleFlag then
-							self.selectPartName = iter_76_1
+							self.selectPartName = iter_79_1
 
 							self:updateSelectPartScale()
 						end
 					end)
 					self:ResetPartScale(true)
 					table.insert(self.partScaleList, {
-						name = iter_76_1,
-						tf = var_76_2,
-						com = var_76_3
+						name = iter_79_1,
+						tf = var_79_2,
+						com = var_79_3
 					})
 				end
 			end
@@ -628,29 +641,29 @@ function MainBasePainting:InitScalePart()
 	end
 end
 
-function MainBasePainting:updatePartCotent(arg_79_1)
-	for iter_79_0 = 1, #self.partScaleSelectList do
-		if arg_79_1 then
-			self:emit(NewMainScene.SET_SCALE_PART_CONTENT, self.partScaleSelectList[iter_79_0].tf)
+function MainBasePainting:updatePartCotent(arg_82_1)
+	for iter_82_0 = 1, #self.partScaleSelectList do
+		if arg_82_1 then
+			self:emit(NewMainScene.SET_SCALE_PART_CONTENT, self.partScaleSelectList[iter_82_0].tf)
 		else
-			setParent(self.partScaleSelectList[iter_79_0].tf, self:GetPaintingTransform(), true)
+			setParent(self.partScaleSelectList[iter_82_0].tf, self:GetPaintingTransform(), true)
 		end
 	end
 end
 
 function MainBasePainting:updateSelectPartScale()
-	for iter_80_0 = 1, #self.partScaleList do
-		self.partScaleList[iter_80_0].com.enabled = self.partScaleFlag and self.partScaleList[iter_80_0].name == self.selectPartName
+	for iter_83_0 = 1, #self.partScaleList do
+		self.partScaleList[iter_83_0].com.enabled = self.partScaleFlag and self.partScaleList[iter_83_0].name == self.selectPartName
 
-		setActive(self.partScaleSelectList[iter_80_0].tf, self.partScaleFlag and self.partScaleSelectList[iter_80_0].name == self.selectPartName)
+		setActive(self.partScaleSelectList[iter_83_0].tf, self.partScaleFlag and self.partScaleSelectList[iter_83_0].name == self.selectPartName)
 	end
 end
 
 function MainBasePainting:ClearScalePart()
 	if self.partScaleList and #self.partScaleList > 0 then
-		for iter_81_0 = 1, #self.partScaleList do
-			if self.partScaleList[iter_81_0].tf then
-				removeOnButton(self.partScaleList[iter_81_0].tf)
+		for iter_84_0 = 1, #self.partScaleList do
+			if self.partScaleList[iter_84_0].tf then
+				removeOnButton(self.partScaleList[iter_84_0].tf)
 			end
 		end
 
@@ -658,9 +671,9 @@ function MainBasePainting:ClearScalePart()
 	end
 
 	if self.partScaleSelectList and #self.partScaleSelectList > 0 then
-		for iter_81_1 = 1, #self.partScaleSelectList do
-			if self.partScaleSelectList[iter_81_1].tf then
-				PoolMgr.GetInstance():ReturnUI("mainuiscalepart", go(self.partScaleSelectList[iter_81_1].tf))
+		for iter_84_1 = 1, #self.partScaleSelectList do
+			if self.partScaleSelectList[iter_84_1].tf then
+				PoolMgr.GetInstance():ReturnUI("mainuiscalepart", go(self.partScaleSelectList[iter_84_1].tf))
 			end
 		end
 
@@ -668,35 +681,35 @@ function MainBasePainting:ClearScalePart()
 	end
 end
 
-function MainBasePainting:OnEnablePartScale(arg_82_1)
+function MainBasePainting:OnEnablePartScale(arg_85_1)
 	if self.partScaleList then
-		self.partScaleFlag = arg_82_1
+		self.partScaleFlag = arg_85_1
 		self.selectPartName = nil
 
-		for iter_82_0 = 1, #self.partScaleList do
-			GetOrAddComponent(self.partScaleList[iter_82_0].tf, typeof(CanvasGroup)).blocksRaycasts = arg_82_1
+		for iter_85_0 = 1, #self.partScaleList do
+			GetOrAddComponent(self.partScaleList[iter_85_0].tf, typeof(CanvasGroup)).blocksRaycasts = arg_85_1
 		end
 
 		self:updateSelectPartScale()
-		self:updatePartCotent(arg_82_1)
+		self:updatePartCotent(arg_85_1)
 
-		if not arg_82_1 then
+		if not arg_85_1 then
 			self:ResetPartScale(true)
 		end
 	end
 end
 
-function MainBasePainting:ResetPartScale(arg_83_1)
+function MainBasePainting:ResetPartScale(arg_86_1)
 	if self.partScaleList and #self.partScaleList > 0 then
-		for iter_83_0 = 1, #self.partScaleList do
-			local var_83_0 = self.partScaleList[iter_83_0].tf
-			local var_83_1
+		for iter_86_0 = 1, #self.partScaleList do
+			local var_86_0 = self.partScaleList[iter_86_0].tf
+			local var_86_1
 
-			if arg_83_1 then
-				var_83_1 = getProxy(SettingsProxy):getSkinScaleSetting(self.ship, self:GetPartStateType(), self.partScaleList[iter_83_0].name) or 1
+			if arg_86_1 then
+				var_86_1 = getProxy(SettingsProxy):getSkinScaleSetting(self.ship, self:GetPartStateType(), self.partScaleList[iter_86_0].name) or 1
 			end
 
-			var_83_0.localScale = Vector3(var_83_1, var_83_1, var_83_1)
+			var_86_0.localScale = Vector3(var_86_1, var_86_1, var_86_1)
 		end
 	end
 end
@@ -710,8 +723,8 @@ function MainBasePainting:SavePartScaleData()
 		return
 	end
 
-	for iter_84_0 = 1, #self.partScaleList do
-		getProxy(SettingsProxy):setSkinScaleSetting(self.ship, self:GetPartStateType(), self.partScaleList[iter_84_0].name, self.partScaleList[iter_84_0].tf.localScale.x)
+	for iter_87_0 = 1, #self.partScaleList do
+		getProxy(SettingsProxy):setSkinScaleSetting(self.ship, self:GetPartStateType(), self.partScaleList[iter_87_0].name, self.partScaleList[iter_87_0].tf.localScale.x)
 	end
 end
 
@@ -728,6 +741,8 @@ function MainBasePainting:GetPartStateType()
 end
 
 function MainBasePainting:Dispose()
+	self._renderTargetContainer = nil
+
 	self:disposeEvent()
 
 	self.isExited = true
@@ -749,8 +764,8 @@ function MainBasePainting:Dispose()
 	self:ClearScalePart()
 end
 
-function MainBasePainting:OnLoad(arg_89_1)
-	arg_89_1()
+function MainBasePainting:OnLoad(arg_92_1)
+	arg_92_1()
 end
 
 function MainBasePainting:OnUnload()
@@ -773,15 +788,15 @@ function MainBasePainting:OnTriggerEventAuto()
 	return
 end
 
-function MainBasePainting:OnDisplayWorld(arg_95_1)
+function MainBasePainting:OnDisplayWorld(arg_98_1)
 	return
 end
 
-function MainBasePainting:OnFold(arg_96_1)
+function MainBasePainting:OnFold(arg_99_1)
 	return
 end
 
-function MainBasePainting:OnEnableOrDisableDragAndZoom(arg_97_1)
+function MainBasePainting:OnEnableOrDisableDragAndZoom(arg_100_1)
 	return
 end
 

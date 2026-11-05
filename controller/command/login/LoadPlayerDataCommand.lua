@@ -317,6 +317,10 @@ function LoadPlayerDataCommand:execute(arg_1_1)
 		{
 			ActivityRemasterProxy,
 			true
+		},
+		{
+			ActivityBanProxy,
+			true
 		}
 	})
 	pg.ConnectionMgr.GetInstance():setPacketIdx(1)

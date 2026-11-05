@@ -65,7 +65,6 @@ function IslandUnitVO:GetAssetPath()
 	local var_11_0
 
 	if self:IsNpcType() then
-		warning(self.type)
 		assert(pg.island_unit_character[self.modelId], self.modelId)
 
 		var_11_0 = pg.island_unit_character[self.modelId].model

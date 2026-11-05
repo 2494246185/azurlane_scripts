@@ -10,7 +10,6 @@ function SyncLocalPlayer:Ctor(arg_1_1, arg_1_2)
 	self.id = arg_1_1
 	self.sceneObject = arg_1_2
 	self.animator = arg_1_2:GetAnimator()
-	self.inTimeline = false
 end
 
 function SyncLocalPlayer:GetStatus()
@@ -27,25 +26,17 @@ function SyncLocalPlayer:IsLoaded()
 	return self.sceneObject and self.sceneObject:IsLoaded()
 end
 
-function SyncLocalPlayer:SetInTimeline(arg_4_1)
-	self.inTimeline = arg_4_1
-end
-
-function SyncLocalPlayer:InTimeline()
-	return self.inTimeline
-end
-
 function SyncLocalPlayer:CreateSyncData()
 	return (SyncUnitData.New({
 		id = self.id,
-		pos = self:GetLocalPosition(),
+		pos = self:GetPosition(),
 		dir = self:GetRotation(),
 		status = self:GetStatus()
 	}))
 end
 
-function SyncLocalPlayer:GetLocalPosition()
-	return self.sceneObject._go.transform.localPosition
+function SyncLocalPlayer:GetPosition()
+	return self.sceneObject._go.transform.position
 end
 
 function SyncLocalPlayer:GetRotation()

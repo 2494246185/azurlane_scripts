@@ -25,7 +25,7 @@ function FormationSuggestionTeamItem:Init()
 
 	for iter_2_0 = 1, 3 do
 		self.mainItemList[iter_2_0] = FormationSuggestionCardItem.New(self[string.format("uiMainShipTf%s", iter_2_0)], self)
-		self.vanguardItemList[iter_2_0] = FormationSuggestionCardItem.New(self[string.format("uiVanguardShipTf%s", iter_2_0)], self)
+		self.vanguardItemList[iter_2_0] = FormationSuggestionCardItem.New(self[string.format("uiVanguardShipTf%s", iter_2_0)], self, true)
 	end
 
 	self.animation = self._tf:GetComponent(typeof(Animation))
@@ -55,7 +55,7 @@ function FormationSuggestionTeamItem:SetID(arg_3_1)
 		end
 
 		for iter_3_6, iter_3_7 in ipairs(pg.chapter_suggestion_formation[arg_3_1].teamid1) do
-			self.vanguardItemList[iter_3_6]:SetData(iter_3_7)
+			self.vanguardItemList[iter_3_6]:SetData(iter_3_7, iter_3_6)
 		end
 	end
 end

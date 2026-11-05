@@ -1,4 +1,6 @@
 local IslandVisitorUnit = class("IslandVisitorUnit", import(".IslandNavigableUnit"))
+local var_0_1 = 3
+local var_0_2 = 6
 
 function IslandVisitorUnit:OnUpdate()
 	if self.delayTime == 0 then
@@ -22,6 +24,7 @@ function IslandVisitorUnit:OnLaterAttach(arg_3_1)
 
 	self.delayTime = 0
 	self.syncData = nil
+	self.animSpeed = 0
 end
 
 function IslandVisitorUnit:UpdateSyncData(arg_4_1)
@@ -42,7 +45,7 @@ function IslandVisitorUnit:MoveHandle()
 	local var_7_1
 
 	if self.delayTime - Time.deltaTime > 0 then
-		var_7_0 = Vector3.Lerp(self:GetLocalPosition(), self.syncData.pos, Time.deltaTime / self.delayTime)
+		var_7_0 = Vector3.Lerp(self:GetPosition(), self.syncData.pos, Time.deltaTime / self.delayTime)
 		var_7_1 = Quaternion.Lerp(self:GetRotation(), self:GetSyncDataRotation(), Time.deltaTime / self.delayTime)
 		self.delayTime = self.delayTime - Time.deltaTime
 	else
@@ -51,27 +54,33 @@ function IslandVisitorUnit:MoveHandle()
 		self.delayTime = 0
 	end
 
-	local var_7_2 = (var_7_0 - self:GetLocalPosition()) / Time.deltaTime
+	if Time.deltaTime > 0 then
+		local var_7_2 = (var_7_0 - self:GetPosition()) / Time.deltaTime
 
-	self.speed = Vector2(var_7_2.x, var_7_2.z).magnitude
+		self.speed = Vector2(var_7_2.x, var_7_2.z).magnitude
+	end
 
-	self:SetLocalPosition(var_7_0)
+	self:SetPosition(var_7_0)
 	self:SetRotation(var_7_1)
 end
 
 function IslandVisitorUnit:AnimHandle()
-	if self.speed > 0.1 then
-		self.speed = 5
+	local var_8_0 = self.speed or 0
+
+	if var_8_0 < 0.1 then
+		var_8_0 = 0
 	end
 
-	local var_8_0 = self:GetAnimator()
+	self.animSpeed = Mathf.Lerp(self.animSpeed, var_8_0, ((var_8_0 > self.animSpeed or nil) and (var_0_1 or var_0_2)) * Time.deltaTime)
 
-	var_8_0:SetFloat(IslandConst.SPEED_FLAG_HASH, self.speed)
+	local var_8_1 = self:GetAnimator()
 
-	for iter_8_0 = 1, var_8_0.layerCount do
-		if not var_8_0:IsInTransition(iter_8_0 - 1) then
-			if var_8_0:GetCurrentAnimatorStateInfo(iter_8_0 - 1).shortNameHash ~= self.syncData.status[iter_8_0] then
-				var_8_0:CrossFadeInFixedTime(self.syncData.status[iter_8_0], 0.25, iter_8_0 - 1)
+	var_8_1:SetFloat(IslandConst.SPEED_FLAG_HASH, self.animSpeed)
+
+	for iter_8_0 = 1, var_8_1.layerCount do
+		if not var_8_1:IsInTransition(iter_8_0 - 1) then
+			if self.syncData.status[iter_8_0] and var_8_1:GetCurrentAnimatorStateInfo(iter_8_0 - 1).shortNameHash ~= self.syncData.status[iter_8_0] then
+				var_8_1:CrossFadeInFixedTime(self.syncData.status[iter_8_0], 0.25, iter_8_0 - 1)
 			end
 		end
 	end
@@ -81,16 +90,16 @@ function IslandVisitorUnit:GetSyncDataRotation()
 	return self.syncData.dir
 end
 
-function IslandVisitorUnit:GetLocalPosition()
-	return self._go.transform.localPosition
+function IslandVisitorUnit:GetPosition()
+	return self._go.transform.position
 end
 
 function IslandVisitorUnit:GetRotation()
 	return self._go.transform.rotation
 end
 
-function IslandVisitorUnit:SetLocalPosition(arg_12_1)
-	self._go.transform.localPosition = arg_12_1
+function IslandVisitorUnit:SetPosition(arg_12_1)
+	self._go.transform.position = arg_12_1
 end
 
 function IslandVisitorUnit:SetRotation(arg_13_1)

@@ -74,6 +74,8 @@ function AgoraView:AddAgoraListeners()
 	self:AddAgoraListener(ISLAND_AGORA_EVT.MAP_SIZE_UPDATE, self.OnBoardUpdate)
 	self:AddAgoraListener(ISLAND_AGORA_EVT.START_INTERACTION, self.OnAgoraVirtualStartInteraction)
 	self:AddAgoraListener(ISLAND_AGORA_EVT.END_INTERACTION, self.OnAgoraVirtualEndInteraction)
+	self:AddAgoraListener(ISLAND_AGORA_EVT.SHIP_START_INTERACTION, self.OnAgoraShipStartInteraction)
+	self:AddAgoraListener(ISLAND_AGORA_EVT.SHIP_END_INTERACTION, self.OnAgoraShipEndInteraction)
 	self:AddAgoraListener(ISLAND_AGORA_EVT.ITEM_OCCUPIED, self.OnPositionOccupied)
 	self:AddAgoraListener(ISLAND_AGORA_EVT.ITEM_CLEAR_OCCUPIED, self.OnClearPositionOccupied)
 	self:AddAgoraListener(ISLAND_AGORA_EVT.SIGN_IN_CNT_UPDATE, self.OnSignCntUpdate)
@@ -115,6 +117,8 @@ function AgoraView:RemoveAgoraListeners()
 	self:RemoveAgoraListener(ISLAND_AGORA_EVT.MAP_SIZE_UPDATE, self.OnBoardUpdate)
 	self:RemoveAgoraListener(ISLAND_AGORA_EVT.START_INTERACTION, self.OnAgoraVirtualStartInteraction)
 	self:RemoveAgoraListener(ISLAND_AGORA_EVT.END_INTERACTION, self.OnAgoraVirtualEndInteraction)
+	self:RemoveAgoraListener(ISLAND_AGORA_EVT.SHIP_START_INTERACTION, self.OnAgoraShipStartInteraction)
+	self:RemoveAgoraListener(ISLAND_AGORA_EVT.SHIP_END_INTERACTION, self.OnAgoraShipEndInteraction)
 	self:RemoveAgoraListener(ISLAND_AGORA_EVT.ITEM_OCCUPIED, self.OnPositionOccupied)
 	self:RemoveAgoraListener(ISLAND_AGORA_EVT.ITEM_CLEAR_OCCUPIED, self.OnClearPositionOccupied)
 	self:RemoveAgoraListener(ISLAND_AGORA_EVT.SIGN_IN_CNT_UPDATE, self.OnSignCntUpdate)
@@ -359,43 +363,84 @@ function AgoraView:OnClearPositionOccupied(arg_34_1)
 	end
 end
 
-function AgoraView:OnAgoraVirtualStartInteraction(arg_35_1, arg_35_2, arg_35_3)
-	local var_35_0 = arg_35_2:GetHostId()
-	local var_35_1 = arg_35_2:GetUserId()
+function AgoraView:OnAgoraVirtualStartInteraction(arg_35_1, arg_35_2, arg_35_3, arg_35_4, arg_35_5)
+	local var_35_0 = self:GetUnitModule(arg_35_1.id)
+	local var_35_1 = self:GetPlayerUnitModule(arg_35_3)
 
-	warning("start", var_35_0, var_35_1, arg_35_3, arg_35_2.id)
+	if not var_35_0 or not var_35_1 then
+		return
+	end
 
-	local var_35_2 = self:GetUnitModule(var_35_0)
-	local var_35_3 = self:GetPlayerUnitModule(var_35_1)
-	local var_35_4 = self.player == var_35_3
+	if not arg_35_1:GetTimeline()[arg_35_4] then
+		warning(string.format("agora view start dropped: timeline config missing unit=%s param=%s", tostring(arg_35_1.id), tostring(arg_35_4)))
 
-	if self.player == var_35_3 then
+		return
+	end
+
+	local var_35_2 = self.player == var_35_1
+
+	if self.player == var_35_1 then
 		self:GetSubView(AgoraOpView):StartInteraction()
 	end
 
-	var_35_2:StartInteract(var_35_3, arg_35_2.id, arg_35_3, arg_35_1:GetTimeline()[arg_35_3], arg_35_1:GetBlackboardParam()[arg_35_3], arg_35_1:AnySlotUsing(), var_35_4, (arg_35_1:GetPlayerParentPath(arg_35_2.id)))
+	var_35_0:StartInteract(var_35_1, arg_35_2, arg_35_4, arg_35_5, var_35_2)
 end
 
-function AgoraView:OnAgoraVirtualEndInteraction(arg_36_1, arg_36_2)
-	local var_36_0 = arg_36_2:GetHostId()
-	local var_36_1 = arg_36_2:GetUserId()
+function AgoraView:OnAgoraVirtualEndInteraction(arg_36_1, arg_36_2, arg_36_3, arg_36_4)
+	local var_36_0 = self:GetUnitModule(arg_36_1.id)
+	local var_36_1 = self:GetPlayerUnitModule(arg_36_3)
 
-	warning("end", var_36_0, var_36_1, arg_36_2.id)
+	if not var_36_0 or not var_36_1 then
+		return
+	end
 
-	local var_36_2 = self:GetUnitModule(var_36_0)
-	local var_36_3 = self:GetPlayerUnitModule(var_36_1)
-	local var_36_4 = self.player == var_36_3
+	local var_36_2 = self.player == var_36_1
 
-	if self.player == var_36_3 then
+	if self.player == var_36_1 then
 		self:GetSubView(AgoraOpView):EndInteraction()
 	end
 
-	var_36_2:EndInteract(var_36_3, arg_36_2.id, not arg_36_1:AnySlotUsing(), var_36_4)
+	var_36_0:EndInteract(var_36_1, arg_36_2, arg_36_4, var_36_2)
 end
 
-function AgoraView:OnMapStateUpdate(arg_37_1)
+function AgoraView:OnAgoraShipStartInteraction(arg_37_1, arg_37_2, arg_37_3, arg_37_4)
+	local var_37_0 = self:GetUnitModule(arg_37_1.id)
+	local var_37_1 = self:GetPlayerUnitModule(arg_37_3)
+
+	if not var_37_0 or not var_37_1 then
+		return
+	end
+
+	if not arg_37_1:GetTimeline()[arg_37_4] then
+		warning(string.format("ship view start dropped: timeline config missing unit=%s param=%s", tostring(arg_37_1.id), tostring(arg_37_4)))
+
+		return
+	end
+
+	local var_37_2 = self.player == var_37_1
+
+	if self.player == var_37_1 then
+		self:GetSubView(AgoraOpView):StartInteraction()
+	end
+
+	var_37_0:StartShipInteract(var_37_1, arg_37_2 or {}, arg_37_4, var_37_2)
+end
+
+function AgoraView:OnAgoraShipEndInteraction(arg_38_1, arg_38_2)
+	local var_38_0 = self:GetUnitModule(arg_38_1.id)
+	local var_38_1 = self:GetPlayerUnitModule(self.player and self.player.id)
+
+	if not var_38_0 or not var_38_1 then
+		return
+	end
+
+	self:GetSubView(AgoraOpView):EndInteraction()
+	var_38_0:EndShipInteract(var_38_1, arg_38_2 or {}, true, true)
+end
+
+function AgoraView:OnMapStateUpdate(arg_39_1)
 	if self.debugMap then
-		self.debugMap:UpdateItem(arg_37_1.position, arg_37_1.flag)
+		self.debugMap:UpdateItem(arg_39_1.position, arg_39_1.flag)
 	end
 end
 
@@ -405,19 +450,19 @@ function AgoraView:OnEnterEditMode()
 	IslandCameraMgr.instance:ActiveVirtualCamera(IslandConst.AGORA_CAMERA_NAME)
 	self.decorationView:Execute("Show")
 
-	for iter_38_0, iter_38_1 in ipairs(self:GetAllUnits()) do
-		iter_38_1:Disable()
+	for iter_40_0, iter_40_1 in ipairs(self:GetAllUnits()) do
+		iter_40_1:Disable()
 	end
 
-	for iter_38_2, iter_38_3 in pairs(self:GetUnitListByKey(IslandConst.UNIT_LIST_AGORA)) do
-		iter_38_3:Disable()
+	for iter_40_2, iter_40_3 in pairs(self:GetUnitListByKey(IslandConst.UNIT_LIST_AGORA)) do
+		iter_40_3:Disable()
 	end
 
-	local var_38_0 = self.agora:GetSize()
-	local var_38_1 = var_38_0.x * var_38_0.y
+	local var_40_0 = self.agora:GetSize()
+	local var_40_1 = var_40_0.x * var_40_0.y
 
-	for iter_38_4, iter_38_5 in pairs(self.grids) do
-		setActive(iter_38_5, iter_38_4 <= var_38_1)
+	for iter_40_4, iter_40_5 in pairs(self.grids) do
+		setActive(iter_40_5, iter_40_4 <= var_40_1)
 	end
 
 	self:RestLookAtPosition()
@@ -430,24 +475,24 @@ function AgoraView:OnExitEditMode()
 	self.decorationView:Execute("Reset")
 	self:GetSubView(AgoraOpView):InActiveDragBtn()
 
-	for iter_39_0, iter_39_1 in ipairs(self:GetAllUnits()) do
-		iter_39_1:Enable()
+	for iter_41_0, iter_41_1 in ipairs(self:GetAllUnits()) do
+		iter_41_1:Enable()
 	end
 
-	for iter_39_2, iter_39_3 in pairs(self:GetUnitListByKey(IslandConst.UNIT_LIST_AGORA)) do
-		iter_39_3:Enable()
+	for iter_41_2, iter_41_3 in pairs(self:GetUnitListByKey(IslandConst.UNIT_LIST_AGORA)) do
+		iter_41_3:Enable()
 	end
 
-	for iter_39_4, iter_39_5 in pairs(self.grids) do
-		setActive(iter_39_5, false)
+	for iter_41_4, iter_41_5 in pairs(self.grids) do
+		setActive(iter_41_5, false)
 	end
 end
 
-function AgoraView:EnterPaveTileMode(arg_40_1, arg_40_2)
+function AgoraView:EnterPaveTileMode(arg_42_1, arg_42_2)
 	self:EnterMode(AgoraView.MODE_PAVE_TILE)
-	self:Op("SelectedPaveItem", arg_40_1.id, arg_40_2)
+	self:Op("SelectedPaveItem", arg_42_1.id, arg_42_2)
 	self.decorationView:Execute("Hide")
-	self.paveTileView:Execute("Show", arg_40_1, arg_40_2)
+	self.paveTileView:Execute("Show", arg_42_1, arg_42_2)
 	self:RestLookAtPosition(1)
 end
 
@@ -458,19 +503,19 @@ function AgoraView:ExitPaveTileMode()
 	self.paveTileView:Execute("Hide")
 end
 
-function AgoraView:EnterMode(arg_42_1)
-	self.mode = arg_42_1
+function AgoraView:EnterMode(arg_44_1)
+	self.mode = arg_44_1
 
-	self:GetSubView(AgoraOpView):EnterMode(arg_42_1)
+	self:GetSubView(AgoraOpView):EnterMode(arg_44_1)
 end
 
-function AgoraView:RestLookAtPosition(arg_43_1)
-	LuaHelper.SetCinemachineFreeLookXAndY(IslandCameraMgr.instance:GetVirtualCamera(IslandConst.AGORA_CAMERA_NAME), 0, arg_43_1 or 0.5)
+function AgoraView:RestLookAtPosition(arg_45_1)
+	LuaHelper.SetCinemachineFreeLookXAndY(IslandCameraMgr.instance:GetVirtualCamera(IslandConst.AGORA_CAMERA_NAME), 0, arg_45_1 or 0.5)
 	self.agoraLookAtObj:SetTargetPosition((AgoraCalc.MapPosition2WorldPosition(Vector2(0, 0))))
 end
 
-function AgoraView:GetAgoraMould(arg_44_1)
-	return self:GetUnitModuleWithType(IslandConst.UNIT_LIST_AGORA, arg_44_1)
+function AgoraView:GetAgoraMould(arg_46_1)
+	return self:GetUnitModuleWithType(IslandConst.UNIT_LIST_AGORA, arg_46_1)
 end
 
 function AgoraView:OnDispose()

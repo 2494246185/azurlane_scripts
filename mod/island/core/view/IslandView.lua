@@ -1554,28 +1554,44 @@ function IslandView:OnSetVisitorSyncData(arg_141_1, arg_141_2)
 	end
 end
 
-function IslandView:OnWorldObjectStartInteraction(arg_142_1, arg_142_2, arg_142_3)
-	local var_142_0 = self:GetUnitModule((arg_142_2:GetHostId()))
-	local var_142_1 = self:GetPlayerUnitModule((arg_142_2:GetUserId()))
+function IslandView:OnWorldObjectStartInteraction(arg_142_1, arg_142_2, arg_142_3, arg_142_4, arg_142_5)
+	local var_142_0 = self:GetUnitModule(arg_142_1.id)
+	local var_142_1 = self:GetPlayerUnitModule(arg_142_3)
+
+	if not var_142_0 or not var_142_1 then
+		return
+	end
+
+	if not arg_142_1:GetTimeline()[arg_142_4] then
+		warning(string.format("wo view start dropped: timeline config missing unit=%s param=%s", tostring(arg_142_1.id), tostring(arg_142_4)))
+
+		return
+	end
+
 	local var_142_2 = self.player == var_142_1
 
 	if self.player == var_142_1 then
 		self:GetSubView(IslandOpView):StartInteraction()
 	end
 
-	var_142_0:StartInteract(var_142_1, arg_142_2.id, arg_142_3, arg_142_1:GetTimeline()[arg_142_3], arg_142_1:GetBlackboardParam()[arg_142_3], arg_142_1:AnySlotUsing(), var_142_2)
+	var_142_0:StartInteract(var_142_1, arg_142_2, arg_142_4, arg_142_5, var_142_2)
 end
 
-function IslandView:OnWorldObjectEndInteraction(arg_143_1, arg_143_2)
-	local var_143_0 = self:GetUnitModule((arg_143_2:GetHostId()))
-	local var_143_1 = self:GetPlayerUnitModule((arg_143_2:GetUserId()))
+function IslandView:OnWorldObjectEndInteraction(arg_143_1, arg_143_2, arg_143_3, arg_143_4)
+	local var_143_0 = self:GetUnitModule(arg_143_1.id)
+	local var_143_1 = self:GetPlayerUnitModule(arg_143_3)
+
+	if not var_143_0 or not var_143_1 then
+		return
+	end
+
 	local var_143_2 = self.player == var_143_1
 
 	if self.player == var_143_1 then
 		self:GetSubView(IslandOpView):EndInteraction()
 	end
 
-	var_143_0:EndInteract(var_143_1, arg_143_2.id, not arg_143_1:AnySlotUsing(), var_143_2)
+	var_143_0:EndInteract(var_143_1, arg_143_2, arg_143_4, var_143_2)
 end
 
 function IslandView:OnWorldObjectInitStatus(arg_144_1, arg_144_2)
