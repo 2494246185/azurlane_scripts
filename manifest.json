@@ -1,6 +1,22 @@
 {
-  "latest": "9.7.416",
+  "latest": "9.7.421",
   "versions": [
+    {
+      "version": "9.7.421",
+      "is_patch": false,
+      "updated_at": "2026-11-05T04:07:16.652501+00:00",
+      "file_count": 46415,
+      "total_size": 425858972,
+      "archive_size": 0,
+      "archive_format": null,
+      "archive_name": null,
+      "raw_version": "9.7.421",
+      "patch_sequence": 1,
+      "scripts64_md5": "f6e1c19f3f4aea2e348ca54e94f8f750",
+      "azhash": "$azhash$9$7$421$de1d9d34dc1a4042",
+      "ref": "v9.7.421",
+      "storage": "github"
+    },
     {
       "version": "9.7.416",
       "is_patch": false,
@@ -66,5 +82,5 @@
       "storage": "github"
     }
   ],
-  "last_updated": "2026-10-23T04:02:33.520330+00:00"
+  "last_updated": "2026-11-05T04:07:16.652501+00:00"
 }
