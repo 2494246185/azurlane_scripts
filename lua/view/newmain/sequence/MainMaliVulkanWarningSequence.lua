@@ -1,0 +1,49 @@
+local MainMaliVulkanWarningSequence = class("MainMaliVulkanWarningSequence")
+
+local function var_0_1()
+	return string.find(string.lower(SystemInfo.graphicsDeviceName or ""), "mali", 1, true) ~= nil
+end
+
+function MainMaliVulkanWarningSequence:Execute(arg_2_1)
+	local var_2_0 = pg.TimeMgr.GetInstance():CurrentSTimeDesc("%Y/%m/%d", true)
+
+	if PlayerPrefs.GetString(VULKAN_WARNING_TIP_WINDOW, "") == var_2_0 then
+		arg_2_1()
+
+		return
+	end
+
+	if var_0_1() and GraphApiHelper.IsUsingOpenGL() then
+		pg.MsgboxMgr.GetInstance():ShowMsgBox({
+			showStopRemind = true,
+			hideClose = true,
+			type = MSGBOX_TYPE_NORMAL,
+			title = pg.MsgboxMgr.TITLE_INFORMATION,
+			content = i18n("openGLerror_warning"),
+			yesText = i18n("island_word_go"),
+			noText = i18n("word_cancel"),
+			onYes = function()
+				if pg.MsgboxMgr.GetInstance().stopRemindToggle.isOn then
+					PlayerPrefs.SetString(VULKAN_WARNING_TIP_WINDOW, var_2_0)
+					PlayerPrefs.Save()
+				end
+
+				pg.m02:sendNotification(GAME.GO_SCENE, SCENE.SETTINGS, {
+					extraOffset = 2000,
+					page = NewSettingsScene.PAGE_OPTION,
+					scroll = SettingsOtherPanel
+				})
+			end,
+			onNo = function()
+				if pg.MsgboxMgr.GetInstance().stopRemindToggle.isOn then
+					PlayerPrefs.SetString(VULKAN_WARNING_TIP_WINDOW, var_2_0)
+					PlayerPrefs.Save()
+				end
+
+				arg_2_1()
+			end
+		})
+	end
+end
+
+return MainMaliVulkanWarningSequence
