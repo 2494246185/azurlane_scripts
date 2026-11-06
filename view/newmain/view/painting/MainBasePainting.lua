@@ -39,12 +39,14 @@ function MainBasePainting:SetOnceLoadedCall(arg_6_1)
 	return
 end
 
-function MainBasePainting:Load(arg_7_1)
+function MainBasePainting:Load(arg_7_1, arg_7_2)
 	self.isPuase = false
 	self.isExited = false
 	self.state = var_0_2
 	self.ship = arg_7_1
 	self.paintingName = arg_7_1:getPainting()
+
+	local var_7_0 = self.paintingName
 
 	self:OnLoad(function()
 		self.state = var_0_3
@@ -53,6 +55,12 @@ function MainBasePainting:Load(arg_7_1)
 			self:TriggerEventAtFirstTime()
 		else
 			self:TriggerNextEventAuto()
+		end
+
+		if arg_7_2 and var_7_0 == self.paintingName then
+			arg_7_2()
+
+			arg_7_2 = nil
 		end
 
 		self:InitClickEvent()

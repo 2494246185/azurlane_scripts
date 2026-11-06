@@ -116,17 +116,15 @@ function MainPaintingView:MakePaintingFadeIn()
 		return
 	end
 
-	local var_18_0 = self.state
-	local var_18_1
-	local var_18_2 = self.painting:GetPaintingTransform()
+	local var_18_0 = self.painting:GetPaintingTransform()
 
-	var_18_1 = (self.state == MainPaintingView.STATE_L2D or var_18_0 == MainPaintingView.STATE_EDUCATE_L2D) and self._paintingManager.PAINTING_TYPE.LIVE2D or (var_18_0 == MainPaintingView.STATE_SPINE_PAINTING or var_18_0 == MainPaintingView.STATE_EDUCATE_SPINE) and self._paintingManager.PAINTING_TYPE.SPINE or self._paintingManager.PAINTING_TYPE.MESH
-
-	if var_18_2 == nil then
+	if var_18_0 == nil then
 		return
 	end
 
-	self._paintingManager:SetOpacityPainting(var_18_2, var_18_1)
+	self._paintingManager:SetOpacityPainting(var_18_0, self:getPaintingContainer(), (self:getPaintingManagerType()))
+	self.painting:OnPaintingFade(true)
+	print("painting fade in ")
 
 	if self._firstPaintingLoading then
 		self._firstPaintingLoading = false
@@ -135,9 +133,24 @@ function MainPaintingView:MakePaintingFadeIn()
 		self._paintingManager:SetPaintingAlpha(1)
 		self.painting:OnPaintingFade(false)
 	else
+		self._paintingManager:SetPaintingAlpha(0)
 		self._paintingManager:SetPaintingFadeIn(function()
 			self.painting:OnPaintingFade(false)
 		end)
+	end
+end
+
+function MainPaintingView:getPaintingManagerType()
+	return (self.state == MainPaintingView.STATE_L2D or self.state == MainPaintingView.STATE_EDUCATE_L2D) and self._paintingManager.PAINTING_TYPE.LIVE2D or (self.state == MainPaintingView.STATE_SPINE_PAINTING or self.state == MainPaintingView.STATE_EDUCATE_SPINE) and self._paintingManager.PAINTING_TYPE.SPINE or self._paintingManager.PAINTING_TYPE.MESH
+end
+
+function MainPaintingView:getPaintingContainer()
+	if self.state == MainPaintingView.STATE_L2D or self.state == MainPaintingView.STATE_EDUCATE_L2D then
+		return self.l2dContainer
+	elseif self.state == MainPaintingView.STATE_SPINE_PAINTING or self.state == MainPaintingView.STATE_EDUCATE_SPINE then
+		return self.spineContainer
+	else
+		return self.meshContainer
 	end
 end
 
@@ -153,42 +166,51 @@ function MainPaintingView:IsLoading()
 	return false
 end
 
-function MainPaintingView:Init(arg_22_1, arg_22_2, arg_22_3)
-	if not self._paintingManager then
-		self._paintingManager = PaintingFadeManager.New()
+function MainPaintingView:Init(arg_24_1, arg_24_2, arg_24_3, arg_24_4)
+	print("初始化舰船 = " .. arg_24_1:getPainting())
 
-		self._paintingManager:SetRawPaintingContainer(self._tf)
-
-		for iter_22_0, iter_22_1 in pairs(self.paintings) do
-			iter_22_1:SetTargetContainer(self._paintingManager:GetPaintingContainer())
-		end
-
-		self._firstPaintingLoading = true
-	end
-
-	print("初始化舰船 = " .. arg_22_1:getPainting())
-
-	if self:ShouldReLoad(arg_22_1) then
-		self.shift = arg_22_2 or self.shift
+	if self:ShouldReLoad(arg_24_1) then
+		self.shift = arg_24_2 or self.shift
 
 		assert(self.shift)
 
-		self.ship = arg_22_1
-		self.anim = arg_22_3
+		self.ship = arg_24_1
+		self.anim = arg_24_3
 
-		local var_22_0, var_22_1 = MainPaintingView.GetAssistantStatus(arg_22_1)
+		local var_24_0, var_24_1 = MainPaintingView.GetAssistantStatus(arg_24_1)
 
-		self.painting = self.paintings[var_22_0]
-		self.state = var_22_0
+		self.painting = self.paintings[var_24_0]
+		self.state = var_24_0
 		self.skinId = self.ship:getSkinId()
-		self.bgToggle = PlayerPrefs.GetInt("paint_hide_other_obj_" .. arg_22_1:getPainting(), 0)
+		self.bgToggle = PlayerPrefs.GetInt("paint_hide_other_obj_" .. arg_24_1:getPainting(), 0)
 
 		self:Reload(function()
+			if self._paintingManager and self.painting then
+				local var_25_0 = self.painting:GetPaintingTransform()
+
+				if var_25_0 then
+					self._paintingManager:SetOpacityPainting(var_25_0, self:getPaintingContainer(), (self:getPaintingManagerType()))
+					self.painting:OnPaintingFade(true)
+				end
+			end
+
 			self:InitShipShift()
+
+			if arg_24_4 then
+				arg_24_4()
+
+				arg_24_4 = nil
+			end
 		end)
 	else
 		self.painting:Resume()
 		self:InitShipShift()
+
+		if arg_24_4 then
+			arg_24_4()
+
+			arg_24_4 = nil
+		end
 	end
 end
 
@@ -202,9 +224,11 @@ function MainPaintingView:InitShipShift()
 	self.painting:SetShift(self.shift)
 end
 
-function MainPaintingView:Reload(arg_25_1)
-	local function var_25_0()
+function MainPaintingView:Reload(arg_27_1)
+	local function var_27_0()
 		print("开始加载舰船 = " .. self.ship:getPainting())
+
+		self._paintingFadeFlag = false
 
 		if self._loadingPainting then
 			if self._paintingManager then
@@ -214,36 +238,43 @@ function MainPaintingView:Reload(arg_25_1)
 			self._loadingPainting:Unload()
 		end
 
-		self.painting:Load(self.ship, self.state)
-
-		if arg_25_1 then
-			arg_25_1()
-
-			arg_25_1 = nil
-		end
+		self.painting:Load(self.ship, arg_27_1)
 
 		self._loadingPainting = self.painting
 	end
 
-	if self._paintingManager then
+	if self._paintingManager and not self._paintingFadeFlag then
 		self.painting:OnPaintingFade(true)
+		self._paintingManager:SetLoading(true)
+		seriesAsync({
+			function(arg_29_0)
+				onDelayTick(arg_29_0, 0.2)
+			end,
+			function(arg_30_0)
+				if isa(self.painting, MainLive2dPainting) then
+					pg.Live2DMgr.GetInstance():preloadL2dModelAsync(self.ship:getPainting(), arg_30_0)
+				else
+					arg_30_0()
+				end
+			end,
+			function(arg_31_0)
+				if self._paintingManager then
+					self._paintingManager:SetLoading(false)
 
-		if not self._paintingFadeFlag then
-			self._paintingFadeFlag = true
+					self._paintingFadeFlag = true
 
-			self._paintingManager:SetPaintingFadeOut(function()
-				self._paintingFadeFlag = false
-
-				var_25_0()
-			end)
-		end
+					self._paintingManager:SetPaintingFadeOut(arg_31_0)
+					self.painting:OnPaintingFade(false)
+				end
+			end
+		}, var_27_0)
 	else
-		var_25_0()
+		var_27_0()
 	end
 end
 
-function MainPaintingView:Refresh(arg_28_1, arg_28_2)
-	self:Init(arg_28_1, arg_28_2)
+function MainPaintingView:Refresh(arg_32_1, arg_32_2, arg_32_3)
+	self:Init(arg_32_1, arg_32_2, nil, arg_32_3)
 end
 
 function MainPaintingView:Disable()
@@ -259,13 +290,13 @@ function MainPaintingView:Disable()
 	end
 end
 
-function MainPaintingView:ShouldReLoad(arg_30_1)
+function MainPaintingView:ShouldReLoad(arg_34_1)
 	if not self.painting or not self._loadingPainting or not self.ship or not self.state or not self.bgToggle then
 		return true
 	end
 
-	if self.skinId == self.ship:getSkinId() and arg_30_1.id == self.ship.id and self.state == MainPaintingView.GetAssistantStatus(arg_30_1) and self.bgToggle == PlayerPrefs.GetInt("paint_hide_other_obj_" .. self._loadingPainting.paintingName, 0) and arg_30_1:GetRecordPosKey() == self.ship:GetRecordPosKey() and not self.reloadOnResume then
-		print("不加载舰船 = " .. arg_30_1:getPainting())
+	if self.skinId == self.ship:getSkinId() and arg_34_1.id == self.ship.id and self.state == MainPaintingView.GetAssistantStatus(arg_34_1) and self.bgToggle == PlayerPrefs.GetInt("paint_hide_other_obj_" .. self._loadingPainting.paintingName, 0) and arg_34_1:GetRecordPosKey() == self.ship:GetRecordPosKey() and not self.reloadOnResume then
+		print("不加载舰船 = " .. arg_34_1:getPainting())
 
 		return false
 	else
@@ -277,74 +308,74 @@ function MainPaintingView:ShouldReLoad(arg_30_1)
 	end
 end
 
-function MainPaintingView:SetOnceLoadedCall(arg_31_1)
-	self.painting:SetOnceLoadedCall(arg_31_1)
+function MainPaintingView:SetOnceLoadedCall(arg_35_1)
+	self.painting:SetOnceLoadedCall(arg_35_1)
 end
 
-function MainPaintingView:PlayChangeSkinActionIn(arg_32_1)
-	self.painting:PlayChangeSkinActionIn(arg_32_1)
+function MainPaintingView:PlayChangeSkinActionIn(arg_36_1)
+	self.painting:PlayChangeSkinActionIn(arg_36_1)
 end
 
-function MainPaintingView:PlayChangeSkinActionOut(arg_33_1)
-	self.painting:PlayChangeSkinActionOut(arg_33_1)
+function MainPaintingView:PlayChangeSkinActionOut(arg_37_1)
+	self.painting:PlayChangeSkinActionOut(arg_37_1)
 end
 
-function MainPaintingView:AdjustPositionWithAnim(arg_34_1)
+function MainPaintingView:AdjustPositionWithAnim(arg_38_1)
 	LeanTween.cancel(go(self._tf))
 	LeanTween.cancel(go(self._bgTf))
 
-	local var_34_0 = self:GetPositionAndScale(arg_34_1)
+	local var_38_0 = self:GetPositionAndScale(arg_38_1)
 
-	LeanTween.moveLocal(go(self._tf), var_34_0, 0.3):setEase(LeanTweenType.easeInOutExpo)
-	LeanTween.moveLocal(go(self._bgTf), var_34_0, 0.3):setEase(LeanTweenType.easeInOutExpo)
+	LeanTween.moveLocal(go(self._tf), var_38_0, 0.3):setEase(LeanTweenType.easeInOutExpo)
+	LeanTween.moveLocal(go(self._bgTf), var_38_0, 0.3):setEase(LeanTweenType.easeInOutExpo)
 
-	local var_34_1, var_34_2 = self.shift:GetSpineShift()
+	local var_38_1, var_38_2 = self.shift:GetSpineShift()
 
-	LeanTween.moveLocal(go(self.spineContainer), var_34_1, 0.3):setEase(LeanTweenType.easeInOutExpo)
+	LeanTween.moveLocal(go(self.spineContainer), var_38_1, 0.3):setEase(LeanTweenType.easeInOutExpo)
 
-	local var_34_3, var_34_4 = self.shift:GetL2dShift()
+	local var_38_3, var_38_4 = self.shift:GetL2dShift()
 
 	if self.painting:IslimitYPos() then
-		var_34_3.y = self.painting:GetHalfBodyOffsetY()
+		var_38_3.y = self.painting:GetHalfBodyOffsetY()
 	end
 
-	LeanTween.moveLocal(go(self.l2dContainer), var_34_3, 0.3):setEase(LeanTweenType.easeInOutExpo):setOnComplete(System.Action(function()
-		self:AdjustPosition(arg_34_1)
+	LeanTween.moveLocal(go(self.l2dContainer), var_38_3, 0.3):setEase(LeanTweenType.easeInOutExpo):setOnComplete(System.Action(function()
+		self:AdjustPosition(arg_38_1)
 	end))
 end
 
-function MainPaintingView:AdjustPosition(arg_36_1)
-	local var_36_0, var_36_1 = self:GetPositionAndScale(arg_36_1)
+function MainPaintingView:AdjustPosition(arg_40_1)
+	local var_40_0, var_40_1 = self:GetPositionAndScale(arg_40_1)
 
-	self._tf.anchoredPosition = var_36_0
-	self._bgTf.anchoredPosition = var_36_0
+	self._tf.anchoredPosition = var_40_0
+	self._bgTf.anchoredPosition = var_40_0
 
-	local var_36_2, var_36_3 = self.shift:GetL2dShift()
+	local var_40_2, var_40_3 = self.shift:GetL2dShift()
 
 	if self.painting:IslimitYPos() then
-		var_36_2.y = self.painting:GetHalfBodyOffsetY()
+		var_40_2.y = self.painting:GetHalfBodyOffsetY()
 	end
 
-	self.l2dContainer.anchoredPosition = var_36_2
+	self.l2dContainer.anchoredPosition = var_40_2
 
-	local var_36_4, var_36_5 = self.shift:GetSpineShift()
+	local var_40_4, var_40_5 = self.shift:GetSpineShift()
 
-	self.spineContainer.anchoredPosition = var_36_4
+	self.spineContainer.anchoredPosition = var_40_4
 
-	local var_36_6, var_36_7, var_36_8 = getProxy(SettingsProxy):getSkinPosSetting(arg_36_1)
+	local var_40_6, var_40_7, var_40_8 = getProxy(SettingsProxy):getSkinPosSetting(arg_40_1)
 
-	if var_36_8 then
-		self._bgTf.localScale = Vector3(var_36_8, var_36_8, 1)
-		self._tf.localScale = Vector3(var_36_8, var_36_8, 1)
+	if var_40_8 then
+		self._bgTf.localScale = Vector3(var_40_8, var_40_8, 1)
+		self._tf.localScale = Vector3(var_40_8, var_40_8, 1)
 	elseif self.state == MainPaintingView.STATE_L2D then
-		self._bgTf.localScale = var_36_3
-		self._tf.localScale = var_36_3
+		self._bgTf.localScale = var_40_3
+		self._tf.localScale = var_40_3
 	elseif self.state == MainPaintingView.STATE_SPINE_PAINTING then
-		self._bgTf.localScale = var_36_5
-		self._tf.localScale = var_36_5
+		self._bgTf.localScale = var_40_5
+		self._tf.localScale = var_40_5
 	else
-		self._bgTf.localScale = var_36_1
-		self._tf.localScale = var_36_1
+		self._bgTf.localScale = var_40_1
+		self._tf.localScale = var_40_1
 	end
 
 	if self._paintingManager then
@@ -352,37 +383,37 @@ function MainPaintingView:AdjustPosition(arg_36_1)
 	end
 end
 
-function MainPaintingView:GetPositionAndScale(arg_37_1)
-	local var_37_0, var_37_1, var_37_2 = getProxy(SettingsProxy):getSkinPosSetting(arg_37_1)
-	local var_37_3 = Vector3(0, 0, 0)
-	local var_37_4 = Vector3(1, 1, 1)
+function MainPaintingView:GetPositionAndScale(arg_41_1)
+	local var_41_0, var_41_1, var_41_2 = getProxy(SettingsProxy):getSkinPosSetting(arg_41_1)
+	local var_41_3 = Vector3(0, 0, 0)
+	local var_41_4 = Vector3(1, 1, 1)
 
-	if var_37_0 then
-		var_37_3 = Vector3(var_37_0, var_37_1, 0)
-		var_37_4 = Vector3(var_37_2, var_37_2, 1)
+	if var_41_0 then
+		var_41_3 = Vector3(var_41_0, var_41_1, 0)
+		var_41_4 = Vector3(var_41_2, var_41_2, 1)
 	else
-		local var_37_5, var_37_6 = self.shift:GetMeshImageShift()
+		local var_41_5, var_41_6 = self.shift:GetMeshImageShift()
 
-		var_37_3 = var_37_5
-		var_37_4 = var_37_6
+		var_41_3 = var_41_5
+		var_41_4 = var_41_6
 	end
 
-	return var_37_3, var_37_4
+	return var_41_3, var_41_4
 end
 
 function MainPaintingView:GetAssistantStatus()
-	local var_38_0 = self:getPainting()
-	local var_38_1 = getProxy(SettingsProxy)
-	local var_38_2 = HXSet.autoHxShiftPath("live2d/" .. var_38_0)
-	local var_38_3 = MainPaintingView.Live2dIsDownload(var_38_2) and checkABExist(var_38_2)
-	local var_38_4 = var_38_1:getCharacterSetting(self.id, SHIP_FLAG_BG)
+	local var_42_0 = self:getPainting()
+	local var_42_1 = getProxy(SettingsProxy)
+	local var_42_2 = HXSet.autoHxShiftPath("live2d/" .. var_42_0)
+	local var_42_3 = MainPaintingView.Live2dIsDownload(var_42_2) and checkABExist(var_42_2)
+	local var_42_4 = var_42_1:getCharacterSetting(self.id, SHIP_FLAG_BG)
 
-	if var_38_1:getCharacterSetting(self.id, SHIP_FLAG_L2D) and var_38_3 then
-		return (isa(self, VirtualEducateCharShip) or nil) and (MainPaintingView.STATE_EDUCATE_L2D or MainPaintingView.STATE_L2D), var_38_4
-	elseif var_38_1:getCharacterSetting(self.id, SHIP_FLAG_SP) and checkABExist((HXSet.autoHxShiftPath("spinepainting/" .. var_38_0))) then
-		return (isa(self, VirtualEducateCharShip) or nil) and (MainPaintingView.STATE_EDUCATE_SPINE or MainPaintingView.STATE_SPINE_PAINTING), var_38_4
+	if var_42_1:getCharacterSetting(self.id, SHIP_FLAG_L2D) and var_42_3 then
+		return (isa(self, VirtualEducateCharShip) or nil) and (MainPaintingView.STATE_EDUCATE_L2D or MainPaintingView.STATE_L2D), var_42_4
+	elseif var_42_1:getCharacterSetting(self.id, SHIP_FLAG_SP) and checkABExist((HXSet.autoHxShiftPath("spinepainting/" .. var_42_0))) then
+		return (isa(self, VirtualEducateCharShip) or nil) and (MainPaintingView.STATE_EDUCATE_SPINE or MainPaintingView.STATE_SPINE_PAINTING), var_42_4
 	else
-		return (isa(self, VirtualEducateCharShip) or nil) and (MainPaintingView.STATE_EDUCATE_CHAR or MainPaintingView.STATE_PAINTING), var_38_4
+		return (isa(self, VirtualEducateCharShip) or nil) and (MainPaintingView.STATE_EDUCATE_CHAR or MainPaintingView.STATE_PAINTING), var_42_4
 	end
 end
 
@@ -393,65 +424,65 @@ function MainPaintingView:OnBoundChange()
 end
 
 function MainPaintingView:Live2dIsDownload()
-	local var_40_0 = GroupHelper.GetGroupMgrByName("L2D"):CheckF(self)
+	local var_44_0 = GroupHelper.GetGroupMgrByName("L2D"):CheckF(self)
 
-	return var_40_0 == DownloadState.None or var_40_0 == DownloadState.UpdateSuccess
+	return var_44_0 == DownloadState.None or var_44_0 == DownloadState.UpdateSuccess
 end
 
-function MainPaintingView:Fold(arg_41_1, arg_41_2)
+function MainPaintingView:Fold(arg_45_1, arg_45_2)
 	return
 end
 
-function MainPaintingView:EnableOrDisableScale(arg_42_1)
-	self.painting:EnableOrDisableMove(arg_42_1)
-	self.painting:OnEnablePartScale(arg_42_1)
+function MainPaintingView:EnableOrDisableScale(arg_46_1)
+	self.painting:EnableOrDisableMove(arg_46_1)
+	self.painting:OnEnablePartScale(arg_46_1)
 end
 
-function MainPaintingView:EnableOrDisableMove(arg_43_1)
-	self.painting:EnableOrDisableMove(arg_43_1)
+function MainPaintingView:EnableOrDisableMove(arg_47_1)
+	self.painting:EnableOrDisableMove(arg_47_1)
 
-	if arg_43_1 then
+	if arg_47_1 then
 		self:EnableDragAndZoom()
 	else
 		self:DisableDragAndZoom()
 	end
 end
 
-function MainPaintingView:OnAsmrTurnning(arg_44_1)
-	self.painting:OnAsmrTurnning(arg_44_1)
+function MainPaintingView:OnAsmrTurnning(arg_48_1)
+	self.painting:OnAsmrTurnning(arg_48_1)
 end
 
 function MainPaintingView:EnableDragAndZoom()
 	self.isEnableDrag = true
 
-	local var_45_0 = self._tf.parent.gameObject
-	local var_45_1 = GetOrAddComponent(self._tf.parent.gameObject, typeof(PinchZoom))
-	local var_45_2 = GetOrAddComponent(self._tf.parent.gameObject, typeof(EventTriggerListener))
-	local var_45_3 = Vector3(0, 0, 0)
+	local var_49_0 = self._tf.parent.gameObject
+	local var_49_1 = GetOrAddComponent(self._tf.parent.gameObject, typeof(PinchZoom))
+	local var_49_2 = GetOrAddComponent(self._tf.parent.gameObject, typeof(EventTriggerListener))
+	local var_49_3 = Vector3(0, 0, 0)
 
-	var_45_2:AddBeginDragFunc(function(arg_46_0, arg_46_1)
+	var_49_2:AddBeginDragFunc(function(arg_50_0, arg_50_1)
 		if Application.isEditor and Input.GetMouseButton(2) then
 			return
 		end
 
-		if var_45_1.processing then
+		if var_49_1.processing then
 			return
 		end
 
-		setButtonEnabled(var_45_0, false)
+		setButtonEnabled(var_49_0, false)
 
 		if Input.touchCount > 1 then
 			return
 		end
 
-		var_45_3 = self._tf.localPosition - MainPaintingView.Screen2Local(var_45_0.transform.parent, arg_46_1.position)
+		var_49_3 = self._tf.localPosition - MainPaintingView.Screen2Local(var_49_0.transform.parent, arg_50_1.position)
 	end)
-	var_45_2:AddDragFunc(function(arg_47_0, arg_47_1)
+	var_49_2:AddDragFunc(function(arg_51_0, arg_51_1)
 		if Application.isEditor and Input.GetMouseButton(2) then
 			return
 		end
 
-		if var_45_1.processing then
+		if var_49_1.processing then
 			return
 		end
 
@@ -459,20 +490,20 @@ function MainPaintingView:EnableDragAndZoom()
 			return
 		end
 
-		local var_47_0 = MainPaintingView.Screen2Local(var_45_0.transform.parent, arg_47_1.position)
+		local var_51_0 = MainPaintingView.Screen2Local(var_49_0.transform.parent, arg_51_1.position)
 
-		self._tf.localPosition = self.painting:IslimitYPos() and Vector3(var_47_0.x, self._tf.localPosition.y, 0) + Vector3(var_45_3.x, 0, 0) or Vector3(var_47_0.x, var_47_0.y, 0) + var_45_3
+		self._tf.localPosition = self.painting:IslimitYPos() and Vector3(var_51_0.x, self._tf.localPosition.y, 0) + Vector3(var_49_3.x, 0, 0) or Vector3(var_51_0.x, var_51_0.y, 0) + var_49_3
 		self._bgTf.localPosition = self.bgOffset + self._tf.localPosition
 	end)
-	var_45_2:AddDragEndFunc(function()
-		setButtonEnabled(var_45_0, true)
+	var_49_2:AddDragEndFunc(function()
+		setButtonEnabled(var_49_0, true)
 	end)
 
 	if not self.painting:IslimitYPos() then
-		var_45_1.enabled = true
+		var_49_1.enabled = true
 	end
 
-	var_45_2.enabled = true
+	var_49_2.enabled = true
 	Input.multiTouchEnabled = true
 	self.cg.blocksRaycasts = false
 
@@ -481,11 +512,11 @@ end
 
 function MainPaintingView:DisableDragAndZoom()
 	if self.isEnableDrag then
-		local var_49_0 = self._tf.parent:GetComponent(typeof(EventTriggerListener))
+		local var_53_0 = self._tf.parent:GetComponent(typeof(EventTriggerListener))
 
-		ClearEventTrigger(var_49_0)
+		ClearEventTrigger(var_53_0)
 
-		var_49_0.enabled = false
+		var_53_0.enabled = false
 		self._tf.parent:GetComponent(typeof(PinchZoom)).enabled = false
 		self.cg.blocksRaycasts = true
 		self.isEnableDrag = false
@@ -499,6 +530,8 @@ function MainPaintingView:Dispose()
 
 	if self._paintingManager then
 		self._paintingManager:Dispose()
+
+		self._paintingManager = nil
 	end
 
 	self:DisableDragAndZoom()
@@ -510,17 +543,17 @@ function MainPaintingView:Dispose()
 	self.painting = nil
 	self._loadingPainting = nil
 
-	for iter_50_0, iter_50_1 in ipairs(self.paintings) do
-		iter_50_1:Dispose()
+	for iter_54_0, iter_54_1 in ipairs(self.paintings) do
+		iter_54_1:Dispose()
 	end
 
 	self.paintings = nil
 end
 
-function MainPaintingView:Screen2Local(arg_51_1)
-	local var_51_0 = GameObject.Find("UICamera")
+function MainPaintingView:Screen2Local(arg_55_1)
+	local var_55_0 = GameObject.Find("UICamera")
 
-	return Vector3(var_51_0.x, LuaHelper.ScreenToLocal(self:GetComponent("RectTransform"), arg_51_1, (var_51_0:GetComponent("Camera"))).y, 0)
+	return Vector3(var_55_0.x, LuaHelper.ScreenToLocal(self:GetComponent("RectTransform"), arg_55_1, (var_55_0:GetComponent("Camera"))).y, 0)
 end
 
 return MainPaintingView

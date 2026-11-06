@@ -18,6 +18,7 @@ function PaintingOpacity:Ctor(arg_1_1)
 	end, var_0_1, -1)
 
 	self.timer:Start()
+	self:SetVisible(false)
 end
 
 function PaintingOpacity:step()
@@ -99,7 +100,6 @@ function PaintingOpacity:SetPaintingAlphaTween(arg_11_1, arg_11_2, arg_11_3)
 	print("set painting alpha tween value = " .. arg_11_1 .. " time = " .. arg_11_2)
 
 	self._delayCallback = arg_11_3
-	self._delayCallbackTime = arg_11_2
 
 	local var_11_0 = 0
 
@@ -123,12 +123,18 @@ function PaintingOpacity:SetPaintingAlphaTween(arg_11_1, arg_11_2, arg_11_3)
 end
 
 function PaintingOpacity:SetPaitningAlphaContent()
+	if not self:GetVisible() then
+		self:SetVisible(true)
+	end
+
 	if not IsNil(self._paintingTF) and not IsNil(self._paintingContent) then
 		SetParent(self._paintingTF, self._paintingContent, false)
 	end
 end
 
 function PaintingOpacity:RevertPaintingContent()
+	print("revert content")
+
 	if not IsNil(self._paintingTF) and not IsNil(self._paintingPreParent) then
 		SetParent(self._paintingTF, self._paintingPreParent, false)
 	end
@@ -163,10 +169,10 @@ function PaintingOpacity:SetMeshPaintingFillter(arg_19_1)
 	var_19_0.Tween = 1
 end
 
-function PaintingOpacity:SetMeshPainting(arg_20_1)
+function PaintingOpacity:SetMeshPainting(arg_20_1, arg_20_2)
 	if arg_20_1 then
 		self._paintingTF = arg_20_1
-		self._paintingPreParent = arg_20_1.parent
+		self._paintingPreParent = arg_20_2
 		self._paintingContent = self._meshContent
 
 		SetParent(arg_20_1, self._meshContent, false)
@@ -175,14 +181,10 @@ function PaintingOpacity:SetMeshPainting(arg_20_1)
 	self:SetRawImageAlpha(1)
 end
 
-function PaintingOpacity:SetSpinePainting(arg_21_1)
+function PaintingOpacity:SetSpinePainting(arg_21_1, arg_21_2)
 	if arg_21_1 then
 		self._paintingTF = arg_21_1
-
-		if arg_21_1.parent then
-			self._paintingPreParent = arg_21_1.parent
-		end
-
+		self._paintingPreParent = arg_21_2
 		self._paintingContent = self._spineContent
 
 		SetParent(arg_21_1, self._spineContent, false)
@@ -191,14 +193,10 @@ function PaintingOpacity:SetSpinePainting(arg_21_1)
 	self:SetRawImageAlpha(1)
 end
 
-function PaintingOpacity:SetLive2DPainting(arg_22_1)
+function PaintingOpacity:SetLive2DPainting(arg_22_1, arg_22_2)
 	if arg_22_1 then
 		self._paintingTF = arg_22_1
-
-		if arg_22_1.parent then
-			self._paintingPreParent = arg_22_1.parent
-		end
-
+		self._paintingPreParent = arg_22_2
 		self._paintingContent = self._live2dContent
 
 		SetParent(arg_22_1, self._live2dContent, false)
@@ -222,6 +220,23 @@ end
 
 function PaintingOpacity:GetCanvasTF()
 	return self._canvasTF
+end
+
+function PaintingOpacity:SetVisible(arg_25_1)
+	if IsNil(self._go) then
+		return
+	end
+
+	setActive(self._go, arg_25_1)
+	self:SetRawImageAlpha(arg_25_1 and 1 or 0)
+end
+
+function PaintingOpacity:GetVisible()
+	if IsNil(self._go) then
+		return false
+	end
+
+	return isActive(self._go)
 end
 
 function PaintingOpacity:Dispose()

@@ -834,7 +834,7 @@ local function var_0_19(arg_34_0, arg_34_1)
 		arg_34_0.delayChangeParamater = nil
 	end
 
-	arg_34_0:offsetL2dPositonDelay(0.75, 5)
+	arg_34_0:offsetL2dPositonDelay(0.5, 5)
 	var_0_13(arg_34_0, "idle", true)
 	Live2DPainting.SetL2dSortingLayer(arg_34_1, LayerWeightConst.L2D_DEFAULT_LAYER)
 end
@@ -865,13 +865,12 @@ function Live2DPainting:Ctor(arg_40_1, arg_40_2)
 				end
 
 				var_0_19(self, arg_41_0)
-				onDelayTick(function()
-					if arg_40_2 then
-						arg_40_2(self)
 
-						arg_40_2 = nil
-					end
-				end, 0.6)
+				if arg_40_2 then
+					arg_40_2(self)
+
+					arg_40_2 = nil
+				end
 			else
 				self:clearMaskTexture(arg_41_0)
 				pg.Live2DMgr.GetInstance():ReturnLive2DModel(self.modelName, arg_41_0)
@@ -880,12 +879,12 @@ function Live2DPainting:Ctor(arg_40_1, arg_40_2)
 	end)
 end
 
-function Live2DPainting:SetVisible(arg_43_1)
+function Live2DPainting:SetVisible(arg_42_1)
 	if not self:IsLoaded() then
 		return
 	end
 
-	if arg_43_1 then
+	if arg_42_1 then
 		self._readlyToStop = false
 
 		if self._physics then
@@ -907,7 +906,7 @@ function Live2DPainting:SetVisible(arg_43_1)
 		onNextTick(function()
 			setActive(self._tf, true)
 			self:loadLive2dData()
-			self:offsetL2dPositonDelay(0.8, 5, function()
+			self:offsetL2dPositonDelay(0.5, 5, function()
 				return
 			end)
 			var_0_13(self, "idle", true)
@@ -929,9 +928,9 @@ function Live2DPainting:loadLive2dData()
 
 	if PlayerPrefs.GetInt(LIVE2D_STATUS_SAVE, 1) ~= 1 and not self.live2dData.spineUseLive2d then
 		if self.drags then
-			for iter_46_0 = 1, #self.drags do
-				self.drags[iter_46_0]:clearData()
-				self.drags[iter_46_0]:loadL2dFinal()
+			for iter_45_0 = 1, #self.drags do
+				self.drags[iter_45_0]:clearData()
+				self.drags[iter_45_0]:loadL2dFinal()
 			end
 		end
 
@@ -939,41 +938,41 @@ function Live2DPainting:loadLive2dData()
 
 		self.saveActionAbleId = nil
 	else
-		local var_46_0, var_46_1 = Live2dConst.GetL2dSaveData(self.live2dData:GetShipSkinConfig().id, self.live2dData.ship.id)
-		local var_46_2 = Live2dConst.GetDragActionIndex(var_46_1, self.live2dData:GetShipSkinConfig().id, self.live2dData.ship.id) or 1
+		local var_45_0, var_45_1 = Live2dConst.GetL2dSaveData(self.live2dData:GetShipSkinConfig().id, self.live2dData.ship.id)
+		local var_45_2 = Live2dConst.GetDragActionIndex(var_45_1, self.live2dData:GetShipSkinConfig().id, self.live2dData.ship.id) or 1
 
-		if var_46_0 then
-			self:changeIdleIndex(var_46_0)
+		if var_45_0 then
+			self:changeIdleIndex(var_45_0)
 		end
 
-		self.saveActionAbleId = var_46_1
+		self.saveActionAbleId = var_45_1
 
-		if var_46_1 and var_46_1 > 0 then
-			if pg.ship_l2d[var_46_1] then
-				local var_46_3 = pg.ship_l2d[var_46_1].action_trigger_active
+		if var_45_1 and var_45_1 > 0 then
+			if pg.ship_l2d[var_45_1] then
+				local var_45_3 = pg.ship_l2d[var_45_1].action_trigger_active
 
-				if var_46_0 and var_46_3.idle_enable and #var_46_3.idle_enable > 0 then
-					for iter_46_1, iter_46_2 in ipairs(var_46_3.idle_enable) do
-						if iter_46_2[1] == var_46_0 then
-							self:setEnableActions(iter_46_2[2])
+				if var_45_0 and var_45_3.idle_enable and #var_45_3.idle_enable > 0 then
+					for iter_45_1, iter_45_2 in ipairs(var_45_3.idle_enable) do
+						if iter_45_2[1] == var_45_0 then
+							self:setEnableActions(iter_45_2[2])
 						end
 					end
-				elseif var_46_2 and var_46_2 >= 1 and var_46_3.active_list then
-					self:setEnableActions((var_46_3.active_list[var_46_2].enable or nil) and (var_46_3.active_list[var_46_2].enable or {}))
+				elseif var_45_2 and var_45_2 >= 1 and var_45_3.active_list then
+					self:setEnableActions((var_45_3.active_list[var_45_2].enable or nil) and (var_45_3.active_list[var_45_2].enable or {}))
 				else
-					self:setEnableActions((var_46_3.enable or nil) and (var_46_3.enable or {}))
+					self:setEnableActions((var_45_3.enable or nil) and (var_45_3.enable or {}))
 				end
 
-				if var_46_0 and var_46_3.idle_ignore and #var_46_3.idle_ignore > 0 then
-					for iter_46_3, iter_46_4 in ipairs(var_46_3.idle_ignore) do
-						if iter_46_4[1] == var_46_0 then
-							self:setIgnoreActions(iter_46_4[2])
+				if var_45_0 and var_45_3.idle_ignore and #var_45_3.idle_ignore > 0 then
+					for iter_45_3, iter_45_4 in ipairs(var_45_3.idle_ignore) do
+						if iter_45_4[1] == var_45_0 then
+							self:setIgnoreActions(iter_45_4[2])
 						end
 					end
-				elseif var_46_2 and var_46_2 >= 1 and var_46_3.active_list then
-					self:setIgnoreActions((var_46_3.active_list[var_46_2].ignore or nil) and (var_46_3.active_list[var_46_2].ignore or {}))
+				elseif var_45_2 and var_45_2 >= 1 and var_45_3.active_list then
+					self:setIgnoreActions((var_45_3.active_list[var_45_2].ignore or nil) and (var_45_3.active_list[var_45_2].ignore or {}))
 				else
-					self:setIgnoreActions((var_46_3.ignore or nil) and (var_46_3.ignore or {}))
+					self:setIgnoreActions((var_45_3.ignore or nil) and (var_45_3.ignore or {}))
 				end
 			end
 		else
@@ -982,9 +981,9 @@ function Live2DPainting:loadLive2dData()
 		end
 
 		if self.drags then
-			for iter_46_5 = 1, #self.drags do
-				self.drags[iter_46_5]:loadData()
-				self.drags[iter_46_5]:loadL2dFinal()
+			for iter_45_5 = 1, #self.drags do
+				self.drags[iter_45_5]:loadData()
+				self.drags[iter_45_5]:loadL2dFinal()
 			end
 		end
 	end
@@ -1003,66 +1002,66 @@ function Live2DPainting:saveLive2dData()
 		return
 	end
 
-	local var_47_0 = self.live2dData.skinId
+	local var_46_0 = self.live2dData.skinId
 
 	if self.idleIndex then
-		Live2dConst.SaveL2dIdle(var_47_0, self.live2dData.ship.id, self.idleIndex)
+		Live2dConst.SaveL2dIdle(var_46_0, self.live2dData.ship.id, self.idleIndex)
 	end
 
 	if self.saveActionAbleId then
 		if self.idleIndex == 0 then
-			Live2dConst.SaveL2dAction(var_47_0, self.live2dData.ship.id, 0)
+			Live2dConst.SaveL2dAction(var_46_0, self.live2dData.ship.id, 0)
 		else
-			Live2dConst.SaveL2dAction(var_47_0, self.live2dData.ship.id, self.saveActionAbleId)
+			Live2dConst.SaveL2dAction(var_46_0, self.live2dData.ship.id, self.saveActionAbleId)
 		end
 	end
 
 	if self.drags then
-		for iter_47_0 = 1, #self.drags do
-			self.drags[iter_47_0]:saveData()
+		for iter_46_0 = 1, #self.drags do
+			self.drags[iter_46_0]:saveData()
 		end
 	end
 
 	if self.liveCom then
-		local var_47_1 = self.liveCom:GetCubismParameter("ParamBGM_loop")
+		local var_46_1 = self.liveCom:GetCubismParameter("ParamBGM_loop")
 
-		if var_47_1 then
-			Live2dConst.SaveL2dBgmVolume(var_47_0, var_47_1.Value)
+		if var_46_1 then
+			Live2dConst.SaveL2dBgmVolume(var_46_0, var_46_1.Value)
 		end
 	end
 end
 
 function Live2DPainting:changeActionIdle()
-	local var_48_0 = var_0_3.idleActions[math.ceil(math.random(#var_0_3.idleActions))]
+	local var_47_0 = var_0_3.idleActions[math.ceil(math.random(#var_0_3.idleActions))]
 
 	var_0_13(self, "idle", true)
 end
 
-function Live2DPainting:enablePlayAction(arg_49_1)
-	return var_0_12(self, arg_49_1)
+function Live2DPainting:enablePlayAction(arg_48_1)
+	return var_0_12(self, arg_48_1)
 end
 
-function Live2DPainting:IgonreReactPos(arg_50_1)
-	self.lockReact = arg_50_1
+function Live2DPainting:IgonreReactPos(arg_49_1)
+	self.lockReact = arg_49_1
 
-	self:setReactPos(arg_50_1)
+	self:setReactPos(arg_49_1)
 end
 
-function Live2DPainting:setReactPos(arg_51_1)
+function Live2DPainting:setReactPos(arg_50_1)
 	if self.liveCom then
 		if self.lockReact then
 			if self.ignoreReact == self.lockReact then
 				return
 			end
 
-			arg_51_1 = self.lockReact
+			arg_50_1 = self.lockReact
 		end
 
-		self.ignoreReact = arg_51_1
+		self.ignoreReact = arg_50_1
 
-		self.liveCom:IgonreReactPos(arg_51_1)
+		self.liveCom:IgonreReactPos(arg_50_1)
 
-		if arg_51_1 then
+		if arg_50_1 then
 			self.liveCom.inDrag = false
 		end
 
@@ -1072,21 +1071,21 @@ function Live2DPainting:setReactPos(arg_51_1)
 	end
 end
 
-function Live2DPainting:l2dCharEnable(arg_52_1)
-	self._l2dCharEnable = arg_52_1
+function Live2DPainting:l2dCharEnable(arg_51_1)
+	self._l2dCharEnable = arg_51_1
 end
 
-function Live2DPainting:getDragEnable(arg_53_1)
-	if self._shopPreView and arg_53_1.shop_action == 0 then
+function Live2DPainting:getDragEnable(arg_52_1)
+	if self._shopPreView and arg_52_1.shop_action == 0 then
 		return false
 	end
 
 	return true
 end
 
-function Live2DPainting:updateShip(arg_54_1)
-	if arg_54_1 and self.live2dData and self.live2dData.ship then
-		self.live2dData.ship = arg_54_1
+function Live2DPainting:updateShip(arg_53_1)
+	if arg_53_1 and self.live2dData and self.live2dData.ship then
+		self.live2dData.ship = arg_53_1
 
 		if self.live2dData and self.live2dData.ship and self.live2dData.ship.propose then
 			self:changeParamaterValue("Paramring", 1)
@@ -1096,14 +1095,14 @@ function Live2DPainting:updateShip(arg_54_1)
 	end
 end
 
-function Live2DPainting:SetLive2dPlayingCallback(arg_55_1)
-	self.live2dPlayingCallback = arg_55_1
+function Live2DPainting:SetLive2dPlayingCallback(arg_54_1)
+	self.live2dPlayingCallback = arg_54_1
 end
 
-function Live2DPainting:getDragByTriggerType(arg_56_1)
-	for iter_56_0 = 1, #self.drags do
-		if self.drags[iter_56_0]:getActionTriggerType() == arg_56_1 then
-			return self.drags[iter_56_0]
+function Live2DPainting:getDragByTriggerType(arg_55_1)
+	for iter_55_0 = 1, #self.drags do
+		if self.drags[iter_55_0]:getActionTriggerType() == arg_55_1 then
+			return self.drags[iter_55_0]
 		end
 	end
 
@@ -1122,17 +1121,17 @@ function Live2DPainting:GetTouchPart()
 	return self.liveCom:GetTouchPart()
 end
 
-function Live2DPainting:TriggerAction(arg_60_1, arg_60_2, arg_60_3, arg_60_4)
+function Live2DPainting:TriggerAction(arg_59_1, arg_59_2, arg_59_3, arg_59_4)
 	self:CheckStopDrag()
 
-	local var_60_0 = var_0_13(self, arg_60_1, arg_60_3)
+	local var_59_0 = var_0_13(self, arg_59_1, arg_59_3)
 
-	if var_60_0 then
-		self.finishActionCB = arg_60_2
-		self.animEventCB = arg_60_4
+	if var_59_0 then
+		self.finishActionCB = arg_59_2
+		self.animEventCB = arg_59_4
 	end
 
-	return var_60_0
+	return var_59_0
 end
 
 function Live2DPainting:ResetL2dData()
@@ -1147,24 +1146,24 @@ function Live2DPainting:IsPlaying()
 	return self.isPlaying
 end
 
-function Live2DPainting:SetLive2dPlayingCallback(arg_63_1)
-	self.live2dPlayingCallback = arg_63_1
+function Live2DPainting:SetLive2dPlayingCallback(arg_62_1)
+	self.live2dPlayingCallback = arg_62_1
 end
 
-function Live2DPainting:setPurchaseOffset(arg_64_1)
-	local var_64_0 = self.live2dData.ship:GetSkinConfig().purchase_offset
+function Live2DPainting:setPurchaseOffset(arg_63_1)
+	local var_63_0 = self.live2dData.ship:GetSkinConfig().purchase_offset
 
-	if not var_64_0 or #var_64_0 < 3 then
+	if not var_63_0 or #var_63_0 < 3 then
 		return
 	end
 
-	if arg_64_1 then
-		if var_64_0 and #var_64_0 >= 3 then
-			self._tf.localPosition = Vector3(var_64_0[1], var_64_0[2], var_64_0[3])
+	if arg_63_1 then
+		if var_63_0 and #var_63_0 >= 3 then
+			self._tf.localPosition = Vector3(var_63_0[1], var_63_0[2], var_63_0[3])
 		end
 
-		if var_64_0 and #var_64_0 >= 4 then
-			self._tf.localScale = Vector3(var_64_0[4], var_64_0[4], var_64_0[4])
+		if var_63_0 and #var_63_0 >= 4 then
+			self._tf.localScale = Vector3(var_63_0[4], var_63_0[4], var_63_0[4])
 		end
 	else
 		self._tf.localScale = self.live2dData.scale
@@ -1172,23 +1171,23 @@ function Live2DPainting:setPurchaseOffset(arg_64_1)
 	end
 end
 
-function Live2DPainting:offsetL2dPositonDelay(arg_65_1, arg_65_2, arg_65_3)
+function Live2DPainting:offsetL2dPositonDelay(arg_64_1, arg_64_2, arg_64_3)
 	if self._tf and LeanTween.isTweening(go(self._tf)) then
 		LeanTween.cancel(go(self._tf))
 	end
 
 	self._tf.localPosition = Vector3(60000, 0, 0)
-	self._animator.speed = arg_65_2
+	self._animator.speed = arg_64_2
 
-	LeanTween.delayedCall(go(self._tf), arg_65_1, System.Action(function()
+	LeanTween.delayedCall(go(self._tf), arg_64_1, System.Action(function()
 		if self._tf then
 			self:resetPosition()
 
 			self._animator.speed = 1
 		end
 
-		if arg_65_3 then
-			arg_65_3()
+		if arg_64_3 then
+			arg_64_3()
 		end
 	end))
 end
@@ -1208,7 +1207,7 @@ function Live2DPainting:resetL2dData()
 		return
 	end
 
-	self:offsetL2dPositonDelay(0.8, 5)
+	self:offsetL2dPositonDelay(0.5, 5)
 	Live2dConst.ClearLive2dSave(self.live2dData.ship:getSkinId(), self.live2dData.ship.id)
 
 	if self.changeBgmVolume then
@@ -1223,135 +1222,135 @@ function Live2DPainting:resetL2dData()
 	var_0_13(self, "idle", true)
 end
 
-function Live2DPainting:applyActiveData(arg_69_1)
-	if not arg_69_1 then
+function Live2DPainting:applyActiveData(arg_68_1)
+	if not arg_68_1 then
 		return
 	end
 
-	local var_69_0 = arg_69_1.activeData
-	local var_69_1 = arg_69_1.activeData.enable
-	local var_69_2 = arg_69_1.activeData.idle_enable
-	local var_69_3 = arg_69_1.activeData.idle_ignore
-	local var_69_4 = arg_69_1.activeData.ignore
-	local var_69_5
+	local var_68_0 = arg_68_1.activeData
+	local var_68_1 = arg_68_1.activeData.enable
+	local var_68_2 = arg_68_1.activeData.idle_enable
+	local var_68_3 = arg_68_1.activeData.idle_ignore
+	local var_68_4 = arg_68_1.activeData.ignore
+	local var_68_5
 
-	if arg_69_1.activeData.idle then
-		var_69_5 = var_69_0.idle or arg_69_1.idle
+	if arg_68_1.activeData.idle then
+		var_68_5 = var_68_0.idle or arg_68_1.idle
 	end
 
-	local var_69_6 = var_69_0.repeatFlag
-	local var_69_7
+	local var_68_6 = var_68_0.repeatFlag
+	local var_68_7
 
-	if var_69_0.fold ~= nil then
-		var_69_7 = var_69_0.fold == 1
+	if var_68_0.fold ~= nil then
+		var_68_7 = var_68_0.fold == 1
 	end
 
-	if var_69_1 and #var_69_1 >= 0 then
-		self:setEnableActions(var_69_1)
-	elseif var_69_2 and #var_69_2 > 0 then
-		for iter_69_0, iter_69_1 in ipairs(var_69_2) do
-			if iter_69_1[1] == var_69_5 then
-				self:setEnableActions(iter_69_1[2])
+	if var_68_1 and #var_68_1 >= 0 then
+		self:setEnableActions(var_68_1)
+	elseif var_68_2 and #var_68_2 > 0 then
+		for iter_68_0, iter_68_1 in ipairs(var_68_2) do
+			if iter_68_1[1] == var_68_5 then
+				self:setEnableActions(iter_68_1[2])
 			end
 		end
 	end
 
-	if var_69_4 and #var_69_4 >= 0 then
-		self:setIgnoreActions(var_69_4)
-	elseif var_69_3 and #var_69_3 > 0 then
-		for iter_69_2, iter_69_3 in ipairs(var_69_3) do
-			if iter_69_3[1] == var_69_5 then
-				self:setIgnoreActions(iter_69_3[2])
+	if var_68_4 and #var_68_4 >= 0 then
+		self:setIgnoreActions(var_68_4)
+	elseif var_68_3 and #var_68_3 > 0 then
+		for iter_68_2, iter_68_3 in ipairs(var_68_3) do
+			if iter_68_3[1] == var_68_5 then
+				self:setIgnoreActions(iter_68_3[2])
 			end
 		end
 	end
 
-	if var_69_5 and var_69_5 ~= self.indexIndex then
-		self.saveActionAbleId = arg_69_1.id
+	if var_68_5 and var_68_5 ~= self.indexIndex then
+		self.saveActionAbleId = arg_68_1.id
 	end
 
-	if var_69_5 then
-		local var_69_8
+	if var_68_5 then
+		local var_68_8
 
-		if type(var_69_5) == "number" and var_69_5 >= 0 then
-			var_69_8 = var_69_5
-		elseif type(var_69_5) == "table" then
-			local var_69_9 = {}
+		if type(var_68_5) == "number" and var_68_5 >= 0 then
+			var_68_8 = var_68_5
+		elseif type(var_68_5) == "table" then
+			local var_68_9 = {}
 
-			for iter_69_4, iter_69_5 in ipairs(var_69_5) do
-				if iter_69_5 == self.idleIndex then
-					if var_69_6 then
-						table.insert(var_69_9, iter_69_5)
+			for iter_68_4, iter_68_5 in ipairs(var_68_5) do
+				if iter_68_5 == self.idleIndex then
+					if var_68_6 then
+						table.insert(var_68_9, iter_68_5)
 					end
 				else
-					table.insert(var_69_9, iter_69_5)
+					table.insert(var_68_9, iter_68_5)
 				end
 			end
 
-			var_69_8 = var_69_9[math.random(1, #var_69_9)]
+			var_68_8 = var_68_9[math.random(1, #var_68_9)]
 		end
 
-		if var_69_8 then
-			self:changeIdleIndex(var_69_8)
+		if var_68_8 then
+			self:changeIdleIndex(var_68_8)
 		end
 
 		self:saveLive2dData()
 	end
 
-	if var_69_7 ~= nil then
+	if var_68_7 ~= nil then
 		self.foldAble = true
 
 		pg.m02:sendNotification(NewMainMediator.HIDE_PANEL, {
-			flag = var_69_7,
+			flag = var_68_7,
 			content = {}
 		})
 	end
 end
 
-function Live2DPainting:setIgnoreActions(arg_70_1)
-	self.ignorePlayActions = arg_70_1 and arg_70_1 or {}
+function Live2DPainting:setIgnoreActions(arg_69_1)
+	self.ignorePlayActions = arg_69_1 and arg_69_1 or {}
 end
 
-function Live2DPainting:setEnableActions(arg_71_1)
-	self.enablePlayActions = arg_71_1 and arg_71_1 or {}
+function Live2DPainting:setEnableActions(arg_70_1)
+	self.enablePlayActions = arg_70_1 and arg_70_1 or {}
 end
 
-function Live2DPainting:changeIdleIndex(arg_72_1)
-	local var_72_0 = false
+function Live2DPainting:changeIdleIndex(arg_71_1)
+	local var_71_0 = false
 
-	if self.idleIndex ~= arg_72_1 then
-		local var_72_1 = self._animator:GetInteger("idle")
+	if self.idleIndex ~= arg_71_1 then
+		local var_71_1 = self._animator:GetInteger("idle")
 
-		if var_72_1 and var_72_1 >= 0 then
-			self._animator:SetInteger("idle", arg_72_1)
+		if var_71_1 and var_71_1 >= 0 then
+			self._animator:SetInteger("idle", arg_71_1)
 
-			var_72_0 = true
+			var_71_0 = true
 		end
 	end
 
-	print("live2d 待机动作设置为 = " .. arg_72_1)
+	print("live2d 待机动作设置为 = " .. arg_71_1)
 
-	self.idleIndex = arg_72_1
+	self.idleIndex = arg_71_1
 
 	self:onListenerHandle(Live2DPainting.ON_ACTION_CHANGE_IDLE, {
 		idle = self.idleIndex,
-		idle_change = var_72_0
+		idle_change = var_71_0
 	})
 	self:updateDragsSateData()
 end
 
-function Live2DPainting:live2dActionChange(arg_73_1)
-	self.isPlaying = arg_73_1
+function Live2DPainting:live2dActionChange(arg_72_1)
+	self.isPlaying = arg_72_1
 
 	self:updateDragsSateData()
 
 	if self.live2dPlayingCallback then
-		self.live2dPlayingCallback(arg_73_1)
+		self.live2dPlayingCallback(arg_72_1)
 	end
 end
 
-function Live2DPainting:setPosition(arg_74_1)
-	self._tf.localPosition = arg_74_1
+function Live2DPainting:setPosition(arg_73_1)
+	self._tf.localPosition = arg_73_1
 end
 
 function Live2DPainting:resetPosition()
@@ -1359,7 +1358,7 @@ function Live2DPainting:resetPosition()
 end
 
 function Live2DPainting:updateDragsSateData()
-	local var_76_0 = {
+	local var_75_0 = {
 		idleIndex = self.idleIndex,
 		isPlaying = self.isPlaying,
 		ignoreReact = self.ignoreReact,
@@ -1367,8 +1366,8 @@ function Live2DPainting:updateDragsSateData()
 	}
 
 	if self.drags then
-		for iter_76_0 = 1, #self.drags do
-			self.drags[iter_76_0]:updateStateData(var_76_0)
+		for iter_75_0 = 1, #self.drags do
+			self.drags[iter_75_0]:updateStateData(var_75_0)
 		end
 	end
 end
@@ -1383,42 +1382,42 @@ function Live2DPainting:GetLive2DStateData()
 end
 
 function Live2DPainting:CheckStopDrag()
-	local var_78_0 = self.live2dData:GetShipSkinConfig()
+	local var_77_0 = self.live2dData:GetShipSkinConfig()
 
-	if var_78_0.l2d_ignore_drag and var_78_0.l2d_ignore_drag == 1 then
+	if var_77_0.l2d_ignore_drag and var_77_0.l2d_ignore_drag == 1 then
 		self.liveCom.ResponseClick = false
 		self.liveCom.inDrag = false
 	end
 end
 
-function Live2DPainting:changeParamaterValue(arg_79_1, arg_79_2)
+function Live2DPainting:changeParamaterValue(arg_78_1, arg_78_2)
 	if self:IsLoaded() then
-		if not arg_79_1 or string.len(arg_79_1) == 0 then
+		if not arg_78_1 or string.len(arg_78_1) == 0 then
 			return
 		end
 
-		local var_79_0 = self.liveCom:GetCubismParameter(arg_79_1)
+		local var_78_0 = self.liveCom:GetCubismParameter(arg_78_1)
 
-		if not var_79_0 then
+		if not var_78_0 then
 			return
 		end
 
-		self.liveCom:AddParameterValue(var_79_0, arg_79_2, var_0_8[1])
+		self.liveCom:AddParameterValue(var_78_0, arg_78_2, var_0_8[1])
 	else
 		self.delayChangeParamater = self.delayChangeParamater or {}
 
 		table.insert(self.delayChangeParamater, {
-			arg_79_1,
-			arg_79_2
+			arg_78_1,
+			arg_78_2
 		})
 	end
 end
 
-function Live2DPainting:changeDragParameter(arg_80_1, arg_80_2)
+function Live2DPainting:changeDragParameter(arg_79_1, arg_79_2)
 	if self:IsLoaded() and self.drags then
-		for iter_80_0 = 1, #self.drags do
-			if self.drags[iter_80_0].parameterName and self.drags[iter_80_0].parameterName == arg_80_1 then
-				self.drags[iter_80_0]:setTargetValue(arg_80_2)
+		for iter_79_0 = 1, #self.drags do
+			if self.drags[iter_79_0].parameterName and self.drags[iter_79_0].parameterName == arg_79_1 then
+				self.drags[iter_79_0]:setTargetValue(arg_79_2)
 			end
 		end
 	end
@@ -1430,14 +1429,14 @@ function Live2DPainting:GetDragBounds()
 		self.dragableNames = {}
 
 		if self.drags then
-			for iter_81_0 = 1, #self.drags do
-				if self.drags[iter_81_0].drawAbleName and self.drags[iter_81_0].drawAbleName ~= "" and not table.contains(self.dragableNames, self.drags[iter_81_0].drawAbleName) then
-					local var_81_0 = self.liveCom:GetDrawablePart(self.drags[iter_81_0].drawAbleName)
+			for iter_80_0 = 1, #self.drags do
+				if self.drags[iter_80_0].drawAbleName and self.drags[iter_80_0].drawAbleName ~= "" and not table.contains(self.dragableNames, self.drags[iter_80_0].drawAbleName) then
+					local var_80_0 = self.liveCom:GetDrawablePart(self.drags[iter_80_0].drawAbleName)
 
-					if var_81_0 then
-						self.drags[iter_81_0]:IsTouchAble()
-						table.insert(self.dragRenders, (GetComponent(var_81_0, typeof(MeshRenderer))))
-						table.insert(self.dragableNames, self.drags[iter_81_0].drawAbleName)
+					if var_80_0 then
+						self.drags[iter_80_0]:IsTouchAble()
+						table.insert(self.dragRenders, (GetComponent(var_80_0, typeof(MeshRenderer))))
+						table.insert(self.dragableNames, self.drags[iter_80_0].drawAbleName)
 					end
 				end
 			end
@@ -1451,12 +1450,12 @@ function Live2DPainting:GetLive2dTransform()
 	return self._tf
 end
 
-function Live2DPainting:setSortingLayer(arg_83_1)
+function Live2DPainting:setSortingLayer(arg_82_1)
 	if self.state == Live2DPainting.STATE_DISPOSE then
 		return
 	end
 
-	arg_83_1 = arg_83_1 or LayerWeightConst.L2D_DEFAULT_LAYER
+	arg_82_1 = arg_82_1 or LayerWeightConst.L2D_DEFAULT_LAYER
 
 	self:updateL2dSortMode()
 
@@ -1519,8 +1518,8 @@ function Live2DPainting:Dispose()
 	end
 
 	if self.drags then
-		for iter_86_0 = 1, #self.drags do
-			self.drags[iter_86_0]:dispose()
+		for iter_85_0 = 1, #self.drags do
+			self.drags[iter_85_0]:dispose()
 		end
 
 		self.drags = {}
@@ -1554,41 +1553,41 @@ function Live2DPainting:Dispose()
 	self.state = Live2DPainting.STATE_DISPOSE
 end
 
-function Live2DPainting:clearMaskTexture(arg_87_1)
-	if not arg_87_1 then
+function Live2DPainting:clearMaskTexture(arg_86_1)
+	if not arg_86_1 then
 		return
 	end
 
-	local var_87_0 = GetComponent(arg_87_1, "CubismMaskController")
+	local var_86_0 = GetComponent(arg_86_1, "CubismMaskController")
 
-	if var_87_0 then
-		if var_87_0.MaskTexture then
-			for iter_87_0 = 0, var_87_0.MaskTexture.RenderTextures.Length - 1 do
-				var_87_0.MaskTexture.RenderTextures[iter_87_0]:Release()
+	if var_86_0 then
+		if var_86_0.MaskTexture then
+			for iter_86_0 = 0, var_86_0.MaskTexture.RenderTextures.Length - 1 do
+				var_86_0.MaskTexture.RenderTextures[iter_86_0]:Release()
 			end
 		end
 	end
 end
 
-function Live2DPainting:settempOffsetPosTime(arg_88_1)
-	self.tempOffsetPosTime = arg_88_1
+function Live2DPainting:settempOffsetPosTime(arg_87_1)
+	self.tempOffsetPosTime = arg_87_1
 end
 
 function Live2DPainting:getParameterDic()
-	local var_89_0 = {}
+	local var_88_0 = {}
 
 	if self.drags and #self.drags > 0 then
-		for iter_89_0, iter_89_1 in ipairs(self.drags) do
-			local var_89_1 = iter_89_1:getParameterName()
-			local var_89_2 = iter_89_1:getParameter()
+		for iter_88_0, iter_88_1 in ipairs(self.drags) do
+			local var_88_1 = iter_88_1:getParameterName()
+			local var_88_2 = iter_88_1:getParameter()
 
-			if var_89_1 and #var_89_1 > 0 and var_89_2 then
-				var_89_0[var_89_1] = var_89_2
+			if var_88_1 and #var_88_1 > 0 and var_88_2 then
+				var_88_0[var_88_1] = var_88_2
 			end
 		end
 	end
 
-	return var_89_0
+	return var_88_0
 end
 
 function Live2DPainting:unloadCueSheet()
@@ -1596,22 +1595,22 @@ function Live2DPainting:unloadCueSheet()
 		return
 	end
 
-	for iter_90_0, iter_90_1 in ipairs(self.loadSheets) do
-		pg.CriMgr.GetInstance():UnloadCueSheet(iter_90_1)
+	for iter_89_0, iter_89_1 in ipairs(self.loadSheets) do
+		pg.CriMgr.GetInstance():UnloadCueSheet(iter_89_1)
 	end
 
 	self.loadSheets = {}
 end
 
-function Live2DPainting:playL2dVoice(arg_91_1, arg_91_2, arg_91_3)
-	if not table.contains(self.loadSheets, arg_91_1) then
-		table.insert(self.loadSheets, arg_91_1)
+function Live2DPainting:playL2dVoice(arg_90_1, arg_90_2, arg_90_3)
+	if not table.contains(self.loadSheets, arg_90_1) then
+		table.insert(self.loadSheets, arg_90_1)
 	end
 
-	pg.CriMgr.GetInstance():playCueSheetVoice(arg_91_1, arg_91_2, arg_91_3, function(arg_92_0)
-		if arg_92_0 then
-			print("播放的语音长度为 = " .. arg_92_0:GetLength())
-			table.insert(self.playingSheetInfo, arg_92_0)
+	pg.CriMgr.GetInstance():playCueSheetVoice(arg_90_1, arg_90_2, arg_90_3, function(arg_91_0)
+		if arg_91_0 then
+			print("播放的语音长度为 = " .. arg_91_0:GetLength())
+			table.insert(self.playingSheetInfo, arg_91_0)
 		end
 	end)
 end
@@ -1628,10 +1627,10 @@ function Live2DPainting:AtomSouceFresh()
 	end
 end
 
-function Live2DPainting:SetL2dSortingLayer(arg_95_1)
+function Live2DPainting:SetL2dSortingLayer(arg_94_1)
 	Live2DPainting.UpdateL2dSortMode(self)
 
-	self:GetComponent(typeof(CubismRenderController)).SortingOrder = arg_95_1
+	self:GetComponent(typeof(CubismRenderController)).SortingOrder = arg_94_1
 end
 
 function Live2DPainting:UpdateL2dSortMode()

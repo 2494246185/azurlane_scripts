@@ -314,7 +314,7 @@ function InstagramChatLayer:UpdateChatContent(arg_15_1, arg_15_2, arg_15_3)
 			end
 		end
 
-		if HXSet.isHx() then
+		if HXSet.isHx() and CUSTOM_HX then
 			SetActive(var_15_1, false)
 			SetActive(var_15_2, true)
 		else

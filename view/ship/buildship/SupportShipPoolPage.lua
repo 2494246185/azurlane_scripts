@@ -18,7 +18,7 @@ function SupportShipPoolPage:getResource()
 			table.insertto(var_1_0, ResPathSupport.GetPaintingListByPaintingName(var_1_1:getPainting()))
 		end
 
-		if HXSet.isHx() then
+		if HXSet.isHx() and CUSTOM_HX then
 			table.insertto(var_1_0, pg.ship_skin_template[900284].painting)
 		end
 	end
@@ -93,7 +93,7 @@ end
 function SupportShipPoolPage:UpdateBuildPoolPaiting()
 	local var_11_0 = self.contextData.falgShip:getPainting()
 
-	if HXSet.isHx() then
+	if HXSet.isHx() and CUSTOM_HX then
 		var_11_0 = pg.ship_skin_template[900284].painting
 	end
 
