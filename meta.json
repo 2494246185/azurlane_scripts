@@ -1,0 +1,16 @@
+{
+  "version": "9.7.434-3",
+  "is_patch": true,
+  "updated_at": "2026-11-12T13:02:30.789676+00:00",
+  "file_count": 46505,
+  "total_size": 426436370,
+  "archive_size": 0,
+  "archive_format": null,
+  "archive_name": null,
+  "raw_version": "9.7.434",
+  "patch_sequence": 3,
+  "scripts64_md5": "71017241f75efe5f28eb15825ddf7e61",
+  "azhash": "$azhash$9$7$434$0d95de31288ee145",
+  "ref": "v9.7.434-3",
+  "storage": "github"
+}
