@@ -84,38 +84,55 @@ end
 function TwoPointFiveKillPage:OnUpdateFlush()
 	setText(self.progressRule, i18n("nier_core_task_desc"))
 
-	local var_10_0 = self.ptData:getTargetLevel()
-	local var_10_1, var_10_2, var_10_3 = self.ptData:GetLevelProgress()
+	local var_10_0, var_10_1, var_10_2 = self.ptData:GetLevelProgress()
 
-	setText(self.nowday, string.format("%s", var_10_1))
-	setText(self.aimday, string.format("/%s", var_10_2))
+	setText(self.nowday, string.format("%s", var_10_0))
+	setText(self.aimday, string.format("/%s", var_10_1))
 
-	local var_10_4, var_10_5, var_10_6 = self.ptData:GetResProgress()
+	local var_10_3, var_10_4, var_10_5 = self.ptData:GetResProgress()
 
-	setText(self.progressStep, string.format("%s<color=#bdbad1>/%s</color>", var_10_6 >= 1 and setColorStr(var_10_4, COLOR_GREEN) or var_10_4, var_10_5))
-	setSlider(self.slider, 0, 1, var_10_6)
+	setText(self.progressStep, string.format("%s<color=#bdbad1>/%s</color>", var_10_5 >= 1 and setColorStr(var_10_3, COLOR_GREEN) or var_10_3, var_10_4))
+	setSlider(self.slider, 0, 1, var_10_5)
 
-	local var_10_7 = self.ptData:CanGetAward()
-	local var_10_8 = self.ptData:CanGetNextAward()
+	local var_10_6 = self.ptData:CanGetAward()
+	local var_10_7 = self.ptData:CanGetNextAward()
 
-	setActive(self.battleBtn, self.ptData:CanGetMorePt() and not var_10_7 and var_10_8)
-	setActive(self.getBtn, var_10_7)
-	setActive(self.gotBtn, not var_10_8)
+	setActive(self.battleBtn, self.ptData:CanGetMorePt() and not var_10_6 and var_10_7)
+	setActive(self.getBtn, var_10_6)
+	setActive(self.gotBtn, not var_10_7)
 
-	local var_10_9 = self.ptData:GetAward()
+	local var_10_8 = self.ptData:GetAward()
 
-	updateDrop(self.awardTF, var_10_9)
+	updateDrop(self.awardTF, var_10_8)
 	onButton(self, self.awardTF, function()
-		self:emit(BaseUI.ON_DROP, var_10_9)
+		self:emit(BaseUI.ON_DROP, var_10_8)
 	end, SFX_PANEL)
+	self:PlayStory()
+end
+
+function TwoPointFiveKillPage:PlayStory()
+	if 3 > self.ptData:GetLevel() then
+		return
+	end
+
+	local var_12_0 = checkExist(self.activity:getConfig("config_client").story, {
+		3
+	}, {
+		1
+	})
+	local var_12_1 = pg.NewStoryMgr.GetInstance()
+
+	if var_12_0 and not var_12_1:IsPlayed(var_12_0) then
+		var_12_1:Play(var_12_0)
+	end
 end
 
 function TwoPointFiveKillPage:OnDestroy()
 	return
 end
 
-function TwoPointFiveKillPage:GetWorldPtData(arg_13_1)
-	if arg_13_1 <= pg.TimeMgr.GetInstance():GetServerTime() - (ActivityMainScene.Data2Time or 0) then
+function TwoPointFiveKillPage:GetWorldPtData(arg_14_1)
+	if arg_14_1 <= pg.TimeMgr.GetInstance():GetServerTime() - (ActivityMainScene.Data2Time or 0) then
 		ActivityMainScene.Data2Time = pg.TimeMgr.GetInstance():GetServerTime()
 
 		self:emit(ActivityMediator.EVENT_PT_OPERATION, {

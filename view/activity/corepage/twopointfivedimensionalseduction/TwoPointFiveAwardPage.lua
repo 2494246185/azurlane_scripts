@@ -194,8 +194,8 @@ end
 function TwoPointFiveAwardPage:ShowSitePage()
 	local var_16_1 = self.bg_1:Find("Role_left")
 	local var_16_2 = Drop.New({
-		type = self.showDataList[2].config.type,
-		id = self.showDataList[2].config.drop_id
+		type = self.showDataList[1].config.type,
+		id = self.showDataList[1].config.drop_id
 	})
 	local var_16_3 = var_16_2:getName()
 	local var_16_4 = tobool(getProxy(CollectionProxy):getShipGroup(pg.ship_data_template[var_16_2.id].group_type))
@@ -207,8 +207,8 @@ function TwoPointFiveAwardPage:ShowSitePage()
 
 	local var_16_5 = self.bg_1:Find("Role_right")
 	local var_16_7 = Drop.New({
-		type = self.showDataList[1].config.type,
-		id = self.showDataList[1].config.drop_id
+		type = self.showDataList[2].config.type,
+		id = self.showDataList[2].config.drop_id
 	})
 	local var_16_8 = var_16_7:getName()
 	local var_16_9 = tobool(getProxy(CollectionProxy):getShipGroup(pg.ship_data_template[var_16_7.id].group_type))

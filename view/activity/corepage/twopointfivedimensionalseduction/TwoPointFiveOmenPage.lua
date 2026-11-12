@@ -109,37 +109,65 @@ function TwoPointFiveOmenPage:OnUpdateFlush()
 	if self.taskWindow:isShowing() then
 		self.taskWindow:ExecuteAction("Show", self.activity)
 	end
+
+	self:PlayStory()
 end
 
-function TwoPointFiveOmenPage:getTaskIdx(arg_13_1)
-	local var_13_0 = 1
-	local var_13_1 = math.min(arg_13_1:getNDay(), #self.taskGroup)
+function TwoPointFiveOmenPage:PlayStory()
+	local var_13_0 = {}
 
-	for iter_13_0 = 1, var_13_1 do
+	var_13_0[1] = 3
+
+	local var_13_1 = checkExist(self.activity:getConfig("config_client").story, var_13_0, {
+		1
+	})
+
+	if not var_13_1 or 3 > self.nday then
+		return
+	end
+
+	for iter_13_0, iter_13_1 in ipairs(self.taskGroup[3]) do
+		if not self:isTaskFinished(iter_13_1) then
+			return
+		end
+	end
+
+	local var_13_2 = pg.NewStoryMgr.GetInstance()
+
+	if not var_13_2:IsPlayed(var_13_1) then
+		var_13_2:Play(var_13_1)
+	end
+end
+
+function TwoPointFiveOmenPage:getTaskIdx(arg_14_1)
+	local var_14_0 = 1
+	local var_14_1 = math.min(arg_14_1:getNDay(), #self.taskGroup)
+
+	for iter_14_0 = 1, var_14_1 do
 		if not true then
 			break
 		end
 
-		var_13_0 = iter_13_0
+		var_14_0 = iter_14_0
 
-		if iter_13_0 < var_13_1 then
-			for iter_13_1, iter_13_2 in ipairs(self.taskGroup[iter_13_0]) do
-				if not self:isTaskFinished(iter_13_2) then
+		if iter_14_0 < var_14_1 then
+			for iter_14_1, iter_14_2 in ipairs(self.taskGroup[iter_14_0]) do
+				if not self:isTaskFinished(iter_14_2) then
 					break
 				end
 			end
 		end
 	end
 
-	return math.min(var_13_0, #self.taskGroup)
+	return math.min(var_14_0, #self.taskGroup)
 end
 
-function TwoPointFiveOmenPage:isTaskFinished(arg_14_1)
+function TwoPointFiveOmenPage:isTaskFinished(arg_15_1)
 	self.taskProxy = self.taskProxy or getProxy(TaskProxy)
 
-	local var_14_0 = self.taskProxy:getTaskById(arg_14_1) or self.taskProxy:getFinishTaskById(arg_14_1)
+	local var_15_0 = self.taskProxy:getTaskById(arg_15_1) or self.taskProxy:getFinishTaskById(arg_15_1)
 
-	return var_14_0 and var_14_0:getTaskStatus() == 2
+	return var_15_0 and var_15_0:getTaskStatus() == 2
 end
 
 function TwoPointFiveOmenPage:GetProgressColor()
