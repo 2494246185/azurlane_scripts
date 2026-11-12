@@ -343,7 +343,7 @@ end
 function CourtYardStoreyModule:UpdateAttachment()
 	for iter_31_0, iter_31_1 in pairs(self.modules) do
 		if isa(iter_31_1, CourtYardShipModule) then
-			iter_31_1:HideAttachment(self._layerCount ~= 0)
+			iter_31_1:HideAttachment(self._layerCount and self._layerCount ~= 0)
 		end
 	end
 end

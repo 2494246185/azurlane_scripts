@@ -99,8 +99,12 @@ function table:equal(arg_9_1)
 		return true
 	end
 
+	if getmetatable(self) ~= getmetatable(arg_9_1) then
+		return false
+	end
+
 	for iter_9_0, iter_9_1 in pairs(self) do
-		if not table.equal(iter_9_1, arg_9_1[iter_9_0]) then
+		if not table.equal(iter_9_1, rawget(arg_9_1, iter_9_0)) then
 			return false
 		end
 	end

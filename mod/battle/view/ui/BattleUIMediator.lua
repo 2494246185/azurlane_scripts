@@ -7,6 +7,7 @@ local var_0_3 = ys.Battle.BattleConst
 local var_0_4 = ys.Battle.BattleVariable
 local var_0_5 = ys.Battle.BattleConfig
 local var_0_6 = ys.Battle.BattleCardPuzzleEvent
+local var_0_7 = 0.12
 local BattleUIMediator = class("BattleUIMediator", ys.MVC.Mediator)
 
 ys.Battle.BattleUIMediator = BattleUIMediator
@@ -44,27 +45,30 @@ function BattleUIMediator:EnableComponent(arg_5_1)
 	self._skillView:EnableWeaponButton(arg_5_1)
 end
 
-function BattleUIMediator:EnableJoystick(arg_6_1)
+function BattleUIMediator:EnableJoystick(arg_6_1, arg_6_2)
 	self._stickController.enabled = arg_6_1
+	self._joystickVisible = arg_6_1 or arg_6_2 == true
+
+	self._uiMGR:SetStickPosition(0, 0)
 
 	local var_6_0 = self._joystick:GetComponent(typeof(Animation))
 
 	if var_6_0 then
-		var_6_0.enabled = arg_6_1
+		var_6_0.enabled = self._joystickVisible
 	end
 
 	local var_6_1 = self._joystick:GetComponent(typeof(Animator))
 
 	if var_6_1 then
-		var_6_1.enabled = arg_6_1
+		var_6_1.enabled = self._joystickVisible
 	end
 
-	setActive(self._joystick, arg_6_1)
+	setActive(self._joystick, self._joystickVisible)
 
 	local var_6_2 = self._joystick:Find("Area/BG/spine")
 
 	if var_6_2 then
-		if arg_6_1 then
+		if self._joystickVisible then
 			var_6_2:GetComponent(typeof(SpineAnimUI)):SetAction("cut_in", 0)
 		end
 	end
@@ -172,7 +176,7 @@ function BattleUIMediator:InitJoystick()
 
 		var_15_4:SetActionCallBack(function(arg_16_0)
 			if arg_16_0 == "finish" then
-				if self._stickController.enabled then
+				if self._stickController.enabled or self._joystickVisible then
 					var_15_4:SetAction("normal", 0)
 				else
 					SetActive(self._joystick, false)
@@ -288,6 +292,22 @@ function BattleUIMediator:InitCamera()
 end
 
 function BattleUIMediator:Update()
+	if self._joystickVisible and not self._stickController.enabled then
+		local var_34_0 = self._dataProxy:GetFleetByIFF(var_0_5.FRIENDLY_CODE)
+		local var_34_1 = var_34_0:GetFleetVelocity()
+		local var_34_2 = 0
+		local var_34_3 = 0
+
+		if var_34_1 > 0 then
+			local var_34_4 = var_34_0:GetMotion():GetSpeed()
+
+			var_34_2 = var_34_4.x / var_34_1
+			var_34_3 = var_34_4.z / var_34_1
+		end
+
+		self._uiMGR:SetStickPosition(var_34_2, var_34_3, Time.deltaTime * 2 / var_0_7)
+	end
+
 	for iter_34_0, iter_34_1 in pairs(self._updateViewList) do
 		iter_34_0:Update()
 	end

@@ -1,5 +1,4 @@
 local NavTacticsDockyardScene = class("NavTacticsDockyardScene", import("view.ship.DockyardScene"))
-local var_0_1 = 7
 
 function NavTacticsDockyardScene:init()
 	NavTacticsDockyardScene.super.init(self)
@@ -60,7 +59,7 @@ end
 function NavTacticsDockyardScene:onUpdateItem(arg_7_1, arg_7_2)
 	NavTacticsDockyardScene.super.onUpdateItem(self, arg_7_1, arg_7_2)
 
-	if self.isShowRecent and arg_7_1 + 1 <= var_0_1 then
+	if self.isShowRecent and arg_7_1 + 1 <= self.maxRecnetShipCnt then
 		setActive(self.scrollItems[arg_7_2].recentTr, self.shipVOs[arg_7_1 + 1])
 	end
 end
@@ -75,7 +74,7 @@ end
 
 function NavTacticsDockyardScene:updateShipCount(arg_9_1)
 	if self.isShowRecent and #self.recentShips > 0 then
-		for iter_9_0 = #self.recentShips + 1, var_0_1 do
+		for iter_9_0 = #self.recentShips + 1, self.maxRecnetShipCnt do
 			table.insert(self.shipVOs, 1, false)
 		end
 
@@ -94,7 +93,7 @@ function NavTacticsDockyardScene:CollectionRecentShips()
 	local var_10_1 = getProxy(NavalAcademyProxy):GetRecentShips()
 
 	for iter_10_0 = #var_10_1, 1, -1 do
-		if #var_10_0 == var_0_1 then
+		if #var_10_0 == self.maxRecnetShipCnt then
 			break
 		end
 

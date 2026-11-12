@@ -280,7 +280,7 @@ function ShipSkinProxy:GetAllSkins()
 		var_34_1(var_36_0)
 
 		local var_36_1 = ShopConst.GetShopConfig(arg_36_0)
-		local var_36_2 = var_36_1.collaboration_skin_time == "" or var_36_1.collaboration_skin_time == var_36_1.time
+		local var_36_2 = var_36_1.collaboration_skin_time == "" or table.equal(var_36_1.time, var_36_1.collaboration_skin_time)
 		local var_36_3, var_36_4 = pg.TimeMgr.GetInstance():inTime(var_36_1.time)
 
 		if var_36_2 and var_36_3 then

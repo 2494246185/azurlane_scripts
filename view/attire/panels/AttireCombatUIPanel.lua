@@ -109,17 +109,31 @@ function AttireCombatUIPanel:OnInit()
 	self.confirmBtn = self.listPanel:Find("confirm")
 	self.previewBtn = self.listPanel:Find("preview")
 	self.lockBtn = self.listPanel:Find("lock")
+	self.alwaysShowStickToggle = self.listPanel:Find("AlwaysShowStick")
 
-	function self.scolrect.onInitItem(arg_14_0)
-		self:OnInitItem(arg_14_0)
+	setText(self.alwaysShowStickToggle:Find("Text"), i18n("combatUI_stick_set"))
+
+	local var_13_0 = getProxy(SettingsProxy)
+
+	self.isShowStickInCombat = var_13_0:IsShowStickInCombat()
+
+	triggerToggle(self.alwaysShowStickToggle, self.isShowStickInCombat)
+	onToggle(self, self.alwaysShowStickToggle, function(arg_14_0)
+		self.isShowStickInCombat = arg_14_0
+
+		var_13_0:SetShowStickInCombat(arg_14_0)
+	end)
+
+	function self.scolrect.onInitItem(arg_15_0)
+		self:OnInitItem(arg_15_0)
 	end
 
-	function self.scolrect.onUpdateItem(arg_15_0, arg_15_1)
-		self:OnUpdateItem(arg_15_0, arg_15_1)
+	function self.scolrect.onUpdateItem(arg_16_0, arg_16_1)
+		self:OnUpdateItem(arg_16_0, arg_16_1)
 	end
 
-	function self.scolrect.onReturnItem(arg_16_0, arg_16_1)
-		self:OnReturnItem(arg_16_0, arg_16_1)
+	function self.scolrect.onReturnItem(arg_17_0, arg_17_1)
+		self:OnReturnItem(arg_17_0, arg_17_1)
 	end
 
 	self.cards = {}
@@ -150,25 +164,25 @@ function AttireCombatUIPanel:GetData()
 	return self.rawAttireVOs.combatUIStyles
 end
 
-function AttireCombatUIPanel:OnInitItem(arg_20_1)
-	local var_20_0 = var_0_2(arg_20_1, self.loader)
+function AttireCombatUIPanel:OnInitItem(arg_21_1)
+	local var_21_0 = var_0_2(arg_21_1, self.loader)
 
-	self.cards[arg_20_1] = var_20_0
+	self.cards[arg_21_1] = var_21_0
 
-	onButton(self, var_20_0._go, function()
-		if not var_20_0:isEmpty() then
+	onButton(self, var_21_0._go, function()
+		if not var_21_0:isEmpty() then
 			if self.card then
 				self.card:UpdateSelected(false)
 			end
 
-			self.contextData.iconFrameId = var_20_0.uiStyle.id
+			self.contextData.iconFrameId = var_21_0.uiStyle.id
 
-			self:UpdateDesc(var_20_0)
-			var_20_0:UpdateSelected(true)
+			self:UpdateDesc(var_21_0)
+			var_21_0:UpdateSelected(true)
 
-			self.card = var_20_0
+			self.card = var_21_0
 
-			if var_20_0:IsOwned() then
+			if var_21_0:IsOwned() then
 				setActive(self.confirmBtn, true)
 				setActive(self.lockBtn, false)
 			else
@@ -179,66 +193,66 @@ function AttireCombatUIPanel:OnInitItem(arg_20_1)
 	end, SFX_PANEL)
 end
 
-function AttireCombatUIPanel:OnReturnItem(arg_22_1, arg_22_2)
-	if self.cards[arg_22_2] then
-		self.cards[arg_22_2]:Dispose()
+function AttireCombatUIPanel:OnReturnItem(arg_23_1, arg_23_2)
+	if self.cards[arg_23_2] then
+		self.cards[arg_23_2]:Dispose()
 	end
 
-	self.cards[arg_22_2] = nil
+	self.cards[arg_23_2] = nil
 end
 
 function AttireCombatUIPanel:GetColumn()
 	return 2
 end
 
-function AttireCombatUIPanel:OnUpdateItem(arg_24_1, arg_24_2)
-	AttireCombatUIPanel.super.OnUpdateItem(self, arg_24_1, arg_24_2)
+function AttireCombatUIPanel:OnUpdateItem(arg_25_1, arg_25_2)
+	AttireCombatUIPanel.super.OnUpdateItem(self, arg_25_1, arg_25_2)
 
-	if self.cards[arg_24_2].uiStyle.id == self.playerVO:getAttireByType(AttireConst.TYPE_COMBAT_UI_STYLE) then
-		triggerButton(self.cards[arg_24_2]._go)
+	if self.cards[arg_25_2].uiStyle.id == self.playerVO:getAttireByType(AttireConst.TYPE_COMBAT_UI_STYLE) then
+		triggerButton(self.cards[arg_25_2]._go)
 	end
 end
 
 function AttireCombatUIPanel:GetDisplayVOs()
-	local var_25_0 = {}
-	local var_25_1 = 0
+	local var_26_0 = {}
+	local var_26_1 = 0
 
-	for iter_25_0, iter_25_1 in pairs(self:GetData()) do
-		table.insert(var_25_0, iter_25_1)
+	for iter_26_0, iter_26_1 in pairs(self:GetData()) do
+		table.insert(var_26_0, iter_26_1)
 
-		if iter_25_1:getState() == AttireFrame.STATE_UNLOCK and iter_25_1.id >= 0 then
-			var_25_1 = var_25_1 + 1
+		if iter_26_1:getState() == AttireFrame.STATE_UNLOCK and iter_26_1.id >= 0 then
+			var_26_1 = var_26_1 + 1
 		end
 	end
 
-	return var_25_0, var_25_1
+	return var_26_0, var_26_1
 end
 
-function AttireCombatUIPanel:UpdateDesc(arg_26_1)
-	if arg_26_1:isEmpty() then
+function AttireCombatUIPanel:UpdateDesc(arg_27_1)
+	if arg_27_1:isEmpty() then
 		return
 	end
 
 	onButton(self, self.confirmBtn, function()
-		self:emit(AttireMediator.ON_APPLY, arg_26_1.uiStyle:getType(), arg_26_1.uiStyle.id)
+		self:emit(AttireMediator.ON_APPLY, arg_27_1.uiStyle:getType(), arg_27_1.uiStyle.id)
 	end, SFX_PANEL)
 
-	local var_26_0 = Ship.New({
+	local var_27_0 = Ship.New({
 		id = 100001,
 		configId = 100001,
 		skin_id = 100000
 	})
-	local var_26_1 = Ship.New({
+	local var_27_1 = Ship.New({
 		id = 100011,
 		configId = 100011,
 		skin_id = 100010
 	})
-	local var_26_2 = arg_26_1.uiStyle:getConfig("key")
+	local var_27_2 = arg_27_1.uiStyle:getConfig("key")
 
 	onButton(self, self.previewBtn, function()
 		self.combatPreview = CombatPreviewLayer.New(pg.UIMgr.GetInstance().OverlayMain)
 
-		self.combatPreview:ExecuteAction("Show", arg_26_1.uiStyle:getConfig("id"), function()
+		self.combatPreview:ExecuteAction("Show", arg_27_1.uiStyle:getConfig("id"), function()
 			self.combatPreview:Destroy()
 
 			self.combatPreview = nil

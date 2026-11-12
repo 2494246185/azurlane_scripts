@@ -246,13 +246,13 @@ function EquipmentTransformTreeScene:UpdateEquipmentTypes()
 
 		self.equipmentTypeToggles[iter_17_0]:GetComponent(typeof(Toggle)).isOn = false
 
-		local var_17_2 = var_17_0[iter_17_0]
-
 		self.loader:GetSprite(var_0_2, "equipmentType" .. var_17_0[iter_17_0], self.equipmentTypeToggles[iter_17_0]:Find("itemName"), true)
 		setActive(self.equipmentTypeToggles[iter_17_0]:Find("selectedframe"), false)
 		onToggle(self, self.equipmentTypeToggles[iter_17_0], function(arg_18_0)
-			if arg_18_0 and self.contextData.equipmentTypeIndex ~= var_17_2 then
-				self.contextData.equipmentTypeIndex = var_17_2
+			local var_18_0 = EquipmentTransformTreeScene.GetSortTypes(self.env.nationsTree[self.contextData.nation])
+
+			if arg_18_0 and self.contextData.equipmentTypeIndex ~= var_18_0[iter_17_0] then
+				self.contextData.equipmentTypeIndex = var_18_0[iter_17_0]
 
 				self:ResetCanvas()
 			end

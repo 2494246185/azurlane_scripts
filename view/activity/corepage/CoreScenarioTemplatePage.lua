@@ -297,8 +297,8 @@ function CoreScenarioTemplatePage:UpdateStory(arg_19_1)
 	local var_19_6 = self.branchUpWidth
 	local var_19_7 = self.branchUpHeight
 	local var_19_8 = self.UnionTailWidth
-	local var_19_9 = 95
-	local var_19_10 = 82
+	local var_19_9 = self.NODE_SPACING or 95
+	local var_19_10 = self.TAIL_SPACING or 82
 	local var_19_11 = 20
 	local var_19_12 = 0
 	local var_19_13 = pg.NewStoryMgr.GetInstance()

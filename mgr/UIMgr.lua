@@ -186,9 +186,16 @@ function var_0_0:AttachStickOb(arg_16_1)
 	self.vtc = 0
 	self.fingerId = -1
 
+	print(arg_16_1)
+
 	local var_16_0 = arg_16_1:Find("Area")
 
+	print(var_16_0)
+
 	self._stick = var_16_0:Find("Stick")
+
+	print(self._stick)
+
 	self._areaImg = var_16_0:GetComponent(typeof(Image))
 	self._stickImg = self._stick:GetComponent(typeof(Image))
 	self._stickCom = arg_16_1:GetComponent(typeof(StickController))
@@ -267,27 +274,62 @@ function var_0_0:UpdateStick(arg_22_1, arg_22_2)
 	end
 end
 
-function var_0_0:SetOutput(arg_23_1, arg_23_2, arg_23_3)
-	self.hrz = arg_23_1
-	self.vtc = arg_23_2
+function var_0_0:SetStickPosition(arg_23_1, arg_23_2, arg_23_3)
+	if arg_23_1 * arg_23_1 + arg_23_2 * arg_23_2 > 1 then
+		local var_23_0 = math.sqrt(arg_23_1 * arg_23_1 + arg_23_2 * arg_23_2)
 
-	local var_23_0 = (arg_23_3 >= 0 and 1 or 0) - (self.fingerId >= 0 and 1 or 0)
+		arg_23_1 = arg_23_1 / var_23_0
+		arg_23_2 = arg_23_2 / var_23_0
+	end
 
-	if (arg_23_3 >= 0 and 1 or 0) - (self.fingerId >= 0 and 1 or 0) ~= 0 and self._areaImg and self._stickImg then
-		if var_23_0 > 0 then
+	local var_23_1 = Vector3(arg_23_1 * self._maxbianjie, arg_23_2 * self._maxbianjie, 0)
+
+	if arg_23_3 then
+		var_23_1 = Vector3.MoveTowards(self._stick.localPosition, var_23_1, arg_23_3 * self._maxbianjie)
+	end
+
+	self._stick.localPosition = var_23_1
+
+	local var_23_2 = var_23_1:SqrMagnitude() > 0
+
+	if var_23_2 then
+		local var_23_3 = var_0_0._normalColor or var_0_0._darkColor
+
+		if self._areaImg then
+			self._areaImg.color = var_23_3
+		end
+
+		if self._stickImg then
+			self._stickImg.color = var_23_3
+		end
+
+		if self._stickTailPS then
+			setActive(self._stickTailPS, var_23_2)
+		end
+	end
+end
+
+function var_0_0:SetOutput(arg_24_1, arg_24_2, arg_24_3)
+	self.hrz = arg_24_1
+	self.vtc = arg_24_2
+
+	local var_24_0 = (arg_24_3 >= 0 and 1 or 0) - (self.fingerId >= 0 and 1 or 0)
+
+	if (arg_24_3 >= 0 and 1 or 0) - (self.fingerId >= 0 and 1 or 0) ~= 0 and self._areaImg and self._stickImg then
+		if var_24_0 > 0 then
 			self._areaImg.color = var_0_0._normalColor or var_0_0._darkColor
 		end
 
-		if var_23_0 > 0 then
+		if var_24_0 > 0 then
 			self._stickImg.color = var_0_0._normalColor or var_0_0._darkColor
 		end
 	end
 
-	if arg_23_3 < 0 then
+	if arg_24_3 < 0 then
 		self._stick.localPosition = Vector3.zero
 	end
 
-	self.fingerId = arg_23_3
+	self.fingerId = arg_24_3
 end
 
 function var_0_0:ClearStick()
@@ -301,27 +343,27 @@ function var_0_0:ClearStick()
 	self._stickCom = nil
 end
 
-function var_0_0.OverlayPanel(arg_25_0, arg_25_1, arg_25_2)
-	arg_25_2 = arg_25_2 or {}
-	arg_25_2.type = LayerWeightConst.UI_TYPE_SUB
-
-	var_0_1.LayerWeightMgr.GetInstance():Add2Overlay(arg_25_1, arg_25_2)
-end
-
-function var_0_0.BlurPanel(arg_26_0, arg_26_1, arg_26_2)
+function var_0_0.OverlayPanel(arg_26_0, arg_26_1, arg_26_2)
 	arg_26_2 = arg_26_2 or {}
 	arg_26_2.type = LayerWeightConst.UI_TYPE_SUB
-	arg_26_2.globalBlur = true
 
 	var_0_1.LayerWeightMgr.GetInstance():Add2Overlay(arg_26_1, arg_26_2)
 end
 
-function var_0_0:UnOverlayPanel(arg_27_1, arg_27_2)
-	var_0_1.LayerWeightMgr.GetInstance():DelFromOverlay(arg_27_1, arg_27_2 or self.UIMain)
+function var_0_0.BlurPanel(arg_27_0, arg_27_1, arg_27_2)
+	arg_27_2 = arg_27_2 or {}
+	arg_27_2.type = LayerWeightConst.UI_TYPE_SUB
+	arg_27_2.globalBlur = true
+
+	var_0_1.LayerWeightMgr.GetInstance():Add2Overlay(arg_27_1, arg_27_2)
 end
 
-function var_0_0:PartialBlurTfs(arg_28_1)
-	self:UpdatePBList(arg_28_1)
+function var_0_0:UnOverlayPanel(arg_28_1, arg_28_2)
+	var_0_1.LayerWeightMgr.GetInstance():DelFromOverlay(arg_28_1, arg_28_2 or self.UIMain)
+end
+
+function var_0_0:PartialBlurTfs(arg_29_1)
+	self:UpdatePBList(arg_29_1)
 
 	if self.levelCameraComp.enabled then
 		self:UpdatePBEnable(true, self.cameraBlurs[var_0_0.CameraLevel])
@@ -340,47 +382,47 @@ end
 
 local var_0_6 = {}
 
-function var_0_0:UpdatePBList(arg_30_1)
-	for iter_30_0, iter_30_1 in pairs(var_0_6) do
-		if not IsNil(iter_30_0) then
-			iter_30_0.material = iter_30_1
+function var_0_0:UpdatePBList(arg_31_1)
+	for iter_31_0, iter_31_1 in pairs(var_0_6) do
+		if not IsNil(iter_31_0) then
+			iter_31_0.material = iter_31_1
 		end
 
-		var_0_6[iter_30_0] = nil
+		var_0_6[iter_31_0] = nil
 	end
 
 	var_0_6 = {}
 
-	for iter_30_2, iter_30_3 in ipairs(arg_30_1) do
-		local var_30_0 = iter_30_3:GetComponent(typeof(Image))
+	for iter_31_2, iter_31_3 in ipairs(arg_31_1) do
+		local var_31_0 = iter_31_3:GetComponent(typeof(Image))
 
-		assert(var_30_0, "mask should be an image.")
+		assert(var_31_0, "mask should be an image.")
 
-		var_0_6[var_30_0] = var_30_0.material
-		var_30_0.material = self.partialBlurMaterial
+		var_0_6[var_31_0] = var_31_0.material
+		var_31_0.material = self.partialBlurMaterial
 	end
 end
 
-function var_0_0.UpdatePBEnable(arg_31_0, arg_31_1, arg_31_2)
-	arg_31_2[var_0_0.PartialBlur].enabled = arg_31_1
+function var_0_0.UpdatePBEnable(arg_32_0, arg_32_1, arg_32_2)
+	arg_32_2[var_0_0.PartialBlur].enabled = arg_32_1
 end
 
 local var_0_7
 
-function var_0_0:TempOverlayPanelPB(arg_32_1, arg_32_2)
-	self:OverlayPanel(arg_32_1, setmetatable({}, {
-		__index = function(arg_33_0, arg_33_1)
-			if arg_33_1 == "pbList" then
+function var_0_0:TempOverlayPanelPB(arg_33_1, arg_33_2)
+	self:OverlayPanel(arg_33_1, setmetatable({}, {
+		__index = function(arg_34_0, arg_34_1)
+			if arg_34_1 == "pbList" then
 				return nil
 			end
 
-			return arg_32_2[arg_33_1]
+			return arg_33_2[arg_34_1]
 		end
 	}))
 
 	var_0_7 = {
-		arg_32_2.baseCamera:GetComponent("BlurOptimized"),
-		arg_32_2.baseCamera:GetComponent("UIPartialBlur")
+		arg_33_2.baseCamera:GetComponent("BlurOptimized"),
+		arg_33_2.baseCamera:GetComponent("UIPartialBlur")
 	}
 
 	if DevicePerformanceUtil.GetDeviceLevel() == DevicePerformanceLevel.Low then
@@ -393,68 +435,68 @@ function var_0_0:TempOverlayPanelPB(arg_32_1, arg_32_2)
 
 	var_0_7[var_0_0.PartialBlur].maskCam = self.overlayCamera:GetComponent("Camera")
 
-	self:UpdateOtherPBList(arg_32_2.pbList)
+	self:UpdateOtherPBList(arg_33_2.pbList)
 	self:UpdatePBEnable(true, var_0_7)
 end
 
-function var_0_0:TempUnOverlayPanelPB(arg_34_1, arg_34_2)
+function var_0_0:TempUnOverlayPanelPB(arg_35_1, arg_35_2)
 	self:UpdateOtherPBList({})
 	self:UpdatePBEnable(false, var_0_7)
 
 	var_0_7 = nil
 
-	self:UnOverlayPanel(arg_34_1, arg_34_2)
+	self:UnOverlayPanel(arg_35_1, arg_35_2)
 end
 
 local var_0_8 = {}
 
-function var_0_0:UpdateOtherPBList(arg_35_1)
-	for iter_35_0, iter_35_1 in pairs(var_0_8) do
-		iter_35_0.material = iter_35_1
+function var_0_0:UpdateOtherPBList(arg_36_1)
+	for iter_36_0, iter_36_1 in pairs(var_0_8) do
+		iter_36_0.material = iter_36_1
 	end
 
 	var_0_8 = {}
 
-	for iter_35_2, iter_35_3 in ipairs(arg_35_1 or {}) do
-		local var_35_0 = iter_35_3:GetComponent(typeof(Image))
+	for iter_36_2, iter_36_3 in ipairs(arg_36_1 or {}) do
+		local var_36_0 = iter_36_3:GetComponent(typeof(Image))
 
-		assert(var_35_0, "mask should be an image.")
+		assert(var_36_0, "mask should be an image.")
 
-		var_0_8[var_35_0] = var_35_0.material
-		var_35_0.material = self.partialBlurMaterial
+		var_0_8[var_36_0] = var_36_0.material
+		var_36_0.material = self.partialBlurMaterial
 	end
 end
 
-function var_0_0:BlurCamera(arg_36_1, arg_36_2, arg_36_3)
+function var_0_0:BlurCamera(arg_37_1, arg_37_2, arg_37_3)
 	if self.camLockStatus then
 		return
 	end
 
-	local var_36_0 = self.cameraBlurs[arg_36_1][var_0_0.OptimizedBlur]
+	local var_37_0 = self.cameraBlurs[arg_37_1][var_0_0.OptimizedBlur]
 
-	if not arg_36_2 and var_36_0.enabled and var_36_0.staticBlur then
-		var_36_0.enabled = false
+	if not arg_37_2 and var_37_0.enabled and var_37_0.staticBlur then
+		var_37_0.enabled = false
 	end
 
-	var_36_0.enabled = true
-	var_36_0.staticBlur = tobool(arg_36_2)
+	var_37_0.enabled = true
+	var_37_0.staticBlur = tobool(arg_37_2)
 end
 
-function var_0_0:UnblurCamera(arg_37_1, arg_37_2)
+function var_0_0:UnblurCamera(arg_38_1, arg_38_2)
 	if self.camLockStatus then
 		return
 	end
 
-	self.cameraBlurs[arg_37_1][var_0_0.OptimizedBlur].enabled = false
+	self.cameraBlurs[arg_38_1][var_0_0.OptimizedBlur].enabled = false
 end
 
-function var_0_0.SetCameraBlurLock(arg_38_0, arg_38_1)
-	arg_38_0.camLockStatus = arg_38_1
+function var_0_0.SetCameraBlurLock(arg_39_0, arg_39_1)
+	arg_39_0.camLockStatus = arg_39_1
 end
 
-function var_0_0:SetMainCamBlurTexture(arg_39_1)
-	local var_39_0 = self.mainCamera:GetComponent(typeof(Camera))
-	local var_39_1 = ReflectionHelp.RefCallStaticMethod(typeof("UnityEngine.RenderTexture"), "GetTemporary", {
+function var_0_0:SetMainCamBlurTexture(arg_40_1)
+	local var_40_0 = self.mainCamera:GetComponent(typeof(Camera))
+	local var_40_1 = ReflectionHelp.RefCallStaticMethod(typeof("UnityEngine.RenderTexture"), "GetTemporary", {
 		typeof("System.Int32"),
 		typeof("System.Int32"),
 		typeof("System.Int32")
@@ -464,24 +506,24 @@ function var_0_0:SetMainCamBlurTexture(arg_39_1)
 		0
 	})
 
-	var_39_0.targetTexture = var_39_1
+	var_40_0.targetTexture = var_40_1
 
-	var_39_0:Render()
+	var_40_0:Render()
 
-	local var_39_2 = var_0_1.ShaderMgr.GetInstance():BlurTexture(var_39_1)
+	local var_40_2 = var_0_1.ShaderMgr.GetInstance():BlurTexture(var_40_1)
 
-	var_39_0.targetTexture = nil
+	var_40_0.targetTexture = nil
 
 	ReflectionHelp.RefCallStaticMethod(typeof("UnityEngine.RenderTexture"), "ReleaseTemporary", {
 		typeof("UnityEngine.RenderTexture")
 	}, {
-		var_39_1
+		var_40_1
 	})
 
-	arg_39_1.uvRect = var_39_0.rect
-	arg_39_1.texture = var_39_2
+	arg_40_1.uvRect = var_40_0.rect
+	arg_40_1.texture = var_40_2
 
-	return var_39_2
+	return var_40_2
 end
 
 function var_0_0:GetMainCamera()

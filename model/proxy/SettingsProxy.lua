@@ -420,26 +420,35 @@ function SettingsProxy:setAutoBattleTip()
 	PlayerPrefs.Save()
 end
 
+function SettingsProxy:IsShowStickInCombat()
+	return PlayerPrefs.GetInt("combat_ui_always_show_stick", 0) > 0
+end
+
+function SettingsProxy:SetShowStickInCombat(arg_57_1)
+	PlayerPrefs.SetInt("combat_ui_always_show_stick", arg_57_1 and 1 or 0)
+	PlayerPrefs.Save()
+end
+
 function SettingsProxy:isTipAutoBattle()
 	return pg.TimeMgr.GetInstance():GetServerTime() > self._nextTipAutoBattleTime
 end
 
-function SettingsProxy:setActBossExchangeTicketTip(arg_57_1)
-	if self.nextTipActBossExchangeTicket == arg_57_1 then
+function SettingsProxy:setActBossExchangeTicketTip(arg_59_1)
+	if self.nextTipActBossExchangeTicket == arg_59_1 then
 		return
 	end
 
-	self.nextTipActBossExchangeTicket = arg_57_1
+	self.nextTipActBossExchangeTicket = arg_59_1
 
-	local var_57_0 = GetZeroTime()
+	local var_59_0 = GetZeroTime()
 
-	if var_57_0 > self._nextTipActBossTime then
-		self._nextTipActBossTime = var_57_0
+	if var_59_0 > self._nextTipActBossTime then
+		self._nextTipActBossTime = var_59_0
 
-		PlayerPrefs.SetInt("ActBossTipLastTime", var_57_0)
+		PlayerPrefs.SetInt("ActBossTipLastTime", var_59_0)
 	end
 
-	PlayerPrefs.SetInt("ActBossTip", arg_57_1)
+	PlayerPrefs.SetInt("ActBossTip", arg_59_1)
 	PlayerPrefs.Save()
 end
 
@@ -451,11 +460,11 @@ function SettingsProxy:isTipActBossExchangeTicket()
 	return self.nextTipActBossExchangeTicket
 end
 
-function SettingsProxy:SetScreenRatio(arg_59_1)
-	if self._screenRatio ~= arg_59_1 then
-		self._screenRatio = arg_59_1
+function SettingsProxy:SetScreenRatio(arg_61_1)
+	if self._screenRatio ~= arg_61_1 then
+		self._screenRatio = arg_61_1
 
-		PlayerPrefs.SetFloat("SetScreenRatio", arg_59_1)
+		PlayerPrefs.SetFloat("SetScreenRatio", arg_61_1)
 		PlayerPrefs.Save()
 	end
 end
@@ -492,10 +501,10 @@ function SettingsProxy:MarkEventActHelpFlag()
 	end
 end
 
-function SettingsProxy:SetStorySpeed(arg_66_1)
-	self.storySpeed = arg_66_1
+function SettingsProxy:SetStorySpeed(arg_68_1)
+	self.storySpeed = arg_68_1
 
-	PlayerPrefs.SetInt("story_speed_flag" .. (getProxy(PlayerProxy) and getProxy(PlayerProxy):getRawData().id or 1), arg_66_1)
+	PlayerPrefs.SetInt("story_speed_flag" .. (getProxy(PlayerProxy) and getProxy(PlayerProxy):getRawData().id or 1), arg_68_1)
 	PlayerPrefs.Save()
 end
 
@@ -509,12 +518,12 @@ function SettingsProxy:GetStoryAutoPlayFlag()
 	return self.storyAutoPlayCode > 0
 end
 
-function SettingsProxy:SetStoryAutoPlayFlag(arg_69_1)
-	if self.storyAutoPlayCode ~= arg_69_1 then
-		PlayerPrefs.SetInt("story_autoplay_flag", arg_69_1)
+function SettingsProxy:SetStoryAutoPlayFlag(arg_71_1)
+	if self.storyAutoPlayCode ~= arg_71_1 then
+		PlayerPrefs.SetInt("story_autoplay_flag", arg_71_1)
 		PlayerPrefs.Save()
 
-		self.storyAutoPlayCode = arg_69_1
+		self.storyAutoPlayCode = arg_71_1
 	end
 end
 
@@ -522,19 +531,19 @@ function SettingsProxy:GetPaintingDownloadPrefs()
 	return PlayerPrefs.GetInt("Painting_Download_Prefs", 0)
 end
 
-function SettingsProxy:SetPaintingDownloadPrefs(arg_71_1)
-	PlayerPrefs.SetInt("Painting_Download_Prefs", arg_71_1)
+function SettingsProxy:SetPaintingDownloadPrefs(arg_73_1)
+	PlayerPrefs.SetInt("Painting_Download_Prefs", arg_73_1)
 end
 
 function SettingsProxy:ShouldShipMainSceneWord()
 	return self.showMainSceneWordTip
 end
 
-function SettingsProxy:SaveMainSceneWordFlag(arg_73_1)
-	if self.showMainSceneWordTip ~= arg_73_1 then
-		self.showMainSceneWordTip = arg_73_1
+function SettingsProxy:SaveMainSceneWordFlag(arg_75_1)
+	if self.showMainSceneWordTip ~= arg_75_1 then
+		self.showMainSceneWordTip = arg_75_1
 
-		PlayerPrefs.SetInt("main_scene_word_toggle", arg_73_1 and 1 or 0)
+		PlayerPrefs.SetInt("main_scene_word_toggle", arg_75_1 and 1 or 0)
 		PlayerPrefs.Save()
 	end
 end
@@ -572,60 +581,60 @@ function SettingsProxy:SetNextTipTimeLimitSkinShop()
 	end
 end
 
-function SettingsProxy:WorldBossProgressTipFlag(arg_79_1)
-	if self.WorldBossProgressTipValue ~= arg_79_1 then
-		self.WorldBossProgressTipValue = arg_79_1
+function SettingsProxy:WorldBossProgressTipFlag(arg_81_1)
+	if self.WorldBossProgressTipValue ~= arg_81_1 then
+		self.WorldBossProgressTipValue = arg_81_1
 
-		PlayerPrefs.SetString("_WorldBossProgressTipFlag_", arg_79_1)
+		PlayerPrefs.SetString("_WorldBossProgressTipFlag_", arg_81_1)
 		PlayerPrefs.Save()
 	end
 end
 
 function SettingsProxy:GetWorldBossProgressTipFlag()
 	if not self.WorldBossProgressTipValue then
-		local var_80_0 = PlayerPrefs.GetString("_WorldBossProgressTipFlag_", pg.gameset.joint_boss_ticket.description[1] .. "&" .. pg.gameset.joint_boss_ticket.description[1] + pg.gameset.joint_boss_ticket.description[2])
+		local var_82_0 = PlayerPrefs.GetString("_WorldBossProgressTipFlag_", pg.gameset.joint_boss_ticket.description[1] .. "&" .. pg.gameset.joint_boss_ticket.description[1] + pg.gameset.joint_boss_ticket.description[2])
 
-		self.WorldBossProgressTipValue = var_80_0
+		self.WorldBossProgressTipValue = var_82_0
 
-		return var_80_0
+		return var_82_0
 	else
 		return self.WorldBossProgressTipValue
 	end
 end
 
 function SettingsProxy:GetWorldBossProgressTipTable()
-	local var_81_0 = self:GetWorldBossProgressTipFlag()
+	local var_83_0 = self:GetWorldBossProgressTipFlag()
 
-	if not var_81_0 or var_81_0 == "" then
+	if not var_83_0 or var_83_0 == "" then
 		return {}
 	end
 
-	return string.split(var_81_0, "&")
+	return string.split(var_83_0, "&")
 end
 
 function SettingsProxy:GetChatFlag()
 	if not self.chatFlag then
-		local var_82_0 = {
+		local var_84_0 = {
 			ChatConst.ChannelWorld,
 			ChatConst.ChannelPublic,
 			ChatConst.ChannelFriend
 		}
 
 		if getProxy(GuildProxy):getRawData() then
-			table.insert(var_82_0, ChatConst.ChannelGuild)
+			table.insert(var_84_0, ChatConst.ChannelGuild)
 		end
 
-		self.chatFlag = PlayerPrefs.GetInt("chat__setting", IndexConst.Flags2Bits(var_82_0))
+		self.chatFlag = PlayerPrefs.GetInt("chat__setting", IndexConst.Flags2Bits(var_84_0))
 	end
 
 	return self.chatFlag
 end
 
-function SettingsProxy:SetChatFlag(arg_83_1)
-	if self.chatFlag ~= arg_83_1 then
-		self.chatFlag = arg_83_1
+function SettingsProxy:SetChatFlag(arg_85_1)
+	if self.chatFlag ~= arg_85_1 then
+		self.chatFlag = arg_85_1
 
-		PlayerPrefs.SetInt("chat__setting", arg_83_1)
+		PlayerPrefs.SetInt("chat__setting", arg_85_1)
 		PlayerPrefs.Save()
 	end
 end
@@ -640,27 +649,27 @@ function SettingsProxy.SetActivityMapSPTip()
 end
 
 function SettingsProxy:IsTipNewTheme()
-	local var_86_0 = pg.backyard_theme_template.all[#pg.backyard_theme_template.all]
-	local var_86_1 = pg.furniture_shop_template[pg.backyard_theme_template[var_86_0].ids[1]]
-	local var_86_2
+	local var_88_0 = pg.backyard_theme_template.all[#pg.backyard_theme_template.all]
+	local var_88_1 = pg.furniture_shop_template[pg.backyard_theme_template[var_88_0].ids[1]]
+	local var_88_2
 
-	if pg.furniture_shop_template[pg.backyard_theme_template[var_86_0].ids[1]] then
-		::label_86_0::
+	if pg.furniture_shop_template[pg.backyard_theme_template[var_88_0].ids[1]] then
+		::label_88_0::
 
-		if var_86_1.new == 1 then
-			var_86_2 = pg.TimeMgr.GetInstance():inTime(var_86_1.time)
+		if var_88_1.new == 1 then
+			var_88_2 = pg.TimeMgr.GetInstance():inTime(var_88_1.time)
 
-			if var_86_2 then
-				var_86_2 = PlayerPrefs.GetInt(getProxy(PlayerProxy):getRawData().id .. "IsTipNewTheme" .. var_86_0, 0) == 0
+			if var_88_2 then
+				var_88_2 = PlayerPrefs.GetInt(getProxy(PlayerProxy):getRawData().id .. "IsTipNewTheme" .. var_88_0, 0) == 0
 			end
 		else
-			var_86_2 = false
+			var_88_2 = false
 		end
 	else
-		var_86_2 = true
+		var_88_2 = true
 	end
 
-	self.lastThemeId = var_86_2 and var_86_0 or nil
+	self.lastThemeId = var_88_2 and var_88_0 or nil
 
 	return self.lastThemeId ~= nil
 end
@@ -676,11 +685,11 @@ function SettingsProxy:GetNewGemFurnitureLocalCache()
 	if not self.cacheGemFuruitures then
 		self.cacheGemFuruitures = {}
 
-		local var_88_0 = PlayerPrefs.GetString(getProxy(PlayerProxy):getRawData().id .. "IsTipNewGenFurniture")
+		local var_90_0 = PlayerPrefs.GetString(getProxy(PlayerProxy):getRawData().id .. "IsTipNewGenFurniture")
 
-		if var_88_0 ~= "" then
-			for iter_88_0, iter_88_1 in ipairs((string.split(var_88_0, "#"))) do
-				self.cacheGemFuruitures[tonumber(iter_88_1)] = true
+		if var_90_0 ~= "" then
+			for iter_90_0, iter_90_1 in ipairs((string.split(var_90_0, "#"))) do
+				self.cacheGemFuruitures[tonumber(iter_90_1)] = true
 			end
 		end
 	end
@@ -689,20 +698,20 @@ function SettingsProxy:GetNewGemFurnitureLocalCache()
 end
 
 function SettingsProxy:IsTipNewGemFurniture()
-	local var_89_0 = self:GetNewGemFurnitureLocalCache()
-	local var_89_1 = getProxy(DormProxy):GetTag7Furnitures()
+	local var_91_0 = self:GetNewGemFurnitureLocalCache()
+	local var_91_1 = getProxy(DormProxy):GetTag7Furnitures()
 
-	self.newGemFurniture = _.any(var_89_1, function(arg_90_0)
-		return pg.furniture_shop_template[arg_90_0].new == 1 and not var_89_0[arg_90_0]
-	end) and var_89_1 or nil
+	self.newGemFurniture = _.any(var_91_1, function(arg_92_0)
+		return pg.furniture_shop_template[arg_92_0].new == 1 and not var_91_0[arg_92_0]
+	end) and var_91_1 or nil
 
 	return self.newGemFurniture ~= nil
 end
 
 function SettingsProxy:UpdateNewGemFurnitureValue()
 	if self.newGemFurniture then
-		for iter_91_0, iter_91_1 in pairs(self.newGemFurniture) do
-			self.cacheGemFuruitures[iter_91_1] = true
+		for iter_93_0, iter_93_1 in pairs(self.newGemFurniture) do
+			self.cacheGemFuruitures[iter_93_1] = true
 		end
 
 		PlayerPrefs.SetString(getProxy(PlayerProxy):getRawData().id .. "IsTipNewGenFurniture", (table.concat(self.newGemFurniture, "#")))
@@ -715,49 +724,49 @@ function SettingsProxy:GetRandomFlagShipList()
 		return self.randomFlagShipList
 	end
 
-	local var_92_0 = PlayerPrefs.GetString("RandomFlagShipList" .. getProxy(PlayerProxy):getRawData().id, "")
+	local var_94_0 = PlayerPrefs.GetString("RandomFlagShipList" .. getProxy(PlayerProxy):getRawData().id, "")
 
-	self.randomFlagShipList = var_92_0 == "" and {} or string.split(var_92_0, "#")
+	self.randomFlagShipList = var_94_0 == "" and {} or string.split(var_94_0, "#")
 
 	return self.randomFlagShipList
 end
 
-function SettingsProxy:IsRandomFlagShip(arg_93_1)
+function SettingsProxy:IsRandomFlagShip(arg_95_1)
 	if not self.randomFlagShipMap then
 		self.randomFlagShipMap = {}
 
-		for iter_93_0, iter_93_1 in ipairs(self:GetRandomFlagShipList()) do
-			self.randomFlagShipMap[iter_93_1] = true
+		for iter_95_0, iter_95_1 in ipairs(self:GetRandomFlagShipList()) do
+			self.randomFlagShipMap[iter_95_1] = true
 		end
 	end
 
-	return self.randomFlagShipMap[arg_93_1] == true
+	return self.randomFlagShipMap[arg_95_1] == true
 end
 
 function SettingsProxy:IsOpenRandomFlagShip()
-	local var_94_0 = self:GetRandomFlagShipList()
-	local var_94_1 = getProxy(BayProxy)
+	local var_96_0 = self:GetRandomFlagShipList()
+	local var_96_1 = getProxy(BayProxy)
 
-	return #var_94_0 > 0 and _.any(var_94_0, function(arg_95_0)
-		local var_95_0, var_95_1 = ShipPhantom.UnpackMark(arg_95_0)
+	return #var_96_0 > 0 and _.any(var_96_0, function(arg_97_0)
+		local var_97_0, var_97_1 = ShipPhantom.UnpackMark(arg_97_0)
 
-		return var_94_1:RawGetShipById(var_95_0) ~= nil
+		return var_96_1:RawGetShipById(var_97_0) ~= nil
 	end)
 end
 
-function SettingsProxy:UpdateRandomFlagShipList(arg_96_1)
+function SettingsProxy:UpdateRandomFlagShipList(arg_98_1)
 	self.randomFlagShipMap = nil
-	self.randomFlagShipList = arg_96_1
+	self.randomFlagShipList = arg_98_1
 
-	for iter_96_0, iter_96_1 in ipairs(arg_96_1) do
-		local var_96_0 = getProxy(BayProxy):GetShipPhantom(iter_96_1)
+	for iter_98_0, iter_98_1 in ipairs(arg_98_1) do
+		local var_98_0 = getProxy(BayProxy):GetShipPhantom(iter_98_1)
 
-		if var_96_0 and var_96_0.phantomId > 0 then
-			pg.GameTrackerMgr.GetInstance():Record(GameTrackerBuilder.BuildPhantom(var_96_0:getSkinId()))
+		if var_98_0 and var_98_0.phantomId > 0 then
+			pg.GameTrackerMgr.GetInstance():Record(GameTrackerBuilder.BuildPhantom(var_98_0:getSkinId()))
 		end
 	end
 
-	PlayerPrefs.SetString("RandomFlagShipList" .. getProxy(PlayerProxy):getRawData().id, (table.concat(arg_96_1, "#")))
+	PlayerPrefs.SetString("RandomFlagShipList" .. getProxy(PlayerProxy):getRawData().id, (table.concat(arg_98_1, "#")))
 	PlayerPrefs.Save()
 end
 
@@ -771,14 +780,14 @@ function SettingsProxy:GetPrevRandomFlagShipTime()
 	return self.prevRandomFlagShipTime
 end
 
-function SettingsProxy:SetPrevRandomFlagShipTime(arg_98_1)
-	if self.prevRandomFlagShipTime == arg_98_1 then
+function SettingsProxy:SetPrevRandomFlagShipTime(arg_100_1)
+	if self.prevRandomFlagShipTime == arg_100_1 then
 		return
 	end
 
-	self.prevRandomFlagShipTime = arg_98_1
+	self.prevRandomFlagShipTime = arg_100_1
 
-	PlayerPrefs.SetInt("RandomFlagShipTime" .. getProxy(PlayerProxy):getRawData().id, arg_98_1)
+	PlayerPrefs.SetInt("RandomFlagShipTime" .. getProxy(PlayerProxy):getRawData().id, arg_100_1)
 	PlayerPrefs.Save()
 end
 
@@ -788,17 +797,17 @@ function SettingsProxy:GetFlagShipDisplayMode()
 	return self.flagShipDisplayMode
 end
 
-function SettingsProxy:SetFlagShipDisplayMode(arg_100_1)
-	if self.flagShipDisplayMode ~= arg_100_1 then
-		self.flagShipDisplayMode = arg_100_1
+function SettingsProxy:SetFlagShipDisplayMode(arg_102_1)
+	if self.flagShipDisplayMode ~= arg_102_1 then
+		self.flagShipDisplayMode = arg_102_1
 
-		PlayerPrefs.SetInt("flag-ship-display-mode" .. getProxy(PlayerProxy):getRawData().id, arg_100_1)
+		PlayerPrefs.SetInt("flag-ship-display-mode" .. getProxy(PlayerProxy):getRawData().id, arg_102_1)
 		PlayerPrefs.Save()
 	end
 end
 
-function SettingsProxy:RecordContinuousOperationAutoSubStatus(arg_101_1)
-	if arg_101_1 then
+function SettingsProxy:RecordContinuousOperationAutoSubStatus(arg_103_1)
+	if arg_103_1 then
 		return
 	end
 
@@ -807,9 +816,9 @@ function SettingsProxy:RecordContinuousOperationAutoSubStatus(arg_101_1)
 end
 
 function SettingsProxy:ResetContinuousOperationAutoSub()
-	local var_102_0 = getProxy(PlayerProxy):getRawData().id
+	local var_104_0 = getProxy(PlayerProxy):getRawData().id
 
-	if PlayerPrefs.GetInt("AutoBotCOFlag" .. var_102_0, 0) == 0 then
+	if PlayerPrefs.GetInt("AutoBotCOFlag" .. var_104_0, 0) == 0 then
 		return
 	end
 
@@ -817,7 +826,7 @@ function SettingsProxy:ResetContinuousOperationAutoSub()
 		isActiveSub = true,
 		system = SYSTEM_ACT_BOSS
 	})
-	PlayerPrefs.SetInt("AutoBotCOFlag" .. var_102_0, 0)
+	PlayerPrefs.SetInt("AutoBotCOFlag" .. var_104_0, 0)
 	PlayerPrefs.Save()
 end
 
@@ -831,19 +840,19 @@ function SettingsProxy:IsTipWorkbenchDaily()
 end
 
 function SettingsProxy:IsDisplayResultPainting()
-	local var_105_0 = false
+	local var_107_0 = false
 
 	if PlayerPrefs.HasKey(BATTLERESULT_SKIP_DISPAY_PAINTING) then
-		var_105_0 = PlayerPrefs.GetInt(BATTLERESULT_SKIP_DISPAY_PAINTING) <= 0
+		var_107_0 = PlayerPrefs.GetInt(BATTLERESULT_SKIP_DISPAY_PAINTING) <= 0
 
 		PlayerPrefs.DeleteKey(BATTLERESULT_SKIP_DISPAY_PAINTING)
-		PlayerPrefs.SetInt(BATTLERESULT_DISPAY_PAINTING, var_105_0 and 1 or 0)
+		PlayerPrefs.SetInt(BATTLERESULT_DISPAY_PAINTING, var_107_0 and 1 or 0)
 		PlayerPrefs.Save()
 	else
-		var_105_0 = PlayerPrefs.GetInt(BATTLERESULT_DISPAY_PAINTING, 0) >= 1
+		var_107_0 = PlayerPrefs.GetInt(BATTLERESULT_DISPAY_PAINTING, 0) >= 1
 	end
 
-	return var_105_0
+	return var_107_0
 end
 
 function SettingsProxy:IsDisplayCommanderCatCustomName()
@@ -852,70 +861,70 @@ function SettingsProxy:IsDisplayCommanderCatCustomName()
 	return self.customFlag
 end
 
-function SettingsProxy:SetDisplayCommanderCatCustomName(arg_107_1)
-	if arg_107_1 == self.customFlag then
+function SettingsProxy:SetDisplayCommanderCatCustomName(arg_109_1)
+	if arg_109_1 == self.customFlag then
 		return
 	end
 
-	self.customFlag = arg_107_1
+	self.customFlag = arg_109_1
 
 	PlayerPrefs.SetInt("DisplayCommanderCatCustomName" .. getProxy(PlayerProxy):getRawData().id, self.customFlag and 0 or 1)
 	PlayerPrefs.Save()
 end
 
 function SettingsProxy:GetCommanderQuicklyToolRarityConfig()
-	self.quicklyToolRarityConfig = self.quicklyToolRarityConfig or _.map(string.split(PlayerPrefs.GetString("CommanderQuicklyToolRarityConfig" .. getProxy(PlayerProxy):getRawData().id, "1#1#1"), "#"), function(arg_109_0)
-		return tonumber(arg_109_0) == 1
+	self.quicklyToolRarityConfig = self.quicklyToolRarityConfig or _.map(string.split(PlayerPrefs.GetString("CommanderQuicklyToolRarityConfig" .. getProxy(PlayerProxy):getRawData().id, "1#1#1"), "#"), function(arg_111_0)
+		return tonumber(arg_111_0) == 1
 	end)
 
 	return self.quicklyToolRarityConfig
 end
 
-function SettingsProxy:SaveCommanderQuicklyToolRarityConfig(arg_110_1)
-	local var_110_0 = false
+function SettingsProxy:SaveCommanderQuicklyToolRarityConfig(arg_112_1)
+	local var_112_0 = false
 
-	for iter_110_0, iter_110_1 in ipairs(self.quicklyToolRarityConfig) do
-		if arg_110_1[iter_110_0] ~= iter_110_1 then
-			var_110_0 = true
+	for iter_112_0, iter_112_1 in ipairs(self.quicklyToolRarityConfig) do
+		if arg_112_1[iter_112_0] ~= iter_112_1 then
+			var_112_0 = true
 
 			break
 		end
 	end
 
-	if var_110_0 then
-		self.quicklyToolRarityConfig = arg_110_1
+	if var_112_0 then
+		self.quicklyToolRarityConfig = arg_112_1
 
-		PlayerPrefs.SetString("CommanderQuicklyToolRarityConfig" .. getProxy(PlayerProxy):getRawData().id, (table.concat(_.map(self.quicklyToolRarityConfig, function(arg_111_0)
-			return arg_111_0 and "1" or "0"
+		PlayerPrefs.SetString("CommanderQuicklyToolRarityConfig" .. getProxy(PlayerProxy):getRawData().id, (table.concat(_.map(self.quicklyToolRarityConfig, function(arg_113_0)
+			return arg_113_0 and "1" or "0"
 		end), "#")))
 		PlayerPrefs.Save()
 	end
 end
 
 function SettingsProxy:GetCommanderLockFlagRarityConfig()
-	self.lockFlagRarityConfig = self.lockFlagRarityConfig or _.map(string.split(PlayerPrefs.GetString("CommanderLockFlagRarityConfig_" .. getProxy(PlayerProxy):getRawData().id, "1#0#0"), "#"), function(arg_113_0)
-		return tonumber(arg_113_0) == 1
+	self.lockFlagRarityConfig = self.lockFlagRarityConfig or _.map(string.split(PlayerPrefs.GetString("CommanderLockFlagRarityConfig_" .. getProxy(PlayerProxy):getRawData().id, "1#0#0"), "#"), function(arg_115_0)
+		return tonumber(arg_115_0) == 1
 	end)
 
 	return self.lockFlagRarityConfig
 end
 
-function SettingsProxy:SaveCommanderLockFlagRarityConfig(arg_114_1)
-	local var_114_0 = false
+function SettingsProxy:SaveCommanderLockFlagRarityConfig(arg_116_1)
+	local var_116_0 = false
 
-	for iter_114_0, iter_114_1 in ipairs(self.lockFlagRarityConfig) do
-		if arg_114_1[iter_114_0] ~= iter_114_1 then
-			var_114_0 = true
+	for iter_116_0, iter_116_1 in ipairs(self.lockFlagRarityConfig) do
+		if arg_116_1[iter_116_0] ~= iter_116_1 then
+			var_116_0 = true
 
 			break
 		end
 	end
 
-	if var_114_0 then
-		self.lockFlagRarityConfig = arg_114_1
+	if var_116_0 then
+		self.lockFlagRarityConfig = arg_116_1
 
-		PlayerPrefs.SetString("CommanderLockFlagRarityConfig_" .. getProxy(PlayerProxy):getRawData().id, (table.concat(_.map(self.lockFlagRarityConfig, function(arg_115_0)
-			return arg_115_0 and "1" or "0"
+		PlayerPrefs.SetString("CommanderLockFlagRarityConfig_" .. getProxy(PlayerProxy):getRawData().id, (table.concat(_.map(self.lockFlagRarityConfig, function(arg_117_0)
+			return arg_117_0 and "1" or "0"
 		end), "#")))
 		PlayerPrefs.Save()
 	end
@@ -923,78 +932,78 @@ end
 
 function SettingsProxy:GetCommanderLockFlagTalentConfig()
 	if not self.lockFlagTalentConfig then
-		local var_116_0 = PlayerPrefs.GetString("CommanderLockFlagTalentConfig" .. getProxy(PlayerProxy):getRawData().id, "")
-		local var_116_1 = {}
+		local var_118_0 = PlayerPrefs.GetString("CommanderLockFlagTalentConfig" .. getProxy(PlayerProxy):getRawData().id, "")
+		local var_118_1 = {}
 
-		if var_116_0 == "" then
-			for iter_116_0, iter_116_1 in ipairs(CommanderCatUtil.GetAllTalentNames()) do
-				var_116_1[iter_116_1.id] = true
+		if var_118_0 == "" then
+			for iter_118_0, iter_118_1 in ipairs(CommanderCatUtil.GetAllTalentNames()) do
+				var_118_1[iter_118_1.id] = true
 			end
 		else
-			for iter_116_2, iter_116_3 in ipairs(string.split(var_116_0, "#")) do
-				local var_116_2 = string.split(iter_116_3, "*")
+			for iter_118_2, iter_118_3 in ipairs(string.split(var_118_0, "#")) do
+				local var_118_2 = string.split(iter_118_3, "*")
 
-				if #var_116_2 == 2 then
-					var_116_1[tonumber(var_116_2[1])] = tonumber(var_116_2[2]) == 1
+				if #var_118_2 == 2 then
+					var_118_1[tonumber(var_118_2[1])] = tonumber(var_118_2[2]) == 1
 				end
 			end
 		end
 
-		self.lockFlagTalentConfig = var_116_1
+		self.lockFlagTalentConfig = var_118_1
 	end
 
 	return self.lockFlagTalentConfig
 end
 
-function SettingsProxy:SaveCommanderLockFlagTalentConfig(arg_117_1)
-	self.lockFlagTalentConfig = arg_117_1
+function SettingsProxy:SaveCommanderLockFlagTalentConfig(arg_119_1)
+	self.lockFlagTalentConfig = arg_119_1
 
-	local var_117_0 = {}
+	local var_119_0 = {}
 
-	for iter_117_0, iter_117_1 in pairs(arg_117_1) do
-		table.insert(var_117_0, iter_117_0 .. "*" .. (iter_117_1 and "1" or "0"))
+	for iter_119_0, iter_119_1 in pairs(arg_119_1) do
+		table.insert(var_119_0, iter_119_0 .. "*" .. (iter_119_1 and "1" or "0"))
 	end
 
-	PlayerPrefs.SetString("CommanderLockFlagTalentConfig" .. getProxy(PlayerProxy):getRawData().id, (table.concat(var_117_0, "#")))
+	PlayerPrefs.SetString("CommanderLockFlagTalentConfig" .. getProxy(PlayerProxy):getRawData().id, (table.concat(var_119_0, "#")))
 	PlayerPrefs.Save()
 end
 
-function SettingsProxy:GetMainPaintingVariantFlag(arg_118_1)
+function SettingsProxy:GetMainPaintingVariantFlag(arg_120_1)
 	self.mainPaintingVariantFlag = self.mainPaintingVariantFlag or {}
-	self.mainPaintingVariantFlag[arg_118_1] = self.mainPaintingVariantFlag[arg_118_1] or PlayerPrefs.GetInt(arg_118_1 .. "_mainMeshImagePainting_ex_" .. getProxy(PlayerProxy):getRawData().id, 0)
+	self.mainPaintingVariantFlag[arg_120_1] = self.mainPaintingVariantFlag[arg_120_1] or PlayerPrefs.GetInt(arg_120_1 .. "_mainMeshImagePainting_ex_" .. getProxy(PlayerProxy):getRawData().id, 0)
 
-	return self.mainPaintingVariantFlag[arg_118_1]
+	return self.mainPaintingVariantFlag[arg_120_1]
 end
 
-function SettingsProxy:SwitchMainPaintingVariantFlag(arg_119_1)
-	local var_119_0 = 1 - self:GetMainPaintingVariantFlag(arg_119_1)
+function SettingsProxy:SwitchMainPaintingVariantFlag(arg_121_1)
+	local var_121_0 = 1 - self:GetMainPaintingVariantFlag(arg_121_1)
 
-	self.mainPaintingVariantFlag[arg_119_1] = var_119_0
+	self.mainPaintingVariantFlag[arg_121_1] = var_121_0
 
-	PlayerPrefs.SetInt(arg_119_1 .. "_mainMeshImagePainting_ex_" .. getProxy(PlayerProxy):getRawData().id, var_119_0)
+	PlayerPrefs.SetInt(arg_121_1 .. "_mainMeshImagePainting_ex_" .. getProxy(PlayerProxy):getRawData().id, var_121_0)
 	PlayerPrefs.Save()
 end
 
-function SettingsProxy:IsTipDay(arg_120_1, arg_120_2, arg_120_3)
-	return PlayerPrefs.GetInt(getProxy(PlayerProxy):getRawData().id .. "educate_char_" .. arg_120_1 .. arg_120_2 .. arg_120_3, 0) == 1
+function SettingsProxy:IsTipDay(arg_122_1, arg_122_2, arg_122_3)
+	return PlayerPrefs.GetInt(getProxy(PlayerProxy):getRawData().id .. "educate_char_" .. arg_122_1 .. arg_122_2 .. arg_122_3, 0) == 1
 end
 
-function SettingsProxy:RecordTipDay(arg_121_1, arg_121_2, arg_121_3)
-	PlayerPrefs.SetInt(getProxy(PlayerProxy):getRawData().id .. "educate_char_" .. arg_121_1 .. arg_121_2 .. arg_121_3, 1)
+function SettingsProxy:RecordTipDay(arg_123_1, arg_123_2, arg_123_3)
+	PlayerPrefs.SetInt(getProxy(PlayerProxy):getRawData().id .. "educate_char_" .. arg_123_1 .. arg_123_2 .. arg_123_3, 1)
 	PlayerPrefs.Save()
 end
 
-function SettingsProxy:UpdateEducateCharTip(arg_122_1)
-	local var_122_0 = getProxy(PlayerProxy):getRawData().id
-	local var_122_1 = {}
+function SettingsProxy:UpdateEducateCharTip(arg_124_1)
+	local var_124_0 = getProxy(PlayerProxy):getRawData().id
+	local var_124_1 = {}
 
-	for iter_122_0, iter_122_1 in ipairs(arg_122_1 or {}) do
-		var_122_1[iter_122_1] = true
+	for iter_124_0, iter_124_1 in ipairs(arg_124_1 or {}) do
+		var_124_1[iter_124_1] = true
 	end
 
-	for iter_122_2, iter_122_3 in ipairs(NewEducateHelper.GetAllUnlockSecretaryIds() or {}) do
-		if var_122_1[iter_122_3] ~= true then
-			PlayerPrefs.SetInt(var_122_0 .. "educate_char_tip" .. iter_122_3, 1)
+	for iter_124_2, iter_124_3 in ipairs(NewEducateHelper.GetAllUnlockSecretaryIds() or {}) do
+		if var_124_1[iter_124_3] ~= true then
+			PlayerPrefs.SetInt(var_124_0 .. "educate_char_tip" .. iter_124_3, 1)
 			PlayerPrefs.Save()
 		end
 	end
@@ -1003,7 +1012,7 @@ function SettingsProxy:UpdateEducateCharTip(arg_122_1)
 end
 
 function SettingsProxy:RefillEducateCharTipList()
-	local var_123_0 = getProxy(PlayerProxy):getRawData().id
+	local var_125_0 = getProxy(PlayerProxy):getRawData().id
 
 	self.educateCharTipList = {}
 
@@ -1011,9 +1020,9 @@ function SettingsProxy:RefillEducateCharTipList()
 		return
 	end
 
-	for iter_123_0, iter_123_1 in ipairs(NewEducateHelper.GetAllUnlockSecretaryIds() or {}) do
-		if PlayerPrefs.GetInt(var_123_0 .. "educate_char_tip" .. iter_123_1, 0) == 1 then
-			table.insert(self.educateCharTipList, iter_123_1)
+	for iter_125_0, iter_125_1 in ipairs(NewEducateHelper.GetAllUnlockSecretaryIds() or {}) do
+		if PlayerPrefs.GetInt(var_125_0 .. "educate_char_tip" .. iter_125_1, 0) == 1 then
+			table.insert(self.educateCharTipList, iter_125_1)
 		end
 	end
 end
@@ -1027,37 +1036,37 @@ function SettingsProxy:ShouldEducateCharTip()
 		self:RefillEducateCharTipList()
 	end
 
-	return _.any(self.educateCharTipList, function(arg_125_0)
-		return NewEducateHelper.IsUnlockDefaultShip(arg_125_0)
+	return _.any(self.educateCharTipList, function(arg_127_0)
+		return NewEducateHelper.IsUnlockDefaultShip(arg_127_0)
 	end)
 end
 
-function SettingsProxy:_ShouldEducateCharTip(arg_126_1)
+function SettingsProxy:_ShouldEducateCharTip(arg_128_1)
 	if not self.educateCharTipList or #self.educateCharTipList == 0 then
 		self:RefillEducateCharTipList()
 	end
 
-	if table.contains(self.educateCharTipList, arg_126_1) and NewEducateHelper.IsUnlockDefaultShip(arg_126_1) then
+	if table.contains(self.educateCharTipList, arg_128_1) and NewEducateHelper.IsUnlockDefaultShip(arg_128_1) then
 		return true
 	end
 
 	return false
 end
 
-function SettingsProxy:ClearEducateCharTip(arg_127_1)
-	if not self:_ShouldEducateCharTip(arg_127_1) then
+function SettingsProxy:ClearEducateCharTip(arg_129_1)
+	if not self:_ShouldEducateCharTip(arg_129_1) then
 		return false
 	end
 
-	table.removebyvalue(self.educateCharTipList, arg_127_1)
+	table.removebyvalue(self.educateCharTipList, arg_129_1)
 
-	if PlayerPrefs.HasKey(getProxy(PlayerProxy):getRawData().id .. "educate_char_tip" .. arg_127_1) then
-		PlayerPrefs.DeleteKey(getProxy(PlayerProxy):getRawData().id .. "educate_char_tip" .. arg_127_1)
+	if PlayerPrefs.HasKey(getProxy(PlayerProxy):getRawData().id .. "educate_char_tip" .. arg_129_1) then
+		PlayerPrefs.DeleteKey(getProxy(PlayerProxy):getRawData().id .. "educate_char_tip" .. arg_129_1)
 		PlayerPrefs.Save()
 	end
 
 	pg.m02:sendNotification(GAME.CLEAR_EDUCATE_TIP, {
-		id = arg_127_1
+		id = arg_129_1
 	})
 
 	return true
@@ -1098,9 +1107,9 @@ end
 local var_0_1 = "ISLAND_REST_EVENT"
 
 function SettingsProxy:ShouldTipIslandRestEvet()
-	local var_133_0 = getProxy(PlayerProxy)
+	local var_135_0 = getProxy(PlayerProxy)
 
-	return PlayerPrefs.GetInt(var_0_1 .. var_133_0:getRawData().id, 0) < pg.TimeMgr.GetInstance().GetServerTime(var_133_0)
+	return PlayerPrefs.GetInt(var_0_1 .. var_135_0:getRawData().id, 0) < pg.TimeMgr.GetInstance().GetServerTime(var_135_0)
 end
 
 function SettingsProxy:RecordIslandRestEvet()

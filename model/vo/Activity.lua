@@ -863,8 +863,6 @@ function Activity:IsShowTipByClient()
 	elseif var_88_0.is_showMedal then
 		return ActivityMedalGroup.showTip(var_88_0.medal_group_id)
 	elseif var_88_0.is_clickOnce then
-		local var_88_2 = self:getConfig("id")
-
 		return PlayerPrefs.GetInt(Activity.GetPlayerActivyIDKey(self:getConfig("id")), 0) == 0
 	else
 		return false

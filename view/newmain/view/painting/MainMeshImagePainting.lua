@@ -197,7 +197,9 @@ function MainMeshImagePainting:SwitchToVariant(arg_17_1)
 		end,
 		function(arg_21_0)
 			self:UnloadOnlyPainting()
-			self:Load(self.ship, true)
+			self:Load(self.ship, function()
+				return
+			end)
 			onDelayTick(arg_21_0, 1)
 		end
 	}, function()
@@ -206,15 +208,15 @@ function MainMeshImagePainting:SwitchToVariant(arg_17_1)
 	end)
 end
 
-function MainMeshImagePainting:PlayVariantEffect(arg_23_1, arg_23_2)
-	local var_23_0 = getProxy(SettingsProxy):GetMainPaintingVariantFlag(self.paintingName) == MainMeshImagePainting.PAINTING_VARIANT_EX
-	local var_23_1 = var_23_0 and "lihui_qiehuan01" or "lihui_qiehuan02"
+function MainMeshImagePainting:PlayVariantEffect(arg_24_1, arg_24_2)
+	local var_24_0 = getProxy(SettingsProxy):GetMainPaintingVariantFlag(self.paintingName) == MainMeshImagePainting.PAINTING_VARIANT_EX
+	local var_24_1 = var_24_0 and "lihui_qiehuan01" or "lihui_qiehuan02"
 
-	pg.PoolMgr.GetInstance():GetPrefab("ui/" .. (var_23_0 and "lihui_qiehuan01" or "lihui_qiehuan02"), "", true, function(arg_24_0)
-		pg.ViewUtils.SetLayer(arg_24_0.transform, Layer.UI)
+	pg.PoolMgr.GetInstance():GetPrefab("ui/" .. (var_24_0 and "lihui_qiehuan01" or "lihui_qiehuan02"), "", true, function(arg_25_0)
+		pg.ViewUtils.SetLayer(arg_25_0.transform, Layer.UI)
 
-		self.effectGo = arg_24_0
-		self.effectGo.name = var_23_1
+		self.effectGo = arg_25_0
+		self.effectGo.name = var_24_1
 
 		if self:IsExited() then
 			self:ClearEffect()
@@ -222,17 +224,17 @@ function MainMeshImagePainting:PlayVariantEffect(arg_23_1, arg_23_2)
 			return
 		end
 
-		setParent(arg_24_0, self.container)
+		setParent(arg_25_0, self.container)
 
-		self.effectGo.transform.position = arg_23_1.position
+		self.effectGo.transform.position = arg_24_1.position
 
-		if var_23_0 then
+		if var_24_0 then
 			pg.CriMgr.GetInstance():PlaySoundEffect_V3(SFX_EXPLOSIVE_SKIN)
 		else
 			pg.CriMgr.GetInstance():PlaySoundEffect_V3(SFX_ANTI_EXPLOSIVE_SKIN)
 		end
 
-		arg_23_2()
+		arg_24_2()
 	end)
 end
 
@@ -255,24 +257,24 @@ function MainMeshImagePainting:ClearSpecialDrag()
 		return
 	end
 
-	local var_26_0 = findTF(self._paintingGO, "Drag")
+	local var_27_0 = findTF(self._paintingGO, "Drag")
 
-	if not var_26_0 then
+	if not var_27_0 then
 		return
 	end
 
-	local var_26_1 = GetOrAddComponent(var_26_0, typeof(EventTriggerListener))
+	local var_27_1 = GetOrAddComponent(var_27_0, typeof(EventTriggerListener))
 
-	var_26_1:AddBeginDragFunc(nil)
-	var_26_1:AddDragEndFunc(nil)
-	var_26_1:AddPointUpFunc(nil)
-	GetOrAddComponent(var_26_0, "UILongPressTrigger").onLongPressed:RemoveAllListeners()
+	var_27_1:AddBeginDragFunc(nil)
+	var_27_1:AddDragEndFunc(nil)
+	var_27_1:AddPointUpFunc(nil)
+	GetOrAddComponent(var_27_0, "UILongPressTrigger").onLongPressed:RemoveAllListeners()
 end
 
 function MainMeshImagePainting:OnClick()
-	local var_27_0 = self:CollectTouchEvents()
+	local var_28_0 = self:CollectTouchEvents()
 
-	self:TriggerEvent(var_27_0[math.ceil(math.random(#var_27_0))])
+	self:TriggerEvent(var_28_0[math.ceil(math.random(#var_28_0))])
 end
 
 function MainMeshImagePainting:OnLongPress()
@@ -285,10 +287,24 @@ function MainMeshImagePainting:OnLongPress()
 	})
 end
 
-function MainMeshImagePainting:OnDisplayWorld(arg_29_1)
-	local var_29_0, var_29_1 = ShipExpressionHelper.SetExpression(self._paintingGO, self.paintingName, arg_29_1, self.ship:getCVIntimacy(), self.ship:getSkinId())
+function MainMeshImagePainting:OnEnableTimerEvent()
+	if self._nextChatTime and Time.realtimeSinceStartup < self._nextChatTime then
+		return false
+	end
 
-	self.expression = var_29_1
+	return true
+end
+
+function MainMeshImagePainting:StartChatAnimtion(arg_31_1, arg_31_2)
+	MainMeshImagePainting.super.StartChatAnimtion(self, arg_31_1, arg_31_2)
+
+	self._nextChatTime = Time.realtimeSinceStartup + arg_31_1
+end
+
+function MainMeshImagePainting:OnDisplayWorld(arg_32_1)
+	local var_32_0, var_32_1 = ShipExpressionHelper.SetExpression(self._paintingGO, self.paintingName, arg_32_1, self.ship:getCVIntimacy(), self.ship:getSkinId())
+
+	self.expression = var_32_1
 end
 
 function MainMeshImagePainting:OnTriggerEvent()
@@ -299,27 +315,27 @@ function MainMeshImagePainting:OnTriggerEventAuto()
 	self:Shake(MainMeshImagePainting.CHAT_HEIGHT, MainMeshImagePainting.CHAT_DURATION)
 end
 
-function MainMeshImagePainting:Shake(arg_32_1, arg_32_2, arg_32_3)
-	local var_32_0 = arg_32_1
+function MainMeshImagePainting:Shake(arg_35_1, arg_35_2, arg_35_3)
+	local var_35_0 = arg_35_1
 
 	if nil then
-		var_32_0 = arg_32_1 - MainMeshImagePainting.DEFAULT_HEIGHT + nil
+		var_35_0 = arg_35_1 - MainMeshImagePainting.DEFAULT_HEIGHT + nil
 	end
 
-	arg_32_3 = arg_32_3 or math.random(3) - 1
+	arg_35_3 = arg_35_3 or math.random(3) - 1
 
-	if arg_32_3 == 0 then
+	if arg_35_3 == 0 then
 		return
 	end
 
-	local var_32_1 = self._paintingGO
+	local var_35_1 = self._paintingGO
 
 	if not self._paintingGO then
 		return
 	end
 
-	LeanTween.cancel(go(var_32_1))
-	LeanTween.moveY(rtf(var_32_1), var_32_0, 0.1):setLoopPingPong(arg_32_3):setOnComplete(System.Action(function()
+	LeanTween.cancel(go(var_35_1))
+	LeanTween.moveY(rtf(var_35_1), var_35_0, 0.1):setLoopPingPong(arg_35_3):setOnComplete(System.Action(function()
 		self:Breath()
 	end))
 end
@@ -331,15 +347,15 @@ function MainMeshImagePainting:Breath()
 
 	print("start breath")
 
-	local var_34_0 = nil or MainMeshImagePainting.BREATH_HEIGHT
-	local var_34_1
+	local var_37_0 = nil or MainMeshImagePainting.BREATH_HEIGHT
+	local var_37_1
 
 	if nil then
-		var_34_1 = nil - 10 or MainMeshImagePainting.DEFAULT_HEIGHT
+		var_37_1 = nil - 10 or MainMeshImagePainting.DEFAULT_HEIGHT
 	end
 
 	LeanTween.cancel(go(self._paintingGO))
-	LeanTween.moveY(rtf(self._paintingGO), var_34_1, MainMeshImagePainting.BREATH_DURATION):setLoopPingPong():setEase(LeanTweenType.easeInOutCubic):setFrom(var_34_0)
+	LeanTween.moveY(rtf(self._paintingGO), var_37_1, MainMeshImagePainting.BREATH_DURATION):setLoopPingPong():setEase(LeanTweenType.easeInOutCubic):setFrom(var_37_0)
 end
 
 function MainMeshImagePainting:StopBreath()
@@ -351,20 +367,20 @@ function MainMeshImagePainting:StopBreath()
 	LeanTween.cancel(go(self._paintingGO))
 end
 
-function MainMeshImagePainting:OnEnableOrDisableDragAndZoom(arg_36_1)
-	if arg_36_1 then
+function MainMeshImagePainting:OnEnableOrDisableDragAndZoom(arg_39_1)
+	if arg_39_1 then
 		self:StopBreath()
 	else
 		self:Breath()
 	end
 end
 
-function MainMeshImagePainting:OnPaintingFade(arg_37_1)
+function MainMeshImagePainting:OnPaintingFade(arg_40_1)
 	if not self:IsLoaded() then
 		return
 	end
 
-	if arg_37_1 then
+	if arg_40_1 then
 		self:StopBreath()
 	else
 		self:Breath()
@@ -383,8 +399,8 @@ function MainMeshImagePainting:GetPartStateType()
 	return MainPaintingView.STATE_PAINTING
 end
 
-function MainMeshImagePainting:OnFold(arg_41_1)
-	if not arg_41_1 then
+function MainMeshImagePainting:OnFold(arg_44_1)
+	if not arg_44_1 then
 		self:Breath()
 	end
 end

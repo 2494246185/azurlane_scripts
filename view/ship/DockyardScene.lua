@@ -564,6 +564,8 @@ function DockyardScene:SwitchContainerDisplay()
 				var_41_4.constraintCount = math.max(7, math.floor((self._tf:Find("main/ship_container").rect.width - var_41_4.padding.left - var_41_4.padding.right + var_41_4.spacing.x) / (var_41_4.cellSize.x + var_41_4.spacing.x)) - 1)
 			end
 
+			self.maxRecnetShipCnt = var_41_4.constraintCount
+
 			self:filter()
 		end
 	})
@@ -1648,12 +1650,12 @@ function DockyardScene:TriggerCard(arg_138_1)
 
 	if self.cardItemDic[var_138_0] and self.scrollItems[self.cardItemDic[var_138_0]] and var_138_7.shipVO.id == var_138_5.id and var_138_7 or nil then
 		if not getBounds(self._tf:Find("main/ship_container")):Intersects((getBounds(var_138_8.tr))) then
-			self.shipContainer:SetNormalizedPosition(self.shipContainer.value + arg_138_1 * (self.shipContainer:HeadIndexToValue(7) - self.shipContainer:HeadIndexToValue(1)), 1)
+			self.shipContainer:SetNormalizedPosition(self.shipContainer.value + arg_138_1 * (self.shipContainer:HeadIndexToValue(self.maxRecnetShipCnt) - self.shipContainer:HeadIndexToValue(1)), 1)
 		end
 	end
 
 	if not var_138_8 then
-		self.shipContainer:SetNormalizedPosition(self.shipContainer.value + (math.ceil(var_138_2 / 7) - math.ceil(var_138_1 / 7)) * (self.shipContainer:HeadIndexToValue(21) - self.shipContainer:HeadIndexToValue(1)), 1)
+		self.shipContainer:SetNormalizedPosition(self.shipContainer.value + (math.ceil(var_138_2 / self.maxRecnetShipCnt) - math.ceil(var_138_1 / self.maxRecnetShipCnt)) * (self.shipContainer:HeadIndexToValue(self.maxRecnetShipCnt) - self.shipContainer:HeadIndexToValue(1)), 1)
 
 		var_138_8 = var_138_6()
 	end

@@ -167,8 +167,6 @@ function MainPaintingView:IsLoading()
 end
 
 function MainPaintingView:Init(arg_24_1, arg_24_2, arg_24_3, arg_24_4)
-	print("初始化舰船 = " .. arg_24_1:getPainting())
-
 	if self:ShouldReLoad(arg_24_1) then
 		self.shift = arg_24_2 or self.shift
 
@@ -203,6 +201,9 @@ function MainPaintingView:Init(arg_24_1, arg_24_2, arg_24_3, arg_24_4)
 			end
 		end)
 	else
+		self.shift = arg_24_2 or self.shift
+
+		assert(self.shift)
 		self.painting:Resume()
 		self:InitShipShift()
 

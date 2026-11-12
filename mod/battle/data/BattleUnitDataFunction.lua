@@ -538,142 +538,178 @@ function ys.Battle.BattleDataFunction.GetEquipSkinDataFromID(arg_32_0)
 	return var_0_24[arg_32_0]
 end
 
-function ys.Battle.BattleDataFunction.GetEquipSkin(arg_33_0)
-	assert(var_0_24[arg_33_0] ~= nil, ">>equip_skin_template<< 找不到装备皮肤配置：id = " .. arg_33_0)
+local var_0_34
 
-	return var_0_24[arg_33_0].bullet_name, var_0_24[arg_33_0].derivate_bullet, var_0_24[arg_33_0].derivate_torpedo, var_0_24[arg_33_0].derivate_boom, var_0_24[arg_33_0].fire_fx_name, var_0_24[arg_33_0].hit_fx_name
+function ys.Battle.BattleDataFunction.GetEquipSkinGroupList(arg_33_0)
+	local var_33_0 = var_0_33.GetEquipSkinDataFromID(arg_33_0).plane_group or 0
+
+	if var_33_0 == 0 then
+		return {
+			arg_33_0
+		}
+	end
+
+	if not var_0_34 then
+		var_0_34 = {}
+
+		for iter_33_0, iter_33_1 in ipairs(var_0_24.all) do
+			local var_33_1 = var_0_24[iter_33_1].plane_group or 0
+
+			if var_33_1 ~= 0 then
+				var_0_34[var_33_1] = var_0_34[var_33_1] or {}
+
+				table.insert(var_0_34[var_33_1], iter_33_1)
+			end
+		end
+	end
+
+	return var_0_34[var_33_0] or {
+		arg_33_0
+	}
 end
 
-function ys.Battle.BattleDataFunction.GetEquipSkinSFX(arg_34_0)
-	assert(var_0_24[arg_34_0] ~= nil, ">>equip_skin_template<< 找不到装备皮肤配置：id = " .. arg_34_0)
+function ys.Battle.BattleDataFunction.GetRandomEquipSkin(arg_34_0)
+	local var_34_0 = var_0_33.GetEquipSkinGroupList(arg_34_0)
 
-	return var_0_24[arg_34_0].hit_sfx, var_0_24[arg_34_0].miss_sfx
+	return var_34_0[math.random(#var_34_0)]
 end
 
-function ys.Battle.BattleDataFunction.GetSpecificGuildBossEnemyList(arg_35_0, arg_35_1)
-	return (var_0_29[arg_35_0].expedition_id[1] == arg_35_1 or nil) and var_0_29[arg_35_0].expedition_id[2]
+function ys.Battle.BattleDataFunction.GetEquipSkin(arg_35_0)
+	assert(var_0_24[arg_35_0] ~= nil, ">>equip_skin_template<< 找不到装备皮肤配置：id = " .. arg_35_0)
+
+	return var_0_24[arg_35_0].bullet_name, var_0_24[arg_35_0].derivate_bullet, var_0_24[arg_35_0].derivate_torpedo, var_0_24[arg_35_0].derivate_boom, var_0_24[arg_35_0].fire_fx_name, var_0_24[arg_35_0].hit_fx_name
 end
 
-function ys.Battle.BattleDataFunction.GetSpecificEnemyList(arg_36_0, arg_36_1)
-	local var_36_0
+function ys.Battle.BattleDataFunction.GetEquipSkinSFX(arg_36_0)
+	assert(var_0_24[arg_36_0] ~= nil, ">>equip_skin_template<< 找不到装备皮肤配置：id = " .. arg_36_0)
 
-	for iter_36_0, iter_36_1 in ipairs(var_0_26[var_0_25[arg_36_0].config_id].ex_expedition_enemy) do
-		if iter_36_1[1] == arg_36_1 then
-			var_36_0 = iter_36_1[2]
+	return var_0_24[arg_36_0].hit_sfx, var_0_24[arg_36_0].miss_sfx
+end
+
+function ys.Battle.BattleDataFunction.GetSpecificGuildBossEnemyList(arg_37_0, arg_37_1)
+	return (var_0_29[arg_37_0].expedition_id[1] == arg_37_1 or nil) and var_0_29[arg_37_0].expedition_id[2]
+end
+
+function ys.Battle.BattleDataFunction.GetSpecificEnemyList(arg_38_0, arg_38_1)
+	local var_38_0
+
+	for iter_38_0, iter_38_1 in ipairs(var_0_26[var_0_25[arg_38_0].config_id].ex_expedition_enemy) do
+		if iter_38_1[1] == arg_38_1 then
+			var_38_0 = iter_38_1[2]
 
 			break
 		end
 	end
 
-	return var_36_0
+	return var_38_0
 end
 
-function ys.Battle.BattleDataFunction.GetMetaBossTemplate(arg_37_0)
-	return var_0_27[arg_37_0]
+function ys.Battle.BattleDataFunction.GetMetaBossTemplate(arg_39_0)
+	return var_0_27[arg_39_0]
 end
 
-function ys.Battle.BattleDataFunction.GetMetaBossLevelTemplate(arg_38_0, arg_38_1)
-	return var_0_28[var_0_33.GetMetaBossTemplate(arg_38_0).boss_level_id + (arg_38_1 - 1)]
+function ys.Battle.BattleDataFunction.GetMetaBossLevelTemplate(arg_40_0, arg_40_1)
+	return var_0_28[var_0_33.GetMetaBossTemplate(arg_40_0).boss_level_id + (arg_40_1 - 1)]
 end
 
-function ys.Battle.BattleDataFunction.GetSpecificWorldJointEnemyList(arg_39_0, arg_39_1, arg_39_2)
+function ys.Battle.BattleDataFunction.GetSpecificWorldJointEnemyList(arg_41_0, arg_41_1, arg_41_2)
 	return {
-		var_0_33.GetMetaBossLevelTemplate(arg_39_1, arg_39_2).enemy_id
+		var_0_33.GetMetaBossLevelTemplate(arg_41_1, arg_41_2).enemy_id
 	}
 end
 
-function ys.Battle.BattleDataFunction.IncreaseAttributes(arg_40_0, arg_40_1, arg_40_2)
-	for iter_40_0, iter_40_1 in ipairs(arg_40_2) do
-		if iter_40_1[arg_40_1] ~= nil and type(iter_40_1[arg_40_1]) == "number" then
-			arg_40_0 = arg_40_0 + iter_40_1[arg_40_1]
+function ys.Battle.BattleDataFunction.IncreaseAttributes(arg_42_0, arg_42_1, arg_42_2)
+	for iter_42_0, iter_42_1 in ipairs(arg_42_2) do
+		if iter_42_1[arg_42_1] ~= nil and type(iter_42_1[arg_42_1]) == "number" then
+			arg_42_0 = arg_42_0 + iter_42_1[arg_42_1]
 		end
 	end
 end
 
-function ys.Battle.BattleDataFunction.CreateAirFighterWeaponUnit(arg_41_0, arg_41_1, arg_41_2, arg_41_3)
-	local var_41_0
-	local var_41_1 = var_0_33.GetWeaponPropertyDataFromID(arg_41_0)
+function ys.Battle.BattleDataFunction.CreateAirFighterWeaponUnit(arg_43_0, arg_43_1, arg_43_2, arg_43_3)
+	local var_43_0
+	local var_43_1 = var_0_33.GetWeaponPropertyDataFromID(arg_43_0)
 
-	assert(var_41_1 ~= nil, "找不到武器配置：id = " .. arg_41_0)
+	assert(var_43_1 ~= nil, "找不到武器配置：id = " .. arg_43_0)
 
-	if var_41_1.type == var_0_1.EquipmentType.MAIN_CANNON then
-		var_41_0 = var_0_0.Battle.BattleWeaponUnit.New()
-	elseif var_41_1.type == var_0_1.EquipmentType.SUB_CANNON then
-		var_41_0 = var_0_0.Battle.BattleWeaponUnit.New()
-	elseif var_41_1.type == var_0_1.EquipmentType.TORPEDO then
-		var_41_0 = var_0_0.Battle.BattleTorpedoUnit.New()
-	elseif var_41_1.type == var_0_1.EquipmentType.ANTI_AIR then
-		var_41_0 = var_0_0.Battle.BattleAntiAirUnit.New()
-	elseif var_41_1.type == var_0_1.EquipmentType.ANTI_SEA then
-		var_41_0 = var_0_0.Battle.BattleDirectHitWeaponUnit.New()
-	elseif var_41_1.type == var_0_1.EquipmentType.HAMMER_HEAD then
-		var_41_0 = var_0_0.Battle.BattleHammerHeadWeaponUnit.New()
-	elseif var_41_1.type == var_0_1.EquipmentType.BOMBER_PRE_CAST_ALERT then
-		var_41_0 = var_0_0.Battle.BattleBombWeaponUnit.New()
-	elseif var_41_1.type == var_0_1.EquipmentType.DEPTH_CHARGE then
-		var_41_0 = var_0_0.Battle.BattleDepthChargeUnit.New()
+	if var_43_1.type == var_0_1.EquipmentType.MAIN_CANNON then
+		var_43_0 = var_0_0.Battle.BattleWeaponUnit.New()
+	elseif var_43_1.type == var_0_1.EquipmentType.SUB_CANNON then
+		var_43_0 = var_0_0.Battle.BattleWeaponUnit.New()
+	elseif var_43_1.type == var_0_1.EquipmentType.TORPEDO then
+		var_43_0 = var_0_0.Battle.BattleTorpedoUnit.New()
+	elseif var_43_1.type == var_0_1.EquipmentType.ANTI_AIR then
+		var_43_0 = var_0_0.Battle.BattleAntiAirUnit.New()
+	elseif var_43_1.type == var_0_1.EquipmentType.ANTI_SEA then
+		var_43_0 = var_0_0.Battle.BattleDirectHitWeaponUnit.New()
+	elseif var_43_1.type == var_0_1.EquipmentType.HAMMER_HEAD then
+		var_43_0 = var_0_0.Battle.BattleHammerHeadWeaponUnit.New()
+	elseif var_43_1.type == var_0_1.EquipmentType.BOMBER_PRE_CAST_ALERT then
+		var_43_0 = var_0_0.Battle.BattleBombWeaponUnit.New()
+	elseif var_43_1.type == var_0_1.EquipmentType.DEPTH_CHARGE then
+		var_43_0 = var_0_0.Battle.BattleDepthChargeUnit.New()
 	end
 
-	assert(var_41_0 ~= nil, "创建武器失败，不存在该类型的武器：id = " .. arg_41_0)
-	var_41_0:SetPotentialFactor(arg_41_3)
+	assert(var_43_0 ~= nil, "创建武器失败，不存在该类型的武器：id = " .. arg_43_0)
+	var_43_0:SetPotentialFactor(arg_43_3)
 
-	local var_41_2 = Clone(var_41_1)
+	local var_43_2 = Clone(var_43_1)
 
-	var_41_2.spawn_bound = "weapon"
+	var_43_2.spawn_bound = "weapon"
 
-	var_41_0:SetTemplateData(var_41_2)
-	var_41_0:SetHostData(arg_41_1, arg_41_2)
+	var_43_0:SetTemplateData(var_43_2)
+	var_43_0:SetHostData(arg_43_1, arg_43_2)
 
-	return var_41_0
+	return var_43_0
 end
 
-function ys.Battle.BattleDataFunction.GetWords(arg_42_0, arg_42_1, arg_42_2)
-	local var_42_0, var_42_1, var_42_2 = ShipWordHelper.GetWordAndCV(arg_42_0, arg_42_1, 1, true, arg_42_2)
+function ys.Battle.BattleDataFunction.GetWords(arg_44_0, arg_44_1, arg_44_2)
+	local var_44_0, var_44_1, var_44_2 = ShipWordHelper.GetWordAndCV(arg_44_0, arg_44_1, 1, true, arg_44_2)
 
-	return var_42_2
+	return var_44_2
 end
 
-function ys.Battle.BattleDataFunction.SkillTranform(arg_43_0, arg_43_1)
-	local var_43_0 = var_0_33.GetSkillDataTemplate(arg_43_1)
+function ys.Battle.BattleDataFunction.SkillTranform(arg_45_0, arg_45_1)
+	local var_45_0 = var_0_33.GetSkillDataTemplate(arg_45_1)
 
-	if not var_43_0 then
-		return arg_43_1
+	if not var_45_0 then
+		return arg_45_1
 	end
 
-	local var_43_1 = var_43_0.system_transform
+	local var_45_1 = var_45_0.system_transform
 
-	if var_43_0.system_transform[arg_43_0] == nil then
-		return arg_43_1
+	if var_45_0.system_transform[arg_45_0] == nil then
+		return arg_45_1
 	else
-		return var_43_1[arg_43_0]
+		return var_45_1[arg_45_0]
 	end
 end
 
-function ys.Battle.BattleDataFunction.GenerateHiddenBuff(arg_44_0)
-	local var_44_0 = {}
+function ys.Battle.BattleDataFunction.GenerateHiddenBuff(arg_46_0)
+	local var_46_0 = {}
 
-	for iter_44_0, iter_44_1 in ipairs(var_0_33.GetPlayerShipModelFromID(arg_44_0).hide_buff_list) do
-		local var_44_1 = {}
+	for iter_46_0, iter_46_1 in ipairs(var_0_33.GetPlayerShipModelFromID(arg_46_0).hide_buff_list) do
+		local var_46_1 = {}
 
-		var_44_1.level = 1
-		var_44_1.id = iter_44_1
-		var_44_0[iter_44_1] = var_44_1
+		var_46_1.level = 1
+		var_46_1.id = iter_46_1
+		var_46_0[iter_46_1] = var_46_1
 	end
 
-	return var_44_0
+	return var_46_0
 end
 
-function ys.Battle.BattleDataFunction.GetDivingFilter(arg_45_0)
-	return var_0_31[arg_45_0].diving_filter
+function ys.Battle.BattleDataFunction.GetDivingFilter(arg_47_0)
+	return var_0_31[arg_47_0].diving_filter
 end
 
-function ys.Battle.BattleDataFunction.GeneratePlayerSubmarinPhase(arg_46_0, arg_46_1, arg_46_2, arg_46_3, arg_46_4)
+function ys.Battle.BattleDataFunction.GeneratePlayerSubmarinPhase(arg_48_0, arg_48_1, arg_48_2, arg_48_3, arg_48_4)
 	return {
 		{
 			index = 0,
 			switchType = 3,
 			switchTo = 1,
-			switchParam = arg_46_0 - arg_46_2
+			switchParam = arg_48_0 - arg_48_2
 		},
 		{
 			switchType = 5,
@@ -687,14 +723,14 @@ function ys.Battle.BattleDataFunction.GeneratePlayerSubmarinPhase(arg_46_0, arg_
 			dive = "STATE_FLOAT",
 			switchTo = 3,
 			index = 2,
-			switchParam = arg_46_4
+			switchParam = arg_48_4
 		},
 		{
 			switchType = 4,
 			dive = "STATE_RETREAT",
 			switchTo = 4,
 			index = 3,
-			switchParam = arg_46_1
+			switchParam = arg_48_1
 		},
 		{
 			index = 4,
@@ -703,38 +739,38 @@ function ys.Battle.BattleDataFunction.GeneratePlayerSubmarinPhase(arg_46_0, arg_
 	}
 end
 
-function ys.Battle.BattleDataFunction.GetEnvironmentBehaviour(arg_47_0)
-	assert(var_0_23[arg_47_0] ~= nil, ">>battle_environment_behaviour_template<< 找不到环境行为配置：id = " .. arg_47_0)
+function ys.Battle.BattleDataFunction.GetEnvironmentBehaviour(arg_49_0)
+	assert(var_0_23[arg_49_0] ~= nil, ">>battle_environment_behaviour_template<< 找不到环境行为配置：id = " .. arg_49_0)
 
-	return var_0_23[arg_47_0]
+	return var_0_23[arg_49_0]
 end
 
 function ys.Battle.BattleDataFunction:AttachUltimateBonus()
-	local var_48_0 = self:GetTemplateID()
+	local var_50_0 = self:GetTemplateID()
 
-	if not Ship.IsMaxStarByTmpID(var_48_0) then
+	if not Ship.IsMaxStarByTmpID(var_50_0) then
 		return
 	end
 
-	for iter_48_0, iter_48_1 in ipairs(var_0_33.GetPlayerShipModelFromID(var_48_0).specific_type) do
-		if iter_48_1 == ShipType.SpecificTypeTable.gunner then
+	for iter_50_0, iter_50_1 in ipairs(var_0_33.GetPlayerShipModelFromID(var_50_0).specific_type) do
+		if iter_50_1 == ShipType.SpecificTypeTable.gunner then
 			var_0_3.SetCurrent(self, "barrageCounterMod", var_0_1.UltimateBonus.GunnerCountMod)
-		elseif iter_48_1 == ShipType.SpecificTypeTable.torpedo then
+		elseif iter_50_1 == ShipType.SpecificTypeTable.torpedo then
 			self:AddBuff((var_0_0.Battle.BattleBuffUnit.New(var_0_1.UltimateBonus.TorpedoBarrageBuff)))
-		elseif iter_48_1 == ShipType.SpecificTypeTable.auxiliary then
+		elseif iter_50_1 == ShipType.SpecificTypeTable.auxiliary then
 			var_0_33.AuxBoost(self)
 		end
 	end
 end
 
 function ys.Battle.BattleDataFunction:AuxBoost()
-	for iter_49_0, iter_49_1 in ipairs((self:GetEquipment())) do
-		if iter_49_1 and iter_49_1.equipment and table.contains(EquipType.DeviceEquipTypes, iter_49_1.equipment.type) then
-			for iter_49_2 = 1, 3 do
-				if iter_49_1.equipment["attribute_" .. iter_49_2] then
-					local var_49_0 = AttributeType.ConvertBattleAttrName(iter_49_1.equipment["attribute_" .. iter_49_2])
+	for iter_51_0, iter_51_1 in ipairs((self:GetEquipment())) do
+		if iter_51_1 and iter_51_1.equipment and table.contains(EquipType.DeviceEquipTypes, iter_51_1.equipment.type) then
+			for iter_51_2 = 1, 3 do
+				if iter_51_1.equipment["attribute_" .. iter_51_2] then
+					local var_51_0 = AttributeType.ConvertBattleAttrName(iter_51_1.equipment["attribute_" .. iter_51_2])
 
-					var_0_3.SetCurrent(self, var_49_0, var_0_3.GetBase(self, var_49_0) + iter_49_1.equipment["value_" .. iter_49_2] * var_0_1.UltimateBonus.AuxBoostValue)
+					var_0_3.SetCurrent(self, var_51_0, var_0_3.GetBase(self, var_51_0) + iter_51_1.equipment["value_" .. iter_51_2] * var_0_1.UltimateBonus.AuxBoostValue)
 					var_0_3.SetBaseAttr(self)
 				end
 			end
@@ -742,10 +778,10 @@ function ys.Battle.BattleDataFunction:AuxBoost()
 	end
 end
 
-function ys.Battle.BattleDataFunction.GetSLGStrategyBuffByCombatBuffID(arg_50_0)
-	for iter_50_0, iter_50_1 in ipairs(var_0_32.all) do
-		if iter_50_1 == arg_50_0 then
-			return var_0_32[arg_50_0]
+function ys.Battle.BattleDataFunction.GetSLGStrategyBuffByCombatBuffID(arg_52_0)
+	for iter_52_0, iter_52_1 in ipairs(var_0_32.all) do
+		if iter_52_1 == arg_52_0 then
+			return var_0_32[arg_52_0]
 		end
 	end
 end

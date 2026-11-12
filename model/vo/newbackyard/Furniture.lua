@@ -194,7 +194,7 @@ function Furniture:inTime()
 	local var_22_0 = self:getConfig("time")
 	local var_22_1 = self:getConfig("collaboration_furniture_time")
 
-	if var_22_1 ~= "" and var_22_1 ~= var_22_0 then
+	if noEmptyStr(var_22_1) and not table.equal(var_22_0, var_22_1) then
 		return false
 	end
 

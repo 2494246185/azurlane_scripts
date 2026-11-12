@@ -143,7 +143,7 @@ end
 function MainActivityBtnView:OnInstagramDataUpdate()
 	local var_17_0 = self:GetBtn(MainActInsBtn)
 
-	if var_17_0 and var_17_0:InShowTime() then
+	if var_17_0 and not IsNil(var_17_0._tf) and var_17_0:InShowTime() then
 		var_17_0:OnInit()
 	end
 end

@@ -250,6 +250,8 @@ function TaskGoCommand:execute(arg_1_1)
 	elseif var_1_10 == 18 then
 		if var_1_11 == 2 then
 			self:sendNotification(GAME.GO_SCENE, SCENE.LEVEL, var_1_9)
+		elseif var_1_11 == 6 then
+			self:sendNotification(GAME.GO_SCENE, SCENE.DAILYLEVEL)
 		end
 	elseif var_1_10 == 30 then
 		if var_1_11 == 4 then
