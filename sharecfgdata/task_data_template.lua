@@ -269196,7 +269196,7 @@ end)()
 		auto_commit = 0,
 		added_tip = 0,
 		next_task = "0",
-		visibility = 1,
+		visibility = 0,
 		story_icon_shift = "",
 		ryza_type = 0,
 		story_id = "",
