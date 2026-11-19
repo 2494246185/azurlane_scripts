@@ -276,37 +276,52 @@ function ChapterAutoPanel:OnStart(arg_23_1)
 	end)
 end
 
-function ChapterAutoPanel:UpdateAwardTpl(arg_27_1, arg_27_2)
-	local var_27_0 = Drop.Create(self.awards[arg_27_1 + 1])
+local function var_0_1(arg_27_0, arg_27_1, arg_27_2)
+	local var_27_0 = arg_27_2:Find("LevelDropUpTag")
 
-	updateDrop(arg_27_2, var_27_0)
-	onButton(self, arg_27_2, function()
+	if arg_27_1:getConfig("type") ~= 99 then
+		setActive(var_27_0, false)
+
+		return
+	end
+
+	setActive(var_27_0, _.all(arg_27_1:getConfig("display_icon"), function(arg_28_0)
+		return arg_28_0[1] == DROP_TYPE_SHIP
+	end) and arg_27_0 and LevelDropUpActUtil.IsDropUpChapter(arg_27_0.id))
+end
+
+function ChapterAutoPanel:UpdateAwardTpl(arg_29_1, arg_29_2)
+	local var_29_0 = Drop.Create(self.awards[arg_29_1 + 1])
+
+	updateDrop(arg_29_2, var_29_0)
+	onButton(self, arg_29_2, function()
 		if ({
 			[99] = true
-		})[var_27_0:getConfig("type")] then
-			self:emit(LevelMediator2.GET_CHAPTER_DROP_SHIP_LIST, self.chapter.id, function(arg_29_0)
-				local var_29_0 = {}
+		})[var_29_0:getConfig("type")] then
+			self:emit(LevelMediator2.GET_CHAPTER_DROP_SHIP_LIST, self.chapter.id, function(arg_31_0)
+				local var_31_0 = {}
 
-				for iter_29_0, iter_29_1 in ipairs((var_27_0:getConfig("display_icon"))) do
-					local var_29_1 = iter_29_1[2]
+				for iter_31_0, iter_31_1 in ipairs((var_29_0:getConfig("display_icon"))) do
+					local var_31_1 = iter_31_1[2]
 
-					var_29_0[#var_29_0 + 1] = {
-						type = iter_29_1[1],
-						id = iter_29_1[2],
-						anonymous = iter_29_1[1] == DROP_TYPE_SHIP and not table.contains(arg_29_0, var_29_1)
+					var_31_0[#var_31_0 + 1] = {
+						type = iter_31_1[1],
+						id = iter_31_1[2],
+						anonymous = iter_31_1[1] == DROP_TYPE_SHIP and not table.contains(arg_31_0, var_31_1)
 					}
 				end
 
 				self:emit(BaseUI.ON_DROP_LIST, {
 					item2Row = true,
-					itemList = var_29_0,
-					content = var_27_0:getConfig("display")
+					itemList = var_31_0,
+					content = var_29_0:getConfig("display")
 				})
 			end)
 		else
-			self:emit(BaseUI.ON_DROP, var_27_0)
+			self:emit(BaseUI.ON_DROP, var_29_0)
 		end
 	end, SFX_PANEL)
+	var_0_1(self.chapter, var_29_0, arg_29_2)
 end
 
 function ChapterAutoPanel:OnDestroy()
@@ -335,18 +350,18 @@ function ChapterAutoPanel:PopHelpTip()
 end
 
 function ChapterAutoPanel:GetAwards()
-	local var_33_0 = LevelInfoView.getChapterAwards(self)
+	local var_35_0 = LevelInfoView.getChapterAwards(self)
 
 	if type(pg.chapter_auto_statistics[self.id].drop_display_extra) == "table" then
-		for iter_33_0, iter_33_1 in ipairs(pg.chapter_auto_statistics[self.id].drop_display_extra) do
-			table.insert(var_33_0, {
-				iter_33_1[1],
-				iter_33_1[2]
+		for iter_35_0, iter_35_1 in ipairs(pg.chapter_auto_statistics[self.id].drop_display_extra) do
+			table.insert(var_35_0, {
+				iter_35_1[1],
+				iter_35_1[2]
 			})
 		end
 	end
 
-	return var_33_0
+	return var_35_0
 end
 
 return ChapterAutoPanel

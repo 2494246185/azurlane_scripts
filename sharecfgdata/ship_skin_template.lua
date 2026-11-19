@@ -381981,7 +381981,7 @@ end)()
 		live2d_offset_profile = "",
 		show_skin = "stand",
 		tag = {
-			1,
+			9,
 			2,
 		},
 		live2d_offset = {
