@@ -1,0 +1,534 @@
+pg = pg or {}
+pg.word_legal_template_14 = {}
+
+local var_0_0 = pg.word_legal_template_14
+
+function temp()
+	var_0_0.水 = {
+		星 = {
+			纪 = {
+				念 = {
+					this = true,
+					["."] = {
+						改 = {
+							this = true
+						}
+					},
+					· = {
+						M = {
+							E = {
+								T = {
+									A = {
+										this = true
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			号 = {
+				this = true
+			}
+		},
+		濑 = {
+			伊 = {
+				织 = {
+					this = true
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.恰 = {
+		巴 = {
+			耶 = {
+				夫 = {
+					this = true
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.古 = {
+		比 = {
+			雪 = {
+				夫 = {
+					this = true
+				}
+			}
+		},
+		手 = {
+			川 = {
+				唯 = {
+					this = true
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.摩 = {
+		尔 = {
+			曼 = {
+				斯 = {
+					克 = {
+						this = true
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.红 = {
+		色 = {
+			山 = {
+				脉 = {
+					this = true
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.甘 = {
+		古 = {
+			特 = {
+				this = true,
+				· = {
+					M = {
+						E = {
+							T = {
+								A = {
+									this = true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.喀 = {
+		山 = {
+			this = true
+		},
+		琅 = {
+			施 = {
+				塔 = {
+					得 = {
+						this = true
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.凯 = {
+		旋 = {
+			this = true
+		},
+		尔 = {
+			圣 = {
+				this = true
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.福 = {
+		尔 = {
+			班 = {
+				this = true
+			}
+		},
+		煦 = {
+			this = true,
+			· = {
+				M = {
+					E = {
+						T = {
+							A = {
+								this = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.鲁 = {
+		莽 = {
+			this = true,
+			["("] = {
+				μ = {
+					兵 = {
+						装 = {
+							[")"] = {
+								this = true
+							}
+						}
+					}
+				}
+			}
+		},
+		普 = {
+			雷 = {
+				希 = {
+					特 = {
+						亲 = {
+							王 = {
+								this = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.倔 = {
+		强 = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.吉 = {
+		尚 = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.迪 = {
+		盖 = {
+			· = {
+				特 = {
+					鲁 = {
+						因 = {
+							this = true
+						}
+					}
+				}
+			}
+		},
+		凯 = {
+			纳 = {
+				this = true
+			}
+		},
+		普 = {
+			莱 = {
+				克 = {
+					斯 = {
+						this = true
+					}
+				}
+			}
+		},
+		米 = {
+			特 = {
+				里 = {
+					· = {
+						顿 = {
+							斯 = {
+								科 = {
+									伊 = {
+										this = true
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.絮 = {
+		弗 = {
+			伦 = {
+				this = true
+			}
+		},
+		库 = {
+			夫 = {
+				this = true
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.黎 = {
+		塞 = {
+			留 = {
+				this = true
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.伴 = {
+		尔 = {
+			维 = {
+				this = true
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.瑟 = {
+		堡 = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.勒 = {
+		马 = {
+			尔 = {
+				this = true
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.重 = {
+		剑 = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.恶 = {
+		毒 = {
+			this = true,
+			["("] = {
+				μ = {
+					兵 = {
+						装 = {
+							[")"] = {
+								this = true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.果 = {
+		敢 = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.敦 = {
+		刻 = {
+			尔 = {
+				克 = {
+					this = true
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.让 = {
+		· = {
+			巴 = {
+				尔 = {
+					this = true
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.简 = {
+		· = {
+			布 = {
+				罗 = {
+					伊 = {
+						this = true
+					}
+				}
+			}
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.霞 = {
+		飞 = {
+			this = true
+		},
+		this = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.峦 = {
+		this = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.虒 = {
+		this = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.滨 = {
+		江 = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
+	var_0_0.玛 = {
+		丽 = {
+			· = {
+				西 = {
+					莱 = {
+						斯 = {
+							特 = {
+								号 = {
+									this = true
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		克 = {
+			西 = {
+				米 = {
+					莉 = {
+						安 = {
+							· = {
+								伊 = {
+									梅 = {
+										拉 = {
+											this = true
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		莉 = {
+			萝 = {
+				丝 = {
+					this = true
+				}
+			}
+		}
+	}
+end
+
+temp()
