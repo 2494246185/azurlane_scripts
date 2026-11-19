@@ -1382,13 +1382,11 @@ function LatestSkinShopLayer:FlushPainting(arg_81_1)
 end
 
 function LatestSkinShopLayer:loadPainting(arg_83_1)
-	local var_83_0 = self:GetPaintingState(arg_83_1)
-
-	if var_83_0 == var_0_1 then
+	if self.paintingState.state == var_0_1 then
 		self:LoadMeshPainting(arg_83_1, self.isToggleShowBg)
-	elseif var_83_0 == var_0_2 then
+	elseif self.paintingState.state == var_0_2 then
 		self:LoadL2dPainting(arg_83_1)
-	elseif var_83_0 == var_0_3 then
+	elseif self.paintingState.state == var_0_3 then
 		self:LoadSpinePainting(arg_83_1)
 	end
 end
