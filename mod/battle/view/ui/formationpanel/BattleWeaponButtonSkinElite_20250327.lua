@@ -44,47 +44,14 @@ function BattleWeaponButtonSkinElite_20250327:OnCountChange()
 	SetActive(self._glowEff, self._progressInfo:GetCount() > 0)
 end
 
-function BattleWeaponButtonSkinElite_20250327:SetToCombatUIPreview(arg_4_1)
-	if arg_4_1 ~= CombatUIPreviewer.WeaponButtonPreviewMode.UNFILLED then
-		SetActive(self._filled, true)
-		SetActive(self._unfill, false)
-
-		self._progressBar.fillAmount = 1
-		self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = 0
-		self._countTxt.text = "1/1"
-
-		if self._gizmos1 then
-			SetActive(self._gizmos1, true)
-			SetActive(self._gizmosXue, true)
-		end
-
-		SetActive(self._glowEff, true)
-		quickCheckAndPlayAnimator(self._skin, "weapon_button_progress_filled")
-	else
-		SetActive(self._unfill, true)
-		SetActive(self._filled, false)
-
-		self._progressBar.fillAmount = 0
-		self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = 1
-		self._countTxt.text = "0/0"
-
-		SetActive(self._glowEff, false)
-
-		if self._gizmos1 then
-			SetActive(self._gizmos1, false)
-			SetActive(self._gizmosXue, false)
-		end
-	end
-end
-
 function BattleWeaponButtonSkinElite_20250327:updateProgressBar()
-	local var_5_0 = self._progressInfo:GetCurrent() / self._progressInfo:GetMax()
+	local var_4_0 = self._progressInfo:GetCurrent() / self._progressInfo:GetMax()
 
-	self._progressBar.fillAmount = var_5_0
-	self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = self._progressInfo.GetCount and self._progressInfo:GetCount() > 0 and 0 or 1 - var_5_0
+	self._progressBar.fillAmount = var_4_0
+	self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = self._progressInfo.GetCount and self._progressInfo:GetCount() > 0 and 0 or 1 - var_4_0
 end
 
-function BattleWeaponButtonSkinElite_20250327:OnOverLoadChange(arg_6_1)
+function BattleWeaponButtonSkinElite_20250327:OnOverLoadChange(arg_5_1)
 	if self._progressInfo:IsOverLoad() then
 		self._block:SetActive(true)
 		self:OnUnfill()
@@ -93,17 +60,17 @@ function BattleWeaponButtonSkinElite_20250327:OnOverLoadChange(arg_6_1)
 		self:OnFilled()
 	end
 
-	if self._progressInfo:GetCount() >= 1 and arg_6_1 and arg_6_1.Data then
-		if arg_6_1.Data.preCast then
-			if arg_6_1.Data.preCast == 0 then
+	if self._progressInfo:GetCount() >= 1 and arg_5_1 and arg_5_1.Data then
+		if arg_5_1.Data.preCast then
+			if arg_5_1.Data.preCast == 0 then
 				quickCheckAndPlayAnimator(self._skin, "weapon_button_progress_filled")
-			elseif arg_6_1.Data.preCast > 0 then
+			elseif arg_5_1.Data.preCast > 0 then
 				quickCheckAndPlayAnimator(self._skin, "weapon_button_progress_charge")
 			end
 		end
 	end
 
-	if arg_6_1 and arg_6_1.Data and arg_6_1.Data.postCast then
+	if arg_5_1 and arg_5_1.Data and arg_5_1.Data.postCast then
 		quickCheckAndPlayAnimator(self._skin, "weapon_button_progress_use")
 	end
 

@@ -1,6 +1,7 @@
 local IslandSeasonAgency = class("IslandSeasonAgency", import(".IslandBaseAgency"))
 
 IslandSeasonAgency.ADD_PT = "IslandSeasonAgency.ADD_PT"
+IslandSeasonAgency.TW_SEASON_START = 4
 
 function IslandSeasonAgency:OnInit(arg_1_1)
 	self.season = IslandSeason.New(arg_1_1.season)

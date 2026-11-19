@@ -62,6 +62,14 @@ function UseItemCommand:execute(arg_1_1)
 				})
 			elseif var_1_6 == ItemUsage.DROP or var_1_6 == ItemUsage.DROP_TEMPLATE or var_1_6 == ItemUsage.DROP_APPOINTED or var_1_6 == ItemUsage.INVITATION or var_1_6 == ItemUsage.SKIN_SELECT or var_1_6 == ItemUsage.RANDOM_SKIN or var_1_6 == ItemUsage.SHIP_GIFT or var_1_6 == ItemUsage.REPAIR_LOVE_LETTER then
 				var_2_0 = PlayerConst.addTranDrop(arg_2_0.drop_list)
+			elseif var_1_6 == ItemUsage.MESH_IMAGE_SKIN_EXCHANGE then
+				var_2_0 = PlayerConst.addTranDrop(arg_2_0.drop_list)
+
+				if var_1_3[2] then
+					self:sendNotification(GAME.SKIN_SHOPPIGN_DONE, {
+						id = var_1_3[2]
+					})
+				end
 			elseif var_1_6 == ItemUsage.USAGE_SKIN_EXP then
 				local var_2_1 = ShopConst.GetShopConfig(var_1_3[1])
 

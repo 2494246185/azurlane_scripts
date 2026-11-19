@@ -38,7 +38,11 @@ end
 
 function IslandSeasonSwitchPanel:UpdateSelector()
 	if self.isOpen then
-		self.uiList:align(IslandSeasonAgency.GetCurrentSeason() - 1 or 0)
+		local var_7_0 = IslandSeasonAgency.GetCurrentSeason()
+
+		var_7_0 = PLATFORM_CODE == PLATFORM_CHT and var_7_0 - IslandSeasonAgency.TW_SEASON_START or var_7_0 - 1
+
+		self.uiList:align(var_7_0 or 0)
 	end
 
 	setActive(self.selectorPanel, self.isOpen)
@@ -55,10 +59,10 @@ function IslandSeasonSwitchPanel:Hide()
 end
 
 function IslandSeasonSwitchPanel:UpdateItem(arg_9_1, arg_9_2)
-	local var_9_0 = arg_9_1 + 1
-	local var_9_1 = pg.island_season[arg_9_1 + 1].name_short
+	local var_9_0 = PLATFORM_CODE == PLATFORM_CHT and IslandSeasonAgency.TW_SEASON_START + arg_9_1 or arg_9_1 + 1
+	local var_9_1 = pg.island_season[var_9_0].name_short
 
-	setText(arg_9_2, pg.island_season[arg_9_1 + 1].name_short)
+	setText(arg_9_2, pg.island_season[var_9_0].name_short)
 	onButton(self, arg_9_2, function()
 		self.filterTxt.text = var_9_1
 

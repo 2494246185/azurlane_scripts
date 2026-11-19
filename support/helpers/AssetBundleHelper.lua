@@ -52,19 +52,17 @@ function AssetBundleHelper.LoadAsset(arg_6_0, arg_6_1, arg_6_2, arg_6_3, arg_6_4
 
 	if arg_6_3 then
 		AssetBundleHelper.LoadAssetBundle(var_6_0, arg_6_3, true, function(arg_7_0)
-			local var_7_0 = AssetBundleHelper.LoadAssetBundle(var_6_0, arg_6_3, true)
-
 			if arg_6_1 ~= "" then
-				local var_7_2
+				local var_7_1
 
-				if table.contains(var_7_0:GetAllAssetNames(), (var_7_0:ChangeAssetName(var_6_1))) then
-					var_7_2 = var_6_1 or arg_6_1
+				if table.contains(arg_7_0:GetAllAssetNames(), (arg_7_0:ChangeAssetName(var_6_1))) then
+					var_7_1 = var_6_1 or arg_6_1
 				end
 			end
 
-			var_7_0:LoadAssetAsync(var_7_2, arg_6_2, function(arg_8_0)
+			arg_7_0:LoadAssetAsync(var_7_1, arg_6_2, function(arg_8_0)
 				arg_6_4(arg_8_0)
-				var_0_0.AutoUnloadAssetBundle(var_7_0, arg_6_5)
+				var_0_0.AutoUnloadAssetBundle(arg_7_0, arg_6_5)
 			end, false, false)
 		end)
 	else

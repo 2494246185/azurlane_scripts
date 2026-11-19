@@ -292,9 +292,9 @@ function Apartment:getGiftIds()
 end
 
 function Apartment:needDownload()
-	return #ApartmentRoom.New({
+	return ApartmentRoom.New({
 		id = self:getConfig("bind_room")
-	}):getDownloadNameList() > 0
+	}):needDownload()
 end
 
 function Apartment:filterUnlockTalkList(arg_43_1)

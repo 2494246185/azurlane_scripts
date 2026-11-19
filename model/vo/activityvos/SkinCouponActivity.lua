@@ -4,6 +4,8 @@ function SkinCouponActivity:Ctor(arg_1_1)
 	SkinCouponActivity.super.Ctor(self, arg_1_1)
 
 	self.dataConfig = pg.activity_event_shop_discount[self.configId]
+
+	assert(self.dataConfig, "Invalid activity config for SkinCouponActivity>>>>>" .. self.configId)
 end
 
 function SkinCouponActivity:GetDiscountPrice()

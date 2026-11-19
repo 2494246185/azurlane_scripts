@@ -171,6 +171,14 @@ function ItemInfoLayer:setItem(arg_10_1)
 
 	self.itemVO = arg_10_1:getSubClass()
 
+	if self.itemVO:IsVItemSkinCoupon() then
+		setText(self.okBtn:Find("pic"), i18n("msgbox_text_confirm"))
+		setActive(self.okBtn, true)
+		setActive(self.skinShopBtn, false)
+
+		return
+	end
+
 	if not Item.CanInBag(self.itemVO.id) then
 		return
 	end
@@ -317,7 +325,7 @@ function ItemInfoLayer:setItem(arg_10_1)
 			pg.m02:sendNotification(GAME.GO_SCENE, SCENE.METACHARACTER)
 		end, SFX_PANEL)
 		setActive(self.okBtn, true)
-	elseif var_10_1 == Item.SKIN_ASSIGNED_TYPE then
+	elseif self.itemVO:IsExchangeSkinType() then
 		setActive(self.useOneBtn, self.contextData.confirmCall)
 		onButton(self, self.useOneBtn, function()
 			self.contextData.confirmCall()

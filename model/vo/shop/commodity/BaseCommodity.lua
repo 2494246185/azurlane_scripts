@@ -198,4 +198,12 @@ function BaseCommodity:StaticCanUseVoucherType(arg_35_1)
 	return false
 end
 
+function BaseCommodity:ExistMeshImageSkinExchangeItem()
+	return false
+end
+
+function BaseCommodity:GetMeshImageSkinExchangeItems()
+	return {}
+end
+
 return BaseCommodity

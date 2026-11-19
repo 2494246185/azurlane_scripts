@@ -1216,7 +1216,7 @@ function StoreHouseScene:updateItem(arg_103_1, arg_103_2)
 		onButton(self, self.itemCards[arg_103_2].go, function()
 			self:emit(StoreHouseScene.ON_ITEM_EXTRA, var_103_0.id, var_103_0.extra)
 		end, SFX_PANEL)
-	elseif self.itemVOs[arg_103_1 + 1]:getConfig("type") == Item.SKIN_ASSIGNED_TYPE then
+	elseif self.itemVOs[arg_103_1 + 1]:IsExchangeSkinType() then
 		onButton(self, self.itemCards[arg_103_2].go, function()
 			self:emit(StoreHouseScene.ON_ITEM, var_103_0.id, function()
 				local var_120_0 = var_103_0:getConfig("usage_arg")

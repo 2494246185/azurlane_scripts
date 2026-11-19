@@ -20,10 +20,10 @@ function PSSHei5Scene:setActivity(arg_2_1)
 	end
 
 	self.contextData.phase = self.phase
+	self.helpBtnTip = "blackfriday_battlepass_main_help_" .. pg.black_friday_battlepass_event_pt[self.activity.id].map_name
 end
 
 function PSSHei5Scene:initTplVar()
-	self.helpBtnTip = "blackfriday_battlepass_main_help_" .. pg.black_friday_battlepass_event_pt[self.activity.id].map_name
 	self.awardPageCls = PSSHei5AwardPage
 	self.taskPageCls = PSSHei5TaskPage
 	self.chargePageCls = PSSCruiseChargePage

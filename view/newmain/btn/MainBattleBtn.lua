@@ -11,18 +11,22 @@ function MainBattleBtn:OnClick()
 	})
 end
 
+function MainBattleBtn:Flush(arg_2_1)
+	SetActive(self:GetTarget():Find("LevelDropUpTag"), LevelDropUpActUtil.EixstLevelDropUpAct())
+end
+
 function MainBattleBtn:IsFixed()
 	return true
 end
 
-function MainBattleBtn:ShowOrHideBtnEffect(arg_3_1)
-	local var_3_0 = self._tf:Find("FX")
+function MainBattleBtn:ShowOrHideBtnEffect(arg_4_1)
+	local var_4_0 = self._tf:Find("FX")
 
-	if IsNil(var_3_0) then
+	if IsNil(var_4_0) then
 		return
 	end
 
-	setActive(var_3_0, arg_3_1)
+	setActive(var_4_0, arg_4_1)
 end
 
 return MainBattleBtn

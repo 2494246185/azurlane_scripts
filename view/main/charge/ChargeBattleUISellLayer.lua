@@ -230,6 +230,8 @@ function ChargeBattleUISellLayer:InitBattleShow()
 			self.previewer:setDisplayWeapon({
 				100
 			})
+			self.previewer:setHeroHpBarOffset(Vector3(-455, 130, 0))
+			self.previewer:setEnemyHpBarOffset(Vector3(417, 130, 0))
 			self.previewer:setCombatUI(var_20_2, var_20_3, var_20_4, var_19_2)
 			self.previewer:load(40000, var_19_0, var_19_1, {}, function()
 				return

@@ -711,17 +711,12 @@ function ActivityProxy:updateActivity(arg_71_1)
 	assert(self.data[arg_71_1.id], "activity should exist" .. arg_71_1.id)
 	assert(isa(arg_71_1, Activity), "activity should instance of Activity")
 
-	if isa(arg_71_1, CrusingActivity) then
+	if isa(arg_71_1, CrusingActivity) or isa(arg_71_1, Hei5Activity) then
 		local var_71_0 = arg_71_1:GetUpdateToastData(self.data[arg_71_1.id])
 
 		if var_71_0 then
 			pg.ToastMgr.GetInstance():ShowToast(pg.ToastMgr.TYPE_CRUSING, var_71_0)
 		end
-	elseif arg_71_1:getConfig("type") == ActivityConst.ACTIVITY_TYPE_PT_HEI5 and self.data[arg_71_1.id].data1 < pg.black_friday_battlepass_event_pt[arg_71_1.id].target[#pg.black_friday_battlepass_event_pt[arg_71_1.id].target] and arg_71_1.data1 - self.data[arg_71_1.id].data1 > 0 then
-		pg.ToastMgr.GetInstance():ShowToast(pg.ToastMgr.TYPE_CRUSING, {
-			ptId = pg.black_friday_battlepass_event_pt[arg_71_1.id].pt,
-			ptCount = arg_71_1.data1 - self.data[arg_71_1.id].data1
-		})
 	end
 
 	self.data[arg_71_1.id] = arg_71_1

@@ -40,7 +40,7 @@ function ActivityPrevPeriodCrusingOPCommand:execute(arg_1_1)
 			if var_1_0.cmd == 1 then
 				var_2_0 = PlayerConst.addTranDrop(arg_2_0.award_list)
 
-				var_1_4:SyncAwardRecords(pg.black_friday_battlepass_event_pt[var_1_4.id])
+				var_1_4:SyncAwardRecords()
 			elseif var_1_0.cmd == 2 then
 				var_2_0 = PlayerConst.addTranDrop(arg_2_0.award_list)
 

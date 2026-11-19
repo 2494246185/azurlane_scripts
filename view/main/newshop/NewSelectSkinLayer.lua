@@ -5,8 +5,21 @@ NewSelectSkinLayer.MODE_VIEW = 2
 
 function NewSelectSkinLayer:init()
 	NewSelectSkinLayer.super.init(self)
-	setText(self._tf:Find("adapt/top/title/Text"), i18n("shop_new_able_to_exchange"))
-	setText(self._tf:Find("adapt/top/have/Text"), i18n("shop_new_able_to_exchange"))
+
+	local var_1_0 = "shop_new_able_to_exchange"
+
+	if self.contextData.itemId then
+		if Item.New({
+			id = self.contextData.itemId
+		}):IsVItemSkinCoupon() then
+			var_1_0 = "shop_new_able_to_exchange_1"
+		end
+	end
+
+	local var_1_1 = i18n(var_1_0)
+
+	setText(self._tf:Find("adapt/top/title/Text"), var_1_1)
+	setText(self._tf:Find("adapt/top/have/Text"), var_1_1)
 
 	self.msgBox = SelectSkinMsgbox.New(self._tf, self.event)
 end

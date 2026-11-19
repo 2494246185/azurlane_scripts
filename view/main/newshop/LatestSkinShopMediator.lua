@@ -5,6 +5,7 @@ LatestSkinShopMediator.OPEN_ACTIVITY = "LatestSkinShopMediator.OPEN_ACTIVITY"
 LatestSkinShopMediator.ON_SHOPPING_BY_ACT = "LatestSkinShopMediator.ON_SHOPPING_BY_ACT"
 LatestSkinShopMediator.ON_SHOPPING = "LatestSkinShopMediator.ON_SHOPPING"
 LatestSkinShopMediator.ON_ITEM_PURCHASE = "LatestSkinShopMediator.ON_ITEM_PURCHASE"
+LatestSkinShopMediator.ON_ITEM_PURCHASE_4_MESHIMAGE = "LatestSkinShopMediator.ON_ITEM_PURCHASE_4_MESHIMAGE"
 LatestSkinShopMediator.GO_SHOPS_LAYER = "LatestSkinShopMediator.GO_SHOPS_LAYER"
 LatestSkinShopMediator.OPEN_SCENE = "LatestSkinShopMediator.OPEN_SCENE"
 LatestSkinShopMediator.ON_BACKYARD_SHOP = "LatestSkinShopMediator.ON_BACKYARD_SHOP"
@@ -50,16 +51,26 @@ function LatestSkinShopMediator:register()
 			}
 		})
 	end)
-	self:bind(LatestSkinShopMediator.GO_SHOPS_LAYER, function(arg_7_0, arg_7_1)
-		self:sendNotification(GAME.GO_SCENE, SCENE.SHOP, {
-			warp = NewShopsScene.TYPE_ACTIVITY,
-			actId = arg_7_1
+	self:bind(LatestSkinShopMediator.ON_ITEM_PURCHASE_4_MESHIMAGE, function(arg_7_0, arg_7_1, arg_7_2, arg_7_3)
+		self:sendNotification(GAME.USE_ITEM, {
+			count = 1,
+			id = arg_7_1,
+			arg = {
+				arg_7_2,
+				arg_7_3
+			}
 		})
 	end)
-	self:bind(LatestSkinShopMediator.OPEN_SCENE, function(arg_8_0, arg_8_1)
-		self:sendNotification(GAME.GO_SCENE, arg_8_1[1], arg_8_1[2])
+	self:bind(LatestSkinShopMediator.GO_SHOPS_LAYER, function(arg_8_0, arg_8_1)
+		self:sendNotification(GAME.GO_SCENE, SCENE.SHOP, {
+			warp = NewShopsScene.TYPE_ACTIVITY,
+			actId = arg_8_1
+		})
 	end)
-	self:bind(LatestSkinShopMediator.ON_BACKYARD_SHOP, function(arg_9_0)
+	self:bind(LatestSkinShopMediator.OPEN_SCENE, function(arg_9_0, arg_9_1)
+		self:sendNotification(GAME.GO_SCENE, arg_9_1[1], arg_9_1[2])
+	end)
+	self:bind(LatestSkinShopMediator.ON_BACKYARD_SHOP, function(arg_10_0)
 		self:addSubLayers(Context.New({
 			mediator = NewBackYardShopMediator,
 			viewComponent = NewBackYardShopLayer,
@@ -69,147 +80,147 @@ function LatestSkinShopMediator:register()
 			}
 		}))
 	end)
-	self:bind(LatestSkinShopMediator.ON_ITEM_EXPERIENCE, function(arg_10_0, arg_10_1, arg_10_2, arg_10_3)
+	self:bind(LatestSkinShopMediator.ON_ITEM_EXPERIENCE, function(arg_11_0, arg_11_1, arg_11_2, arg_11_3)
 		self:sendNotification(GAME.USE_ITEM, {
-			id = arg_10_1,
-			count = arg_10_3,
+			id = arg_11_1,
+			count = arg_11_3,
 			arg = {
-				arg_10_2
+				arg_11_2
 			}
 		})
 	end)
-	self:bind(LatestSkinShopMediator.OPEN_OWN_SKIN_LAYER, function(arg_11_0, arg_11_1, arg_11_2, arg_11_3)
+	self:bind(LatestSkinShopMediator.OPEN_OWN_SKIN_LAYER, function(arg_12_0, arg_12_1, arg_12_2, arg_12_3)
 		self:addSubLayers(Context.New({
 			viewComponent = NewSkinAtlasLayer,
 			mediator = NewSkinAtlasMediator
 		}))
 	end)
-	self:bind(LatestSkinShopMediator.OPEN_GIFT_PACK_LAYER, function(arg_12_0, arg_12_1, arg_12_2, arg_12_3)
+	self:bind(LatestSkinShopMediator.OPEN_GIFT_PACK_LAYER, function(arg_13_0, arg_13_1, arg_13_2, arg_13_3)
 		self:sendNotification(GAME.GO_SCENE, SCENE.PROBABILITY_SKINSHOP, {
-			giftPackCommodity = arg_12_1,
-			skinCommodities = arg_12_2,
-			skinProbabilitys = arg_12_3
+			giftPackCommodity = arg_13_1,
+			skinCommodities = arg_13_2,
+			skinProbabilitys = arg_13_3
 		})
 	end)
-	self:bind(LatestSkinShopMediator.OPEN_CHARGE_BIRTHDAY, function(arg_13_0, arg_13_1)
+	self:bind(LatestSkinShopMediator.OPEN_CHARGE_BIRTHDAY, function(arg_14_0, arg_14_1)
 		self:addSubLayers(Context.New({
 			mediator = ChargeBirthdayMediator,
 			viewComponent = ChargeBirthdayLayer,
 			data = {}
 		}))
 	end)
-	self:bind(LatestSkinShopMediator.CHARGE, function(arg_14_0, arg_14_1)
+	self:bind(LatestSkinShopMediator.CHARGE, function(arg_15_0, arg_15_1)
 		self:sendNotification(GAME.CHARGE_OPERATION, {
-			shopId = arg_14_1
+			shopId = arg_15_1
 		})
 	end)
-	self:bind(LatestSkinShopMediator.OPEN_CHARGE_ITEM_PANEL, function(arg_15_0, arg_15_1)
+	self:bind(LatestSkinShopMediator.OPEN_CHARGE_ITEM_PANEL, function(arg_16_0, arg_16_1)
 		self:addSubLayers(Context.New({
 			mediator = ChargeItemPanelMediator,
 			viewComponent = ChargeItemPanelLayer,
-			data = {
-				panelConfig = arg_15_1
-			}
-		}))
-	end)
-	self:bind(LatestSkinShopMediator.OPEN_CHARGE_ITEM_BOX, function(arg_16_0, arg_16_1)
-		self:addSubLayers(Context.New({
-			mediator = ChargeItemBoxMediator,
-			viewComponent = ChargeItemBoxLayer,
 			data = {
 				panelConfig = arg_16_1
 			}
 		}))
 	end)
-	self:bind(LatestSkinShopMediator.BUY_ITEM, function(arg_17_0, arg_17_1, arg_17_2)
+	self:bind(LatestSkinShopMediator.OPEN_CHARGE_ITEM_BOX, function(arg_17_0, arg_17_1)
+		self:addSubLayers(Context.New({
+			mediator = ChargeItemBoxMediator,
+			viewComponent = ChargeItemBoxLayer,
+			data = {
+				panelConfig = arg_17_1
+			}
+		}))
+	end)
+	self:bind(LatestSkinShopMediator.BUY_ITEM, function(arg_18_0, arg_18_1, arg_18_2)
 		self:sendNotification(GAME.SHOPPING, {
-			id = arg_17_1,
-			count = arg_17_2
+			id = arg_18_1,
+			count = arg_18_2
 		})
 	end)
-	self:bind(LatestSkinShopMediator.OPEN_GIFT_ACT_LAYER, function(arg_18_0, arg_18_1)
+	self:bind(LatestSkinShopMediator.OPEN_GIFT_ACT_LAYER, function(arg_19_0, arg_19_1)
 		self:sendNotification(NewShopMainMediator.ON_SUBLAYER_EVENT, {
 			NewShopMainMediator.OPEN_GIFT_ACT_LAYER,
-			arg_18_1
+			arg_19_1
 		})
 	end)
 end
 
 function LatestSkinShopMediator:initNotificationHandleDic()
 	self.handleDic = {
-		[NewShopMainScene.CLOSE_ALL_LAYER] = function(arg_20_0, arg_20_1)
-			arg_20_0.viewComponent:closeView()
+		[NewShopMainScene.CLOSE_ALL_LAYER] = function(arg_21_0, arg_21_1)
+			arg_21_0.viewComponent:closeView()
 		end,
-		[PlayerProxy.UPDATED] = function(arg_21_0, arg_21_1)
-			arg_21_0.viewComponent:SetResource()
+		[PlayerProxy.UPDATED] = function(arg_22_0, arg_22_1)
+			arg_22_0.viewComponent:SetResource()
 		end,
-		[GAME.SKIN_SHOPPIGN_DONE] = function(arg_22_0, arg_22_1)
-			local var_22_0 = arg_22_1:getBody()
-			local var_22_1 = ShopConst.GetShopConfig(var_22_0.id)
+		[GAME.SKIN_SHOPPIGN_DONE] = function(arg_23_0, arg_23_1)
+			local var_23_0 = arg_23_1:getBody()
+			local var_23_1 = ShopConst.GetShopConfig(var_23_0.id)
 
-			if var_22_1 then
-				if var_22_1.genre ~= ShopArgs.SkinShop then
-					if var_22_1.genre == ShopArgs.SkinShopTimeLimit then
-						arg_22_0:HandleNewSkin(var_22_0.id, var_22_1.effect_args[1], var_22_1.genre == ShopArgs.SkinShopTimeLimit)
+			if var_23_1 then
+				if var_23_1.genre ~= ShopArgs.SkinShop then
+					if var_23_1.genre == ShopArgs.SkinShopTimeLimit then
+						arg_23_0:HandleNewSkin(var_23_0.id, var_23_1.effect_args[1], var_23_1.genre == ShopArgs.SkinShopTimeLimit)
 					end
 				end
 			end
 		end,
-		[GAME.SKIN_BY_CHARGE_DONE] = function(arg_23_0, arg_23_1)
-			local var_23_0 = arg_23_1:getBody()
-			local var_23_1 = 0
+		[GAME.SKIN_BY_CHARGE_DONE] = function(arg_24_0, arg_24_1)
+			local var_24_0 = arg_24_1:getBody()
+			local var_24_1 = 0
 
-			for iter_23_0, iter_23_1 in ipairs(arg_23_0.viewComponent.commodities or {}) do
-				if var_23_0.skinId == iter_23_1:getSkinId() then
-					var_23_1 = iter_23_1.id
+			for iter_24_0, iter_24_1 in ipairs(arg_24_0.viewComponent.commodities or {}) do
+				if var_24_0.skinId == iter_24_1:getSkinId() then
+					var_24_1 = iter_24_1.id
 
 					break
 				end
 			end
 
-			print(var_23_0.skinId, var_23_1)
+			print(var_24_0.skinId, var_24_1)
 
-			if var_23_1 > 0 then
-				arg_23_0:HandleNewSkin(var_23_1, var_23_0.skinId, false)
+			if var_24_1 > 0 then
+				arg_24_0:HandleNewSkin(var_24_1, var_24_0.skinId, false)
 			end
 		end,
 		[GAME.SKIN_COUPON_SHOPPING_DONE] = GAME.SKIN_SHOPPIGN_DONE,
-		[GAME.BUY_FURNITURE_DONE] = function(arg_24_0, arg_24_1)
-			arg_24_0.viewComponent:OnFurnitureUpdate(arg_24_1:getType()[1])
+		[GAME.BUY_FURNITURE_DONE] = function(arg_25_0, arg_25_1)
+			arg_25_0.viewComponent:OnFurnitureUpdate(arg_25_1:getType()[1])
 		end,
-		[NewShopMainMediator.NOTI_UPDATE_CURRENT] = function(arg_25_0, arg_25_1)
-			arg_25_0.viewComponent:GetAllCommodities()
-			arg_25_0.viewComponent:Refresh(true)
+		[NewShopMainMediator.NOTI_UPDATE_CURRENT] = function(arg_26_0, arg_26_1)
+			arg_26_0.viewComponent:GetAllCommodities()
+			arg_26_0.viewComponent:Refresh(true)
 		end,
-		[GAME.CHARGE_OPERATION_DONE] = function(arg_26_0, arg_26_1)
-			if not getProxy(ShopsProxy):IsSkinTypeCharge(arg_26_1:getBody().shopId) then
-				arg_26_0.viewComponent:closeView()
+		[GAME.CHARGE_OPERATION_DONE] = function(arg_27_0, arg_27_1)
+			if not getProxy(ShopsProxy):IsSkinTypeCharge(arg_27_1:getBody().shopId) then
+				arg_27_0.viewComponent:closeView()
 			end
 		end,
-		[GAME.OPEN_SKIN_COUPON_MULTI_MSG_BOX] = function(arg_27_0, arg_27_1)
-			arg_27_0.viewComponent:OnOpenSkinCouponMultiMsgBox(arg_27_1:getBody())
+		[GAME.OPEN_SKIN_COUPON_MULTI_MSG_BOX] = function(arg_28_0, arg_28_1)
+			arg_28_0.viewComponent:OnOpenSkinCouponMultiMsgBox(arg_28_1:getBody())
 		end
 	}
 end
 
-function LatestSkinShopMediator:HandleNewSkin(arg_28_1, arg_28_2, arg_28_3)
-	if pg.ship_skin_template[arg_28_2].skin_type == ShipSkin.SKIN_TYPE_TB then
+function LatestSkinShopMediator:HandleNewSkin(arg_29_1, arg_29_2, arg_29_3)
+	if pg.ship_skin_template[arg_29_2].skin_type == ShipSkin.SKIN_TYPE_TB then
 		self:addSubLayers(Context.New({
 			mediator = NewSkinTBMediator,
 			viewComponent = NewSkinTBLayer,
 			data = {
-				skinId = arg_28_2,
-				timeLimit = arg_28_3
+				skinId = arg_29_2,
+				timeLimit = arg_29_3
 			}
 		}))
-	elseif PaintingShowScene.GetSkinShowAble(arg_28_2) then
+	elseif PaintingShowScene.GetSkinShowAble(arg_29_2) then
 		self:addSubLayers(Context.New({
 			mediator = PaintingShowMediator,
 			viewComponent = PaintingShowNewSkinScene,
 			data = {
 				is_shop = true,
-				skinId = arg_28_2,
-				timeLimit = arg_28_3
+				skinId = arg_29_2,
+				timeLimit = arg_29_3
 			}
 		}))
 	else
@@ -217,13 +228,13 @@ function LatestSkinShopMediator:HandleNewSkin(arg_28_1, arg_28_2, arg_28_3)
 			mediator = NewSkinMediator,
 			viewComponent = NewSkinLayer,
 			data = {
-				skinId = arg_28_2,
-				timeLimit = arg_28_3
+				skinId = arg_29_2,
+				timeLimit = arg_29_3
 			}
 		}))
 	end
 
-	self.viewComponent:OnShopping(arg_28_1)
+	self.viewComponent:OnShopping(arg_29_1)
 	pg.EasyRedDotMgr.GetInstance():TriggerMarks("specialShop")
 end
 

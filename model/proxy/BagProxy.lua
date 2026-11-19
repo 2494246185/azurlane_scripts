@@ -86,7 +86,7 @@ function BagProxy:getItemsByExclude()
 	local var_8_0 = {}
 
 	for iter_8_0, iter_8_1 in pairs(self.data) do
-		if not Item.INVISIBLE_TYPE[iter_8_1:getConfig("type")] and iter_8_1.count > 0 then
+		if not Item.INVISIBLE_TYPE[iter_8_1:getConfig("type")] and iter_8_1.count > 0 and not iter_8_1:IsExpired() then
 			if self.extraItemData[iter_8_0] then
 				local var_8_1 = iter_8_1.count
 
@@ -115,11 +115,11 @@ function BagProxy:getItemsByExclude()
 	return var_8_0
 end
 
-function BagProxy:getItemsByType(arg_9_1)
+function BagProxy:getItemsByTypeList(arg_9_1)
 	local var_9_0 = {}
 
 	for iter_9_0, iter_9_1 in pairs(self.data) do
-		if iter_9_1:getConfig("type") == arg_9_1 and iter_9_1.count ~= 0 then
+		if table.contains(arg_9_1, (iter_9_1:getConfig("type"))) and iter_9_1.count > 0 then
 			table.insert(var_9_0, iter_9_1)
 		end
 	end
@@ -127,9 +127,21 @@ function BagProxy:getItemsByType(arg_9_1)
 	return Clone(var_9_0)
 end
 
-function BagProxy:ExitTypeItems(arg_10_1)
+function BagProxy:getItemsByType(arg_10_1)
+	local var_10_0 = {}
+
 	for iter_10_0, iter_10_1 in pairs(self.data) do
-		if iter_10_1:getConfig("type") == arg_10_1 and iter_10_1.count > 0 then
+		if iter_10_1:getConfig("type") == arg_10_1 and iter_10_1.count ~= 0 then
+			table.insert(var_10_0, iter_10_1)
+		end
+	end
+
+	return Clone(var_10_0)
+end
+
+function BagProxy:ExitTypeItems(arg_11_1)
+	for iter_11_0, iter_11_1 in pairs(self.data) do
+		if iter_11_1:getConfig("type") == arg_11_1 and iter_11_1.count > 0 then
 			return true
 		end
 	end
@@ -137,58 +149,58 @@ function BagProxy:ExitTypeItems(arg_10_1)
 	return false
 end
 
-function BagProxy:GetItemsByCondition(arg_11_1)
-	local var_11_0 = {}
+function BagProxy:GetItemsByCondition(arg_12_1)
+	local var_12_0 = {}
 
-	for iter_11_0, iter_11_1 in pairs(self.data) do
-		local var_11_1 = true
+	for iter_12_0, iter_12_1 in pairs(self.data) do
+		local var_12_1 = true
 
-		if arg_11_1 then
-			for iter_11_2, iter_11_3 in pairs(arg_11_1) do
-				if iter_11_1:getConfig(iter_11_2) ~= iter_11_3 then
-					var_11_1 = false
+		if arg_12_1 then
+			for iter_12_2, iter_12_3 in pairs(arg_12_1) do
+				if iter_12_1:getConfig(iter_12_2) ~= iter_12_3 then
+					var_12_1 = false
 
 					break
 				end
 			end
 		end
 
-		if var_11_1 then
-			table.insert(var_11_0, iter_11_1)
+		if var_12_1 then
+			table.insert(var_12_0, iter_12_1)
 		end
 	end
 
-	return var_11_0
+	return var_12_0
 end
 
-function BagProxy:getItemById(arg_12_1)
-	if self.data[arg_12_1] ~= nil then
-		return self.data[arg_12_1]:clone()
-	end
-
-	return nil
-end
-
-function BagProxy:RawGetItemById(arg_13_1)
+function BagProxy:getItemById(arg_13_1)
 	if self.data[arg_13_1] ~= nil then
-		return self.data[arg_13_1]
+		return self.data[arg_13_1]:clone()
 	end
 
 	return nil
 end
 
-function BagProxy:getItemCountById(arg_14_1)
-	local var_14_0
+function BagProxy:RawGetItemById(arg_14_1)
+	if self.data[arg_14_1] ~= nil then
+		return self.data[arg_14_1]
+	end
 
-	if self.data[arg_14_1] then
-		var_14_0 = self.data[arg_14_1].count or 0
+	return nil
+end
 
-		if self.extraItemData[arg_14_1] and #self.extraItemData[arg_14_1] > 0 then
-			var_14_0 = math.max(var_14_0, 1)
+function BagProxy:getItemCountById(arg_15_1)
+	local var_15_0
+
+	if self.data[arg_15_1] then
+		var_15_0 = self.data[arg_15_1].count or 0
+
+		if self.extraItemData[arg_15_1] and #self.extraItemData[arg_15_1] > 0 then
+			var_15_0 = math.max(var_15_0, 1)
 		end
 	end
 
-	return var_14_0
+	return var_15_0
 end
 
 function BagProxy:getBoxCount()
@@ -196,48 +208,48 @@ function BagProxy:getBoxCount()
 end
 
 function BagProxy:getCanComposeCount()
-	local var_16_0 = 0
+	local var_17_0 = 0
 
-	for iter_16_0, iter_16_1 in pairs(pg.compose_data_template.all) do
-		local var_16_1 = self:getItemById(pg.compose_data_template[iter_16_1].material_id)
+	for iter_17_0, iter_17_1 in pairs(pg.compose_data_template.all) do
+		local var_17_1 = self:getItemById(pg.compose_data_template[iter_17_1].material_id)
 
-		if var_16_1 and pg.compose_data_template[iter_16_1].material_num <= var_16_1.count then
-			var_16_0 = var_16_0 + 1
+		if var_17_1 and pg.compose_data_template[iter_17_1].material_num <= var_17_1.count then
+			var_17_0 = var_17_0 + 1
 		end
 	end
 
-	return var_16_0
+	return var_17_0
 end
 
-function BagProxy:updateItem(arg_17_1, arg_17_2, arg_17_3)
-	local var_17_0 = self.data[arg_17_1] or Item.New({
+function BagProxy:updateItem(arg_18_1, arg_18_2, arg_18_3)
+	local var_18_0 = self.data[arg_18_1] or Item.New({
 		count = 0,
-		id = arg_17_1
+		id = arg_18_1
 	})
 
-	var_17_0.count = var_17_0.count + arg_17_2
+	var_18_0.count = var_18_0.count + arg_18_2
 
-	assert(var_17_0.count >= 0, "item count error: " .. var_17_0.id)
+	assert(var_18_0.count >= 0, "item count error: " .. var_18_0.id)
 
-	self.data[var_17_0.id] = var_17_0
+	self.data[var_18_0.id] = var_18_0
 
-	self.data[var_17_0.id]:display("updated")
+	self.data[var_18_0.id]:display("updated")
 
-	local var_17_1 = var_17_0:clone()
+	local var_18_1 = var_18_0:clone()
 
-	var_17_1.extra = arg_17_3
+	var_18_1.extra = arg_18_3
 
-	self.facade:sendNotification(BagProxy.ITEM_UPDATED, var_17_1)
+	self.facade:sendNotification(BagProxy.ITEM_UPDATED, var_18_1)
 end
 
 function BagProxy:canUpgradeFlagShipEquip()
-	local var_18_0 = getProxy(BayProxy):getEquipment2ByflagShip()
+	local var_19_0 = getProxy(BayProxy):getEquipment2ByflagShip()
 
-	if var_18_0 then
-		for iter_18_0, iter_18_1 in pairs(var_18_0:getConfig("trans_use_item")) do
-			local var_18_1 = self:getItemById(iter_18_1[1])
+	if var_19_0 then
+		for iter_19_0, iter_19_1 in pairs(var_19_0:getConfig("trans_use_item")) do
+			local var_19_1 = self:getItemById(iter_19_1[1])
 
-			if not var_18_1 or var_18_1.count < iter_18_1[2] then
+			if not var_19_1 or var_19_1.count < iter_19_1[2] then
 				return false
 			end
 		end
@@ -246,35 +258,23 @@ function BagProxy:canUpgradeFlagShipEquip()
 	end
 end
 
-function BagProxy:AddLimitCnt(arg_19_1, arg_19_2)
-	self.limitList[arg_19_1] = (self.limitList[arg_19_1] or 0) + arg_19_2
+function BagProxy:AddLimitCnt(arg_20_1, arg_20_2)
+	self.limitList[arg_20_1] = (self.limitList[arg_20_1] or 0) + arg_20_2
 end
 
-function BagProxy:GetLimitCntById(arg_20_1)
-	return self.limitList[arg_20_1] or 0
+function BagProxy:GetLimitCntById(arg_21_1)
+	return self.limitList[arg_21_1] or 0
 end
 
-function BagProxy:ClearLimitCnt(arg_21_1)
-	self.limitList[arg_21_1] = 0
+function BagProxy:ClearLimitCnt(arg_22_1)
+	self.limitList[arg_22_1] = 0
 end
 
 function BagProxy:GetSkinShopDiscountItemList()
-	local var_22_0 = {}
-
-	for iter_22_0, iter_22_1 in pairs(self.data) do
-		if iter_22_1.count > 0 and iter_22_1:IsSkinShopDiscountType() then
-			table.insert(var_22_0, iter_22_1)
-		end
-	end
-
-	return var_22_0
-end
-
-function BagProxy:GetExclusiveDiscountItem4Shop(arg_23_1)
 	local var_23_0 = {}
 
 	for iter_23_0, iter_23_1 in pairs(self.data) do
-		if iter_23_1.count > 0 and iter_23_1:IsExclusiveDiscountType() and iter_23_1:CanUseForShop(arg_23_1) then
+		if iter_23_1.count > 0 and iter_23_1:IsSkinShopDiscountType() then
 			table.insert(var_23_0, iter_23_1)
 		end
 	end
@@ -282,46 +282,37 @@ function BagProxy:GetExclusiveDiscountItem4Shop(arg_23_1)
 	return var_23_0
 end
 
-function BagProxy:SetLoveLetterRepairInfo(arg_24_1, arg_24_2)
-	self.loveLetterRepairDic[arg_24_1] = arg_24_2
-end
+function BagProxy:GetExclusiveDiscountItem4Shop(arg_24_1)
+	local var_24_0 = {}
 
-function BagProxy:GetLoveLetterRepairInfo(arg_25_1)
-	return self.loveLetterRepairDic[arg_25_1]
-end
-
-function BagProxy:GetSellingPrice(arg_26_1)
-	local var_26_0 = getProxy(BagProxy)
-	local var_26_1 = {}
-
-	for iter_26_0, iter_26_1 in pairs(arg_26_1) do
-		local var_26_2 = var_26_0:RawGetItemById(iter_26_1.id):GetPrice() or {}
-		local var_26_3 = var_26_2[1] or 0
-
-		var_26_1[var_26_3] = var_26_1[var_26_3] or 0
-		var_26_1[var_26_3] = var_26_1[var_26_3] + (var_26_2[2] or 0) * iter_26_1.count
-	end
-
-	local var_26_4 = {}
-
-	for iter_26_2, iter_26_3 in pairs(var_26_1) do
-		if iter_26_2 > 0 and iter_26_3 > 0 then
-			table.insert(var_26_4, {
-				DROP_TYPE_RESOURCE,
-				iter_26_2,
-				iter_26_3
-			})
+	for iter_24_0, iter_24_1 in pairs(self.data) do
+		if iter_24_1.count > 0 and iter_24_1:IsExclusiveDiscountType() and iter_24_1:CanUseForShop(arg_24_1) then
+			table.insert(var_24_0, iter_24_1)
 		end
 	end
 
-	return var_26_4
+	return var_24_0
 end
 
-function BagProxy:GetSkinExperienceItems()
+function BagProxy:ExistMeshImageSkinExchangeItem4Skin(arg_25_1)
+	for iter_25_0, iter_25_1 in pairs(self.data) do
+		if iter_25_1.count > 0 and iter_25_1:IsMeshImageSkinExchangeType() then
+			return _.any(iter_25_1:GetValidSkinList(), function(arg_26_0)
+				return arg_26_0 == arg_25_1
+			end)
+		end
+	end
+
+	return false
+end
+
+function BagProxy:GetMeshImageSkinsExchangeItem4Skin(arg_27_1)
 	local var_27_0 = {}
 
-	for iter_27_0, iter_27_1 in pairs((getProxy(BagProxy):getRawData())) do
-		if iter_27_1.count > 0 and iter_27_1:IsSkinExperienceType() then
+	for iter_27_0, iter_27_1 in pairs(self.data) do
+		if iter_27_1.count > 0 and iter_27_1:IsMeshImageSkinExchangeType() and _.any(iter_27_1:GetValidSkinList(), function(arg_28_0)
+			return arg_28_0 == arg_27_1
+		end) then
 			table.insert(var_27_0, iter_27_1)
 		end
 	end
@@ -329,32 +320,79 @@ function BagProxy:GetSkinExperienceItems()
 	return var_27_0
 end
 
-function BagProxy:GetAllLoveLetterItem()
-	local var_28_0 = {}
-	local var_28_1 = getProxy(LoveLetterProxy):GetLoveLetterItemDic()
+function BagProxy:SetLoveLetterRepairInfo(arg_29_1, arg_29_2)
+	self.loveLetterRepairDic[arg_29_1] = arg_29_2
+end
 
-	for iter_28_0, iter_28_1 in pairs(self.data) do
-		assert(not self.extraItemData[iter_28_0] or iter_28_1.count == #self.extraItemData[iter_28_0])
+function BagProxy:GetLoveLetterRepairInfo(arg_30_1)
+	return self.loveLetterRepairDic[arg_30_1]
+end
 
-		for iter_28_2 = 1, iter_28_1.count do
-			local var_28_2
+function BagProxy:GetSellingPrice(arg_31_1)
+	local var_31_0 = getProxy(BagProxy)
+	local var_31_1 = {}
 
-			if self.extraItemData[iter_28_0] then
-				var_28_2 = self.extraItemData[iter_28_0][iter_28_2] or nil
+	for iter_31_0, iter_31_1 in pairs(arg_31_1) do
+		local var_31_2 = var_31_0:RawGetItemById(iter_31_1.id):GetPrice() or {}
+		local var_31_3 = var_31_2[1] or 0
 
-				if not var_28_1[iter_28_0 .. "_" .. (var_28_2 or 0)] then
-					break
-				end
-			end
+		var_31_1[var_31_3] = var_31_1[var_31_3] or 0
+		var_31_1[var_31_3] = var_31_1[var_31_3] + (var_31_2[2] or 0) * iter_31_1.count
+	end
 
-			table.insert(var_28_0, {
-				iter_28_0,
-				var_28_2
+	local var_31_4 = {}
+
+	for iter_31_2, iter_31_3 in pairs(var_31_1) do
+		if iter_31_2 > 0 and iter_31_3 > 0 then
+			table.insert(var_31_4, {
+				DROP_TYPE_RESOURCE,
+				iter_31_2,
+				iter_31_3
 			})
 		end
 	end
 
-	return var_28_0
+	return var_31_4
+end
+
+function BagProxy:GetSkinExperienceItems()
+	local var_32_0 = {}
+
+	for iter_32_0, iter_32_1 in pairs((getProxy(BagProxy):getRawData())) do
+		if iter_32_1.count > 0 and iter_32_1:IsSkinExperienceType() then
+			table.insert(var_32_0, iter_32_1)
+		end
+	end
+
+	return var_32_0
+end
+
+function BagProxy:GetAllLoveLetterItem()
+	local var_33_0 = {}
+	local var_33_1 = getProxy(LoveLetterProxy):GetLoveLetterItemDic()
+
+	for iter_33_0, iter_33_1 in pairs(self.data) do
+		assert(not self.extraItemData[iter_33_0] or iter_33_1.count == #self.extraItemData[iter_33_0])
+
+		for iter_33_2 = 1, iter_33_1.count do
+			local var_33_2
+
+			if self.extraItemData[iter_33_0] then
+				var_33_2 = self.extraItemData[iter_33_0][iter_33_2] or nil
+
+				if not var_33_1[iter_33_0 .. "_" .. (var_33_2 or 0)] then
+					break
+				end
+			end
+
+			table.insert(var_33_0, {
+				iter_33_0,
+				var_33_2
+			})
+		end
+	end
+
+	return var_33_0
 end
 
 return BagProxy

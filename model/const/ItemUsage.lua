@@ -23,5 +23,6 @@ ItemUsage.USAGE_SKIN_EXP = "usage_skin_exp"
 ItemUsage.SHIP_GIFT = "usage_favorability"
 ItemUsage.REPAIR_LOVE_LETTER = "usage_loveitem_change_2018"
 ItemUsage.EX_RE_MAP = "usage_drop_re_map"
+ItemUsage.MESH_IMAGE_SKIN_EXCHANGE = "usage_skin_exchange"
 
 return ItemUsage

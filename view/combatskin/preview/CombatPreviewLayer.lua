@@ -75,6 +75,16 @@ function CombatPreviewLayer:Show(arg_6_1, arg_6_2)
 			end)
 		end
 	}, function()
+		if self._state == CombatPreviewLayer.STATES.DESTROY then
+			local var_13_0 = PoolMgr.GetInstance()
+
+			var_13_0:ReturnUI(var_6_2, var_6_4)
+			var_13_0:ReturnUI(var_6_2, var_6_5)
+			var_13_0:ReturnUI(var_6_1, var_6_3)
+
+			return
+		end
+
 		var_6_3.transform:SetParent(self.uiLayer, false)
 		var_6_4.transform:SetParent(self.uiLayer, false)
 		var_6_5.transform:SetParent(self.uiLayer, false)

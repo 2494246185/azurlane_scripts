@@ -119,10 +119,16 @@ function SpWeaponInfoMediator:BindEvent()
 	end)
 	self:bind(SpWeaponInfoMediator.ON_SKIP_UNIQUE_SHIPS, function(arg_10_0, arg_10_1)
 		local var_10_0 = getProxy(ContextProxy):getCurrentContext()
+		local var_10_1 = pg.MsgboxMgr.GetInstance()
+
+		if var_10_1.enable then
+			var_10_1:hide()
+		end
 
 		if var_10_0 and var_10_0.scene == SCENE.EQUIPSCENE then
 			var_10_0.data.warp = StoreHouseConst.WARP_TO_WEAPON
 			var_10_0.data.mode = StoreHouseConst.SPWEAPON
+			var_10_0.cleanChild = true
 		end
 
 		self:sendNotification(GAME.GO_SCENE, SCENE.DOCKYARD, {

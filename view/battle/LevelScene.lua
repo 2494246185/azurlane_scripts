@@ -622,6 +622,7 @@ function LevelScene:didEnter()
 		self:ShowSelectedMap(self:GetInitializeMap())
 	end, SFX_PANEL)
 	setText(self.entranceLayer:Find("enters/enter_main/Text"), getProxy(ChapterProxy):getLastUnlockMap():getLastUnlockChapterName())
+	setActive(self.entranceLayer:Find("enters/enter_main/LevelDropUpTag"), LevelDropUpActUtil.EixstLevelDropUpAct())
 	onButton(self, self.entranceLayer:Find("enters/enter_world/enter"), function()
 		if self:isfrozen() then
 			return

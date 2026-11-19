@@ -65,3 +65,57 @@ function BattleWeaponButtonSkinElite_20250520:OnOverLoadChange(arg_3_1)
 		self:updateProgressBar()
 	end
 end
+
+function BattleWeaponButtonSkinElite_20250520:SetToCombatUIPreview(arg_4_1)
+	local var_4_0 = CombatUIPreviewer.WeaponButtonPreviewMode
+
+	switch(arg_4_1, {
+		[CombatUIPreviewer.WeaponButtonPreviewMode.UNFILLED] = function()
+			SetActive(self._unfill, true)
+			SetActive(self._filled, false)
+
+			self._progressBar.fillAmount = 0
+
+			if self._bgEff then
+				self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 1
+			end
+
+			self._countTxt.text = "0/0"
+
+			if self._gizmos1 then
+				SetActive(self._gizmos1, false)
+				SetActive(self._gizmosXue, false)
+			end
+		end,
+		[CombatUIPreviewer.WeaponButtonPreviewMode.FILLED] = function()
+			SetActive(self._filled, true)
+			SetActive(self._unfill, false)
+
+			self._progressBar.fillAmount = 1
+
+			if self._bgEff then
+				self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 0
+			end
+
+			self._countTxt.text = "1/1"
+
+			if self._gizmos1 then
+				SetActive(self._gizmos1, true)
+				SetActive(self._gizmosXue, true)
+			end
+		end,
+		[CombatUIPreviewer.WeaponButtonPreviewMode.LOOP] = function()
+			self:SetToCombatUIPreview(var_4_0.FILLED)
+		end,
+		[CombatUIPreviewer.WeaponButtonPreviewMode.USABLE] = function()
+			local var_8_0 = self:GetProgressFaker(1)
+
+			var_8_0.current = var_8_0.max
+			var_8_0.count = 1
+			self._progressInfo = var_8_0
+
+			self:OnCountChange()
+			self:OnOverLoadChange()
+		end
+	})
+end

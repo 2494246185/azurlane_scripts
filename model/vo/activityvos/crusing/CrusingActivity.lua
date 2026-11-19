@@ -4,8 +4,6 @@ function CrusingActivity:Ctor(arg_1_1)
 	CrusingActivity.super.Ctor(self, arg_1_1)
 
 	self.previousPeriodAct = self:CreatePreviousPeriodAct()
-
-	print("========================&", self.id, self.data3, self.data4)
 end
 
 function CrusingActivity:GetCrusingUnreceiveAward()

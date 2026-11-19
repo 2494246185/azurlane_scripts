@@ -107,18 +107,22 @@ function SelectDorm3DScene:init()
 end
 
 function SelectDorm3DScene:didEnter()
-	self:SetFloor(self.floorData[self.selectedFloorId])
-	self:UpdateStamina()
-	self:CheckGuide("DORM3D_GUIDE_02")
-	self:FlushInsBtn()
+	DormGroupConst.WithDownloadResourceSnapshot(function()
+		self:SetFloor(self.floorData[self.selectedFloorId])
+		self:UpdateStamina()
+		self:CheckGuide("DORM3D_GUIDE_02")
+		self:FlushInsBtn()
 
-	if not ApartmentProxy.CheckDeviceRAMEnough() then
-		pg.TipsMgr.GetInstance():ShowTips(i18n("drom3d_memory_limit_tip"))
-	end
+		if not ApartmentProxy.CheckDeviceRAMEnough() then
+			pg.TipsMgr.GetInstance():ShowTips(i18n("drom3d_memory_limit_tip"))
+		end
+	end)
 end
 
 function SelectDorm3DScene:FlushInsBtn()
-	self.insBtn:Flush()
+	DormGroupConst.WithDownloadResourceSnapshot(function()
+		self.insBtn:Flush()
+	end)
 end
 
 function SelectDorm3DScene:UpdateStamina()
@@ -126,46 +130,48 @@ function SelectDorm3DScene:UpdateStamina()
 	setActive(self.rtStamina:Find("vfx_ui_stamina01"), getProxy(ApartmentProxy):getStamina() > 0)
 end
 
-function SelectDorm3DScene:SetFloor(arg_17_1)
-	local var_17_0
+function SelectDorm3DScene:SetFloor(arg_19_1)
+	DormGroupConst.WithDownloadResourceSnapshot(function()
+		local var_20_0
 
-	eachChild(self.rtMap, function(arg_18_0)
-		setActive(arg_18_0, arg_18_0.name == arg_17_1)
+		eachChild(self.rtMap, function(arg_21_0)
+			setActive(arg_21_0, arg_21_0.name == arg_19_1)
 
-		if arg_18_0.name == arg_17_1 then
-			var_17_0 = arg_18_0
+			if arg_21_0.name == arg_19_1 then
+				var_20_0 = arg_21_0
+			end
+		end)
+		assert(nil)
+
+		self.roomDic = {}
+
+		for iter_20_0, iter_20_1 in ipairs(pg.dorm3d_rooms.get_id_list_by_in_map[arg_19_1]) do
+			self.roomDic[iter_20_1] = (nil):Find(pg.dorm3d_rooms[iter_20_1].assets_prefix)
+
+			self:InitIconTrigger(iter_20_1)
+			self:UpdateIconState(iter_20_1)
 		end
+
+		self:ReplaceSpecialRoomIcon()
 	end)
-	assert(nil)
-
-	self.roomDic = {}
-
-	for iter_17_0, iter_17_1 in ipairs(pg.dorm3d_rooms.get_id_list_by_in_map[arg_17_1]) do
-		self.roomDic[iter_17_1] = (nil):Find(pg.dorm3d_rooms[iter_17_1].assets_prefix)
-
-		self:InitIconTrigger(iter_17_1)
-		self:UpdateIconState(iter_17_1)
-	end
-
-	self:ReplaceSpecialRoomIcon()
 end
 
 function SelectDorm3DScene:FlushFloor()
 	self:SetFloor(self.floorData[self.selectedFloorId])
 end
 
-function SelectDorm3DScene:InitIconTrigger(arg_20_1)
-	local var_20_0 = self.roomDic[arg_20_1]
+function SelectDorm3DScene:InitIconTrigger(arg_23_1)
+	local var_23_0 = self.roomDic[arg_23_1]
 
-	GetImageSpriteFromAtlasAsync(string.format("dorm3dselect/room_icon_%s", string.lower(pg.dorm3d_rooms[arg_20_1].assets_prefix)), "", self.roomDic[arg_20_1]:Find("icon"))
-	onButton(self, self.roomDic[arg_20_1], function()
-		if BLOCK_DORM3D_ROOMS and table.contains(BLOCK_DORM3D_ROOMS, arg_20_1) then
+	GetImageSpriteFromAtlasAsync(string.format("dorm3dselect/room_icon_%s", string.lower(pg.dorm3d_rooms[arg_23_1].assets_prefix)), "", self.roomDic[arg_23_1]:Find("icon"))
+	onButton(self, self.roomDic[arg_23_1], function()
+		if BLOCK_DORM3D_ROOMS and table.contains(BLOCK_DORM3D_ROOMS, arg_23_1) then
 			pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_system_switch"))
 
 			return
 		end
 
-		if arg_20_1 ~= 1 then
+		if arg_23_1 ~= 1 then
 			if getProxy(ApartmentProxy):getRoom(1) then
 				if not pg.NewStoryMgr.GetInstance():IsPlayed("DORM3D_GUIDE_02") then
 					if not DORM_LOCK_GUIDE then
@@ -177,10 +183,10 @@ function SelectDorm3DScene:InitIconTrigger(arg_20_1)
 			end
 		end
 
-		local var_21_0 = getProxy(ApartmentProxy):getRoom(arg_20_1)
+		local var_24_0 = getProxy(ApartmentProxy):getRoom(arg_23_1)
 
-		if pg.dorm3d_rooms[arg_20_1].type == 1 then
-			if arg_20_1 ~= 4 then
+		if pg.dorm3d_rooms[arg_23_1].type == 1 then
+			if arg_23_1 ~= 4 then
 				if not pg.NewStoryMgr.GetInstance():IsPlayed("DORM3D_GUIDE_06") and not DORM_LOCK_GUIDE then
 					pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_guide_tip2"))
 
@@ -188,31 +194,31 @@ function SelectDorm3DScene:InitIconTrigger(arg_20_1)
 				end
 			end
 
-			if not var_21_0 then
-				self:emit(SelectDorm3DMediator.OPEN_ROOM_UNLOCK_WINDOW, arg_20_1)
+			if not var_24_0 then
+				self:emit(SelectDorm3DMediator.OPEN_ROOM_UNLOCK_WINDOW, arg_23_1)
 			else
 				self:TryDownloadResource({
 					click = true,
-					roomId = arg_20_1
+					roomId = arg_23_1
 				}, function()
-					local var_22_0 = ApartmentProxy.GetRoomInviteList(arg_20_1)
+					local var_25_0 = ApartmentProxy.GetRoomInviteList(arg_23_1)
 
-					self:emit(SelectDorm3DMediator.OPEN_INVITE_LAYER, arg_20_1, (self:CheckGuide("DORM3D_GUIDE_06") or nil) and {}, function()
+					self:emit(SelectDorm3DMediator.OPEN_INVITE_LAYER, arg_23_1, (self:CheckGuide("DORM3D_GUIDE_06") or nil) and {}, function()
 						self:FlushFloor()
 					end)
 				end)
 			end
-		elseif pg.dorm3d_rooms[arg_20_1].type == 2 then
-			if not var_21_0 then
-				self:ShowIconTipWindow(arg_20_1, var_20_0)
+		elseif pg.dorm3d_rooms[arg_23_1].type == 2 then
+			if not var_24_0 then
+				self:ShowIconTipWindow(arg_23_1, var_23_0)
 			else
 				self:TryDownloadResource({
 					click = true,
-					roomId = arg_20_1
+					roomId = arg_23_1
 				}, function()
 					self:emit(SelectDorm3DMediator.ON_DORM, {
-						roomId = var_21_0.id,
-						groupIds = var_21_0:getInviteList()
+						roomId = var_24_0.id,
+						groupIds = var_24_0:getInviteList()
 					})
 				end)
 			end
@@ -222,174 +228,176 @@ function SelectDorm3DScene:InitIconTrigger(arg_20_1)
 	end, SFX_PANEL)
 end
 
-function SelectDorm3DScene:UpdateIconState(arg_25_1)
-	local var_25_0 = self.roomDic[arg_25_1]
-	local var_25_1 = getProxy(ApartmentProxy):getRoom(arg_25_1)
-	local var_25_2 = var_25_1 and var_25_1:getState() or "lock"
+function SelectDorm3DScene:UpdateIconState(arg_28_1)
+	local var_28_0 = self.roomDic[arg_28_1]
+	local var_28_1 = getProxy(ApartmentProxy):getRoom(arg_28_1)
+	local var_28_2 = var_28_1 and var_28_1:getState() or "lock"
 
-	setActive(self.roomDic[arg_25_1]:Find("icon/mask"), var_25_2 ~= "complete")
-	eachChild(var_25_0:Find("front"), function(arg_26_0)
-		setActive(arg_26_0, arg_26_0.name == var_25_2)
+	setActive(self.roomDic[arg_28_1]:Find("icon/mask"), var_28_2 ~= "complete")
+	eachChild(var_28_0:Find("front"), function(arg_29_0)
+		setActive(arg_29_0, arg_29_0.name == var_28_2)
 	end)
-	switch(var_25_2, {
+	switch(var_28_2, {
 		loading = function()
-			setSlider(var_25_0:Find("front/loading/progress"), 0, DormGroupConst.DormDownloadLock.totalSize, DormGroupConst.DormDownloadLock.curSize)
+			setSlider(var_28_0:Find("front/loading/progress"), 0, DormGroupConst.DormDownloadLock.totalSize, DormGroupConst.DormDownloadLock.curSize)
 		end,
 		complete = function()
-			local var_28_0 = var_25_0:Find("front/complete")
-			local var_28_1 = var_25_1:isPersonalRoom()
+			local var_31_0 = var_28_0:Find("front/complete")
+			local var_31_1 = var_28_1:isPersonalRoom()
 
-			setActive(var_28_0, var_28_1)
+			setActive(var_31_0, var_31_1)
 
-			if var_28_1 then
-				local var_28_2 = getProxy(ApartmentProxy):getApartment(var_25_1:getPersonalGroupId())
-				local var_28_3 = var_28_2:getIconTip(var_25_1:GetConfigID())
+			if var_31_1 then
+				local var_31_2 = getProxy(ApartmentProxy):getApartment(var_28_1:getPersonalGroupId())
+				local var_31_3 = var_31_2:getIconTip(var_28_1:GetConfigID())
 
-				eachChild(var_28_0:Find("tip"), function(arg_29_0)
-					setActive(arg_29_0, arg_29_0.name == var_28_3)
+				eachChild(var_31_0:Find("tip"), function(arg_32_0)
+					setActive(arg_32_0, arg_32_0.name == var_31_3)
 				end)
-				setText(var_28_0:Find("favor/Text"), var_28_2.level)
+				setText(var_31_0:Find("favor/Text"), var_31_2.level)
 			end
 		end
 	})
 
-	if arg_25_1 == 4 then
-		setActive(var_25_0:Find("inivite_tip"), PlayerPrefs.GetInt(getProxy(PlayerProxy):getRawData().id .. "_dorm3dRoomInviteSuccess_" .. arg_25_1, 1) == 0)
+	if arg_28_1 == 4 then
+		setActive(var_28_0:Find("inivite_tip"), PlayerPrefs.GetInt(getProxy(PlayerProxy):getRawData().id .. "_dorm3dRoomInviteSuccess_" .. arg_28_1, 1) == 0)
 	end
 
-	setActive(var_25_0:Find("tip"), (function()
-		if not var_25_1 or not var_25_1:isPersonalRoom() then
+	setActive(var_28_0:Find("tip"), (function()
+		if not var_28_1 or not var_28_1:isPersonalRoom() then
 			return false
 		end
 
-		return getProxy(ApartmentProxy):HasShipGroupGiftExpireSoon(var_25_1:getConfig("character")[1])
+		return getProxy(ApartmentProxy):HasShipGroupGiftExpireSoon(var_28_1:getConfig("character")[1])
 	end)())
 end
 
-function SelectDorm3DScene:UpdateShowIcon(arg_31_1, arg_31_2)
-	removeOnButton(arg_31_2)
-	setActive(arg_31_2:Find("icon/mask"), false)
-	eachChild(arg_31_2:Find("front"), function(arg_32_0)
-		setActive(arg_32_0, false)
+function SelectDorm3DScene:UpdateShowIcon(arg_34_1, arg_34_2)
+	removeOnButton(arg_34_2)
+	setActive(arg_34_2:Find("icon/mask"), false)
+	eachChild(arg_34_2:Find("front"), function(arg_35_0)
+		setActive(arg_35_0, false)
 	end)
 end
 
 function SelectDorm3DScene:ReplaceSpecialRoomIcon()
-	local var_33_0 = {}
+	local var_36_0 = {}
 
-	for iter_33_0, iter_33_1 in pairs(getProxy(ApartmentProxy):getRawData()) do
-		for iter_33_2, iter_33_3 in ipairs(iter_33_1:getSpecialTalking()) do
-			if self.roomDic[pg.dorm3d_dialogue_group[iter_33_3].trigger_config[1]] then
-				var_33_0[pg.dorm3d_dialogue_group[iter_33_3].trigger_config[1]] = var_33_0[pg.dorm3d_dialogue_group[iter_33_3].trigger_config[1]] or {}
+	for iter_36_0, iter_36_1 in pairs(getProxy(ApartmentProxy):getRawData()) do
+		for iter_36_2, iter_36_3 in ipairs(iter_36_1:getSpecialTalking()) do
+			if self.roomDic[pg.dorm3d_dialogue_group[iter_36_3].trigger_config[1]] then
+				var_36_0[pg.dorm3d_dialogue_group[iter_36_3].trigger_config[1]] = var_36_0[pg.dorm3d_dialogue_group[iter_36_3].trigger_config[1]] or {}
 
-				table.insert(var_33_0[pg.dorm3d_dialogue_group[iter_33_3].trigger_config[1]], iter_33_3)
+				table.insert(var_36_0[pg.dorm3d_dialogue_group[iter_36_3].trigger_config[1]], iter_36_3)
 			end
 		end
 	end
 
-	for iter_33_4, iter_33_5 in pairs(var_33_0) do
-		setActive(self.roomDic[iter_33_4], false)
+	for iter_36_4, iter_36_5 in pairs(var_36_0) do
+		setActive(self.roomDic[iter_36_4], false)
 
-		local var_33_1 = cloneTplTo(self.roomDic[iter_33_4], self.roomDic[iter_33_4].parent, self.roomDic[iter_33_4].name .. "_special")
+		local var_36_1 = cloneTplTo(self.roomDic[iter_36_4], self.roomDic[iter_36_4].parent, self.roomDic[iter_36_4].name .. "_special")
 
-		self:UpdateShowIcon(iter_33_4, var_33_1)
-		GetImageSpriteFromAtlasAsync(string.format("dorm3dselect/room_icon_%s", string.lower(pg.dorm3d_rooms[iter_33_4].assets_prefix)), "", var_33_1:Find("icon"))
-		setActive(var_33_1:Find("front/complete"), true)
-		setActive(var_33_1:Find("front/complete/favor"), false)
-		eachChild(var_33_1:Find("front/complete/tip"), function(arg_34_0)
-			setActive(arg_34_0, arg_34_0.name == "main")
+		self:UpdateShowIcon(iter_36_4, var_36_1)
+		GetImageSpriteFromAtlasAsync(string.format("dorm3dselect/room_icon_%s", string.lower(pg.dorm3d_rooms[iter_36_4].assets_prefix)), "", var_36_1:Find("icon"))
+		setActive(var_36_1:Find("front/complete"), true)
+		setActive(var_36_1:Find("front/complete/favor"), false)
+		eachChild(var_36_1:Find("front/complete/tip"), function(arg_37_0)
+			setActive(arg_37_0, arg_37_0.name == "main")
 		end)
-		table.sort(iter_33_5)
+		table.sort(iter_36_5)
 
-		local var_33_2 = iter_33_5[1]
-		local var_33_3 = pg.dorm3d_dialogue_group[iter_33_5[1]]
+		local var_36_2 = iter_36_5[1]
+		local var_36_3 = pg.dorm3d_dialogue_group[iter_36_5[1]]
 
-		if DORM_LOCK_GUIDE and iter_33_5[1] == 10010 then
+		if DORM_LOCK_GUIDE and iter_36_5[1] == 10010 then
 			return
 		end
 
-		onButton(self, var_33_1, function()
+		onButton(self, var_36_1, function()
 			self:TryDownloadResource({
 				click = true,
-				roomId = var_33_3.room_id
+				roomId = var_36_3.room_id
 			}, function()
 				self:emit(SelectDorm3DMediator.ON_DORM, {
-					roomId = var_33_3.room_id,
+					roomId = var_36_3.room_id,
 					groupIds = {
-						var_33_3.char_id
+						var_36_3.char_id
 					},
-					specialId = var_33_2
+					specialId = var_36_2
 				})
 			end)
 		end, SFX_PANEL)
 	end
 end
 
-function SelectDorm3DScene:DownloadUpdate(arg_37_1, arg_37_2)
-	switch(arg_37_2, {
+function SelectDorm3DScene:DownloadUpdate(arg_40_1, arg_40_2)
+	switch(arg_40_2, {
 		start = function()
-			if self.roomDic[arg_37_1] then
-				self:UpdateIconState(arg_37_1)
+			if self.roomDic[arg_40_1] then
+				self:UpdateIconState(arg_40_1)
 			end
 		end,
 		loading = function()
-			if self.roomDic[arg_37_1] then
-				setSlider(self.roomDic[arg_37_1]:Find("front/loading/progress"), 0, DormGroupConst.DormDownloadLock.totalSize, DormGroupConst.DormDownloadLock.curSize)
+			if self.roomDic[arg_40_1] then
+				setSlider(self.roomDic[arg_40_1]:Find("front/loading/progress"), 0, DormGroupConst.DormDownloadLock.totalSize, DormGroupConst.DormDownloadLock.curSize)
 			end
 		end,
 		finish = function()
-			for iter_40_0, iter_40_1 in pairs(self.roomDic) do
-				self:UpdateIconState(iter_40_0)
-			end
+			DormGroupConst.WithDownloadResourceSnapshot(function()
+				for iter_44_0, iter_44_1 in pairs(self.roomDic) do
+					self:UpdateIconState(iter_44_0)
+				end
 
-			self:CheckGuide("DORM3D_GUIDE_02")
+				self:CheckGuide("DORM3D_GUIDE_02")
+			end)
 		end,
 		delete = function()
-			if self.roomDic[arg_37_1] then
-				self:UpdateIconState(arg_37_1)
+			if self.roomDic[arg_40_1] then
+				self:UpdateIconState(arg_40_1)
 			end
 		end
 	})
 end
 
-function SelectDorm3DScene:AfterRoomUnlock(arg_42_1)
-	local var_42_0 = arg_42_1.roomId
+function SelectDorm3DScene:AfterRoomUnlock(arg_46_1)
+	local var_46_0 = arg_46_1.roomId
 
 	if isActive(self.rtIconTip) then
 		self:HideIconTipWindow()
 	end
 
-	eachChild(self.roomDic[arg_42_1.roomId]:Find("icon/mask"), function(arg_43_0)
-		setActive(arg_43_0, true)
+	eachChild(self.roomDic[arg_46_1.roomId]:Find("icon/mask"), function(arg_47_0)
+		setActive(arg_47_0, true)
 	end)
-	quickPlayAnimation(self.roomDic[arg_42_1.roomId], "anim_Dorm3d_selectDorm_icon_unlock")
+	quickPlayAnimation(self.roomDic[arg_46_1.roomId], "anim_Dorm3d_selectDorm_icon_unlock")
 	pg.UIMgr.GetInstance():LoadingOn(false)
 	LeanTween.delayedCall(1.2333333333333334, System.Action(function()
 		pg.UIMgr.GetInstance():LoadingOff(false)
-		self:UpdateIconState(var_42_0)
-		self:TryDownloadResource(arg_42_1)
+		self:UpdateIconState(var_46_0)
+		self:TryDownloadResource(arg_46_1)
 		self:CheckGuide("DORM3D_GUIDE_02")
 		self:SetMapSwitch()
 	end))
 end
 
-function SelectDorm3DScene:ShowIconTipWindow(arg_45_1, arg_45_2)
-	setLocalPosition(self.rtIconTip:Find("window"), self.rtIconTip:InverseTransformPoint(arg_45_2.position))
+function SelectDorm3DScene:ShowIconTipWindow(arg_49_1, arg_49_2)
+	setLocalPosition(self.rtIconTip:Find("window"), self.rtIconTip:InverseTransformPoint(arg_49_2.position))
 	removeAllChildren(self.rtIconTip:Find("window/icon"))
 
-	arg_45_2 = cloneTplTo(arg_45_2, self.rtIconTip:Find("window/icon"))
+	arg_49_2 = cloneTplTo(arg_49_2, self.rtIconTip:Find("window/icon"))
 
-	self:UpdateShowIcon(arg_45_1, arg_45_2)
-	setAnchoredPosition(arg_45_2, Vector2.zero)
+	self:UpdateShowIcon(arg_49_1, arg_49_2)
+	setAnchoredPosition(arg_49_2, Vector2.zero)
 
-	local var_45_0 = ApartmentRoom.New({
-		id = arg_45_1
+	local var_49_0 = ApartmentRoom.New({
+		id = arg_49_1
 	})
-	local var_45_1, var_45_2 = var_45_0:getDownloadNeedSize()
+	local var_49_1, var_49_2 = var_49_0:getDownloadNeedSize()
 
-	setText(self.rtIconTip:Find("window/Text"), i18n("dorm3d_role_assets_download", ShipGroup.getDefaultShipNameByGroupID(var_45_0:getPersonalGroupId()), var_45_0:needDownload() and var_45_2 or "0B"))
+	setText(self.rtIconTip:Find("window/Text"), i18n("dorm3d_role_assets_download", ShipGroup.getDefaultShipNameByGroupID(var_49_0:getPersonalGroupId()), var_49_0:needDownload() and var_49_2 or "0B"))
 	onButton(self, self.rtIconTip:Find("window/btn_confirm"), function()
-		self:emit(SelectDorm3DMediator.ON_UNLOCK_DORM_ROOM, arg_45_1)
+		self:emit(SelectDorm3DMediator.ON_UNLOCK_DORM_ROOM, arg_49_1)
 	end, SFX_CONFIRM)
 	setActive(self.rtIconTip, true)
 end
@@ -398,29 +406,29 @@ function SelectDorm3DScene:HideIconTipWindow()
 	setActive(self.rtIconTip, false)
 end
 
-function SelectDorm3DScene:TryDownloadResource(arg_48_1, arg_48_2)
+function SelectDorm3DScene:TryDownloadResource(arg_52_1, arg_52_2)
 	if DormGroupConst.IsDownloading() then
 		pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_now_is_downloading"))
 
 		return
 	end
 
-	local var_48_0 = getProxy(ApartmentProxy):getRoom(arg_48_1.roomId)
-	local var_48_1 = var_48_0:getDownloadNameList()
+	local var_52_0 = getProxy(ApartmentProxy):getRoom(arg_52_1.roomId)
+	local var_52_1 = var_52_0:getDownloadNameList()
 
-	if #var_48_1 > 0 then
+	if #var_52_1 > 0 then
 		DormGroupConst.DormDownload({
 			isShowBox = true,
-			fileList = var_48_1,
-			finishFunc = function(arg_49_0)
-				if arg_49_0 then
+			fileList = var_52_1,
+			finishFunc = function(arg_53_0)
+				if arg_53_0 then
 					pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_resource_download_complete"))
 				end
 			end,
-			roomId = var_48_0.configId
+			roomId = var_52_0.configId
 		})
 	else
-		existCall(arg_48_2)
+		existCall(arg_52_2)
 	end
 end
 
@@ -448,44 +456,44 @@ function SelectDorm3DScene:UpdateRes()
 end
 
 function SelectDorm3DScene:UpdateWeekTask()
-	local var_55_0 = getDorm3dGameset("drom3d_weekly_task")[1]
-	local var_55_1 = getProxy(TaskProxy):getTaskVO(var_55_0)
-	local var_55_2 = var_55_1:isReceive()
-	local var_55_3 = var_55_2 and 3 or var_55_1:getProgress()
-	local var_55_4 = self.rtWeekTask:Find("content")
+	local var_59_0 = getDorm3dGameset("drom3d_weekly_task")[1]
+	local var_59_1 = getProxy(TaskProxy):getTaskVO(var_59_0)
+	local var_59_2 = var_59_1:isReceive()
+	local var_59_3 = var_59_2 and 3 or var_59_1:getProgress()
+	local var_59_4 = self.rtWeekTask:Find("content")
 
-	for iter_55_0 = 1, 3 do
-		triggerToggle(var_55_4:Find("tpl_" .. iter_55_0), iter_55_0 <= var_55_3)
+	for iter_59_0 = 1, 3 do
+		triggerToggle(var_59_4:Find("tpl_" .. iter_59_0), iter_59_0 <= var_59_3)
 	end
 
-	local var_55_5 = Drop.Create(var_55_1:getConfig("award_display")[1])
+	local var_59_5 = Drop.Create(var_59_1:getConfig("award_display")[1])
 
-	updateCustomDrop(var_55_4:Find("Dorm3dIconTpl"), var_55_5)
-	onButton(self, var_55_4:Find("Dorm3dIconTpl"), function()
-		if not var_55_2 and var_55_1:isFinish() then
-			self:emit(SelectDorm3DMediator.ON_SUBMIT_TASK, var_55_0)
+	updateCustomDrop(var_59_4:Find("Dorm3dIconTpl"), var_59_5)
+	onButton(self, var_59_4:Find("Dorm3dIconTpl"), function()
+		if not var_59_2 and var_59_1:isFinish() then
+			self:emit(SelectDorm3DMediator.ON_SUBMIT_TASK, var_59_0)
 		else
 			self:emit(BaseUI.ON_NEW_DROP, {
-				drop = var_55_5
+				drop = var_59_5
 			})
 		end
 	end, SFX_CONFIRM)
-	setActive(var_55_4:Find("Dorm3dIconTpl/get"), not var_55_2 and var_55_1:isFinish())
-	setGray(var_55_4:Find("Dorm3dIconTpl"), var_55_2)
+	setActive(var_59_4:Find("Dorm3dIconTpl/get"), not var_59_2 and var_59_1:isFinish())
+	setGray(var_59_4:Find("Dorm3dIconTpl"), var_59_2)
 	onButton(self, self._tf:Find("Main/task_done"), function()
 		setActive(self.rtWeekTask, true)
 		setActive(self._tf:Find("Main/task_done"), false)
 	end)
 	onButton(self, self.rtWeekTask:Find("title"), function()
-		if var_55_2 then
+		if var_59_2 then
 			setActive(self.rtWeekTask, false)
 			setActive(self._tf:Find("Main/task_done"), true)
 		end
 	end)
 end
 
-function SelectDorm3DScene:CheckGuide(arg_59_1)
-	if pg.NewStoryMgr.GetInstance():IsPlayed(arg_59_1) then
+function SelectDorm3DScene:CheckGuide(arg_63_1)
+	if pg.NewStoryMgr.GetInstance():IsPlayed(arg_63_1) then
 		return
 	end
 
@@ -493,17 +501,17 @@ function SelectDorm3DScene:CheckGuide(arg_59_1)
 		return false
 	end
 
-	return switch(arg_59_1, {
+	return switch(arg_63_1, {
 		DORM3D_GUIDE_02 = function()
-			local var_60_0 = getProxy(ApartmentProxy):getApartment(20220)
+			local var_64_0 = getProxy(ApartmentProxy):getApartment(20220)
 
-			if var_60_0 and not var_60_0:needDownload() then
+			if var_64_0 and not var_64_0:needDownload() then
 				pg.m02:sendNotification(GAME.STORY_UPDATE, {
-					storyId = arg_59_1
+					storyId = arg_63_1
 				})
-				pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(1, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_59_1)))
-				pg.NewGuideMgr.GetInstance():Play(arg_59_1, nil, function()
-					pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(2, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_59_1)))
+				pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(1, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_63_1)))
+				pg.NewGuideMgr.GetInstance():Play(arg_63_1, nil, function()
+					pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(2, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_63_1)))
 				end)
 
 				return true
@@ -511,11 +519,11 @@ function SelectDorm3DScene:CheckGuide(arg_59_1)
 		end,
 		DORM3D_GUIDE_06 = function()
 			pg.m02:sendNotification(GAME.STORY_UPDATE, {
-				storyId = arg_59_1
+				storyId = arg_63_1
 			})
-			pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(1, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_59_1)))
-			pg.NewGuideMgr.GetInstance():Play(arg_59_1, nil, function()
-				pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(2, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_59_1)))
+			pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(1, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_63_1)))
+			pg.NewGuideMgr.GetInstance():Play(arg_63_1, nil, function()
+				pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataGuide(2, pg.NewStoryMgr.GetInstance():StoryName2StoryId(arg_63_1)))
 			end)
 
 			return true
@@ -526,39 +534,39 @@ function SelectDorm3DScene:CheckGuide(arg_59_1)
 end
 
 function SelectDorm3DScene:SetMapSwitch()
-	local var_65_0 = getProxy(PlayerProxy):getRawData().id
+	local var_69_0 = getProxy(PlayerProxy):getRawData().id
 
-	self.selectedFloorId = PlayerPrefs.GetInt("DORM_SELECTED_FLOOR_ID" .. var_65_0, 1)
+	self.selectedFloorId = PlayerPrefs.GetInt("DORM_SELECTED_FLOOR_ID" .. var_69_0, 1)
 
 	if pg.NewGuideMgr.GetInstance():GetCurrentGuideName() == "DORM3D_GUIDE_01" then
 		self.selectedFloorId = 1
 	elseif not DORM_LOCK_SELECT_NEW then
-		if PlayerPrefs.GetInt("DORM_SELECTED_NEW_ROOM_FLOOR" .. var_65_0 .. pg.dorm3d_set.drom3d_new_room_remind.key_value_int, 0) == 0 then
+		if PlayerPrefs.GetInt("DORM_SELECTED_NEW_ROOM_FLOOR" .. var_69_0 .. pg.dorm3d_set.drom3d_new_room_remind.key_value_int, 0) == 0 then
 			self.selectedFloorId = table.indexof(self.floorData, pg.dorm3d_rooms[pg.dorm3d_set.drom3d_new_room_remind.key_value_int].in_map)
 
-			PlayerPrefs.SetInt("DORM_SELECTED_NEW_ROOM_FLOOR" .. var_65_0 .. pg.dorm3d_set.drom3d_new_room_remind.key_value_int, 1)
+			PlayerPrefs.SetInt("DORM_SELECTED_NEW_ROOM_FLOOR" .. var_69_0 .. pg.dorm3d_set.drom3d_new_room_remind.key_value_int, 1)
 		end
 	end
 
-	local var_65_1 = self._tf:Find("interludeAni")
-	local var_65_2 = var_65_1:GetComponent(typeof(Animation))
-	local var_65_3 = var_65_1:GetComponent(typeof(DftAniEvent))
+	local var_69_1 = self._tf:Find("interludeAni")
+	local var_69_2 = var_69_1:GetComponent(typeof(Animation))
+	local var_69_3 = var_69_1:GetComponent(typeof(DftAniEvent))
 
 	onButton(self, self.rtMain:Find("btn_switch/left"), function()
-		var_65_3:SetTriggerEvent(function()
+		var_69_3:SetTriggerEvent(function()
 			self:ChangeMap(self.selectedFloorId - 1)
 		end)
-		var_65_2:Play("anim_InterludeAni")
+		var_69_2:Play("anim_InterludeAni")
 	end)
 	onButton(self, self.rtMain:Find("btn_switch/right"), function()
-		var_65_3:SetTriggerEvent(function()
+		var_69_3:SetTriggerEvent(function()
 			self:ChangeMap(self.selectedFloorId + 1)
 		end)
-		var_65_2:Play("anim_InterludeAni")
+		var_69_2:Play("anim_InterludeAni")
 	end)
 	setActive(self.rtMain:Find("btn_switch/switchPanel"), false)
 
-	local var_65_4 = self.rtMain:Find("btn_switch/switchPanel"):GetComponent(typeof(Animation))
+	local var_69_4 = self.rtMain:Find("btn_switch/switchPanel"):GetComponent(typeof(Animation))
 
 	self.rtMain:Find("btn_switch/switchPanel"):GetComponent(typeof(DftAniEvent)):SetEndEvent(function()
 		setActive(self.rtMain:Find("btn_switch/switchPanel"), false)
@@ -567,106 +575,106 @@ function SelectDorm3DScene:SetMapSwitch()
 		setActive(self.rtMain:Find("btn_switch/switchPanel"), true)
 	end)
 	onButton(self, self.rtMain:Find("btn_switch/switchPanel"), function()
-		var_65_4:Play("anim_switchPanel_exit")
+		var_69_4:Play("anim_switchPanel_exit")
 	end)
 
-	local var_65_5 = UIItemList.New(self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content"), self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content/floor"))
+	local var_69_5 = UIItemList.New(self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content"), self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content/floor"))
 
-	var_65_5:make(function(arg_73_0, arg_73_1, arg_73_2)
-		if arg_73_0 == UIItemList.EventUpdate then
-			local var_73_0 = self.floorData[arg_73_1 + 1]
-			local var_73_1 = Clone(pg.dorm3d_rooms.get_id_list_by_in_map[self.floorData[arg_73_1 + 1]])
+	var_69_5:make(function(arg_77_0, arg_77_1, arg_77_2)
+		if arg_77_0 == UIItemList.EventUpdate then
+			local var_77_0 = self.floorData[arg_77_1 + 1]
+			local var_77_1 = Clone(pg.dorm3d_rooms.get_id_list_by_in_map[self.floorData[arg_77_1 + 1]])
 
-			for iter_73_0 = #var_73_1, 1, -1 do
-				if pg.dorm3d_rooms[var_73_1[iter_73_0]].is_common == 1 then
-					table.remove(var_73_1, iter_73_0)
+			for iter_77_0 = #var_77_1, 1, -1 do
+				if pg.dorm3d_rooms[var_77_1[iter_77_0]].is_common == 1 then
+					table.remove(var_77_1, iter_77_0)
 				end
 			end
 
-			setActive(arg_73_2:Find("select"), arg_73_1 + 1 == self.selectedFloorId)
-			setText(arg_73_2:Find("name"), i18n("dorm3d_room_" .. var_73_0))
-			table.sort(var_73_1, CompareFuncs({
-				function(arg_74_0)
-					local var_74_0 = getProxy(ApartmentProxy):getRoom(arg_74_0)
+			setActive(arg_77_2:Find("select"), arg_77_1 + 1 == self.selectedFloorId)
+			setText(arg_77_2:Find("name"), i18n("dorm3d_room_" .. var_77_0))
+			table.sort(var_77_1, CompareFuncs({
+				function(arg_78_0)
+					local var_78_0 = getProxy(ApartmentProxy):getRoom(arg_78_0)
 
-					return (var_74_0 and var_74_0:getState() or "lock") == "complete" and 0 or 1
+					return (var_78_0 and var_78_0:getState() or "lock") == "complete" and 0 or 1
 				end,
-				function(arg_75_0)
-					return pg.dorm3d_rooms[arg_75_0].type == 2 and 0 or 1
+				function(arg_79_0)
+					return pg.dorm3d_rooms[arg_79_0].type == 2 and 0 or 1
 				end
 			}))
 
-			local var_73_2 = UIItemList.New(arg_73_2:Find("rooms"), arg_73_2:Find("rooms/room"))
+			local var_77_2 = UIItemList.New(arg_77_2:Find("rooms"), arg_77_2:Find("rooms/room"))
 
-			var_73_2:make(function(arg_76_0, arg_76_1, arg_76_2)
-				if arg_76_0 == UIItemList.EventUpdate then
-					local var_76_0 = var_73_1[arg_76_1 + 1]
-					local var_76_1 = pg.dorm3d_rooms[var_73_1[arg_76_1 + 1]]
-					local var_76_2 = getProxy(ApartmentProxy):getRoom(var_73_1[arg_76_1 + 1])
+			var_77_2:make(function(arg_80_0, arg_80_1, arg_80_2)
+				if arg_80_0 == UIItemList.EventUpdate then
+					local var_80_0 = var_77_1[arg_80_1 + 1]
+					local var_80_1 = pg.dorm3d_rooms[var_77_1[arg_80_1 + 1]]
+					local var_80_2 = getProxy(ApartmentProxy):getRoom(var_77_1[arg_80_1 + 1])
 
-					setActive(arg_76_2:Find("lock"), (var_76_2 and var_76_2:getState() or "lock") ~= "complete")
-					GetImageSpriteFromAtlasAsync(string.format("dorm3dselect/room_icon_%s", string.lower(var_76_1.assets_prefix)), "", arg_76_2:Find("normal/mask/icon"), false)
-					setText(arg_76_2:Find("roomId"), var_76_0)
+					setActive(arg_80_2:Find("lock"), (var_80_2 and var_80_2:getState() or "lock") ~= "complete")
+					GetImageSpriteFromAtlasAsync(string.format("dorm3dselect/room_icon_%s", string.lower(var_80_1.assets_prefix)), "", arg_80_2:Find("normal/mask/icon"), false)
+					setText(arg_80_2:Find("roomId"), var_80_0)
 				end
 			end)
-			var_73_2:align(#var_73_1)
-			onButton(self, arg_73_2, function()
-				var_65_3:SetTriggerEvent(function()
-					self:ChangeMap(arg_73_1 + 1)
+			var_77_2:align(#var_77_1)
+			onButton(self, arg_77_2, function()
+				var_69_3:SetTriggerEvent(function()
+					self:ChangeMap(arg_77_1 + 1)
 				end)
-				var_65_2:Play("anim_InterludeAni")
-				var_65_4:Play("anim_switchPanel_exit")
+				var_69_2:Play("anim_InterludeAni")
+				var_69_4:Play("anim_switchPanel_exit")
 			end, SFX_PANEL)
 		end
 	end)
-	var_65_5:align(#self.floorData)
+	var_69_5:align(#self.floorData)
 	self:ChangeMap(self.selectedFloorId)
 end
 
-function SelectDorm3DScene:ChangeMap(arg_79_1)
-	self.selectedFloorId = arg_79_1
+function SelectDorm3DScene:ChangeMap(arg_83_1)
+	self.selectedFloorId = arg_83_1
 
-	local var_79_0 = getProxy(PlayerProxy):getRawData().id
+	local var_83_0 = getProxy(PlayerProxy):getRawData().id
 
-	PlayerPrefs.SetInt("DORM_SELECTED_FLOOR_ID" .. var_79_0, self.selectedFloorId)
+	PlayerPrefs.SetInt("DORM_SELECTED_FLOOR_ID" .. var_83_0, self.selectedFloorId)
 	self:SetFloor(self.floorData[self.selectedFloorId])
 	setActive(self.rtMain:Find("btn_switch/left"), self.selectedFloorId > 1)
 	setActive(self.rtMain:Find("btn_switch/right"), self.selectedFloorId < #self.floorData)
 	setText(self.rtMain:Find("btn_switch/switch/currentName"), i18n("dorm3d_room_" .. self.floorData[self.selectedFloorId]))
 
-	for iter_79_0 = 0, #self.floorData - 1 do
-		setActive(self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content"):GetChild(iter_79_0):Find("select"), iter_79_0 + 1 == arg_79_1)
+	for iter_83_0 = 0, #self.floorData - 1 do
+		setActive(self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content"):GetChild(iter_83_0):Find("select"), iter_83_0 + 1 == arg_83_1)
 	end
 
 	self.floorTipFlag = {}
 	self.floorRoomTipFlag = {}
 
-	for iter_79_1, iter_79_2 in ipairs(self.floorData) do
-		local var_79_1 = false
-		local var_79_2 = {}
+	for iter_83_1, iter_83_2 in ipairs(self.floorData) do
+		local var_83_1 = false
+		local var_83_2 = {}
 
-		for iter_79_3, iter_79_4 in ipairs(pg.dorm3d_rooms.get_id_list_by_in_map[iter_79_2]) do
-			if pg.dorm3d_rooms[iter_79_4].is_common == 0 then
-				var_79_2[iter_79_4] = false
+		for iter_83_3, iter_83_4 in ipairs(pg.dorm3d_rooms.get_id_list_by_in_map[iter_83_2]) do
+			if pg.dorm3d_rooms[iter_83_4].is_common == 0 then
+				var_83_2[iter_83_4] = false
 
-				local var_79_3 = getProxy(ApartmentProxy):getRoom(iter_79_4)
-				local var_79_4 = var_79_3 and var_79_3:getState() or "lock"
+				local var_83_3 = getProxy(ApartmentProxy):getRoom(iter_83_4)
+				local var_83_4 = var_83_3 and var_83_3:getState() or "lock"
 
-				if var_79_4 == "complete" and var_79_3:isPersonalRoom() then
-					if getProxy(ApartmentProxy):getApartment(var_79_3:getPersonalGroupId()):getIconTip(var_79_3:GetConfigID()) then
-						var_79_1 = true
-						var_79_2[iter_79_4] = true
+				if var_83_4 == "complete" and var_83_3:isPersonalRoom() then
+					if getProxy(ApartmentProxy):getApartment(var_83_3:getPersonalGroupId()):getIconTip(var_83_3:GetConfigID()) then
+						var_83_1 = true
+						var_83_2[iter_83_4] = true
 					end
 				end
 
-				if var_79_4 == "complete" and not var_79_3:isPersonalRoom() then
-					var_79_2[iter_79_4] = PlayerPrefs.GetInt(var_79_0 .. "_dorm3dRoomInviteSuccess_" .. iter_79_4, 1) == 0
+				if var_83_4 == "complete" and not var_83_3:isPersonalRoom() then
+					var_83_2[iter_83_4] = PlayerPrefs.GetInt(var_83_0 .. "_dorm3dRoomInviteSuccess_" .. iter_83_4, 1) == 0
 				end
 			end
 		end
 
-		table.insert(self.floorTipFlag, var_79_1)
-		table.insert(self.floorRoomTipFlag, var_79_2)
+		table.insert(self.floorTipFlag, var_83_1)
+		table.insert(self.floorRoomTipFlag, var_83_2)
 	end
 
 	if self.selectedFloorId > 1 then
@@ -679,13 +687,13 @@ function SelectDorm3DScene:ChangeMap(arg_79_1)
 
 	setActive(self.rtMain:Find("btn_switch/switch/tip"), table.contains(self.floorTipFlag, true))
 
-	for iter_79_5 = 0, self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content").childCount - 1 do
-		local var_79_5 = self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content"):GetChild(iter_79_5)
+	for iter_83_5 = 0, self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content").childCount - 1 do
+		local var_83_5 = self.rtMain:Find("btn_switch/switchPanel/switchScrollView/Viewport/Content"):GetChild(iter_83_5)
 
-		for iter_79_6 = 0, var_79_5:Find("rooms").childCount - 1 do
-			local var_79_6 = var_79_5:Find("rooms"):GetChild(iter_79_6)
+		for iter_83_6 = 0, var_83_5:Find("rooms").childCount - 1 do
+			local var_83_6 = var_83_5:Find("rooms"):GetChild(iter_83_6)
 
-			setActive(var_79_6:Find("normal/tip"), self.floorRoomTipFlag[iter_79_5 + 1][tonumber(var_79_6:Find("roomId"):GetComponent(typeof(Text)).text)])
+			setActive(var_83_6:Find("normal/tip"), self.floorRoomTipFlag[iter_83_5 + 1][tonumber(var_83_6:Find("roomId"):GetComponent(typeof(Text)).text)])
 		end
 	end
 end

@@ -144,13 +144,29 @@ function CommonCommodity:ExistExclusiveDiscountItem()
 	return #getProxy(BagProxy):GetExclusiveDiscountItem4Shop(self.id) > 0
 end
 
-function CommonCommodity:StaticCanUseVoucherType(arg_19_1)
-	if #arg_19_1 <= 0 then
+function CommonCommodity:ExistMeshImageSkinExchangeItem()
+	if self.type ~= Goods.TYPE_SKIN then
 		return false
 	end
 
-	for iter_19_0, iter_19_1 in ipairs(arg_19_1) do
-		if iter_19_1:CanUseForShop(self.id) then
+	return getProxy(BagProxy):ExistMeshImageSkinExchangeItem4Skin((self:getSkinId()))
+end
+
+function CommonCommodity:GetMeshImageSkinExchangeItems()
+	if self.type ~= Goods.TYPE_SKIN then
+		return {}
+	end
+
+	return getProxy(BagProxy):GetMeshImageSkinsExchangeItem4Skin((self:getSkinId()))
+end
+
+function CommonCommodity:StaticCanUseVoucherType(arg_21_1)
+	if #arg_21_1 <= 0 then
+		return false
+	end
+
+	for iter_21_0, iter_21_1 in ipairs(arg_21_1) do
+		if iter_21_1:CanUseForShop(self.id) then
 			return true
 		end
 	end
@@ -159,21 +175,21 @@ function CommonCommodity:StaticCanUseVoucherType(arg_19_1)
 end
 
 function CommonCommodity:GetVoucherIdList()
-	local var_20_0 = {}
+	local var_22_0 = {}
 
-	for iter_20_0, iter_20_1 in pairs((getProxy(BagProxy):GetSkinShopDiscountItemList())) do
-		if iter_20_1:CanUseForShop(self.id) then
-			table.insert(var_20_0, iter_20_1.id)
+	for iter_22_0, iter_22_1 in pairs((getProxy(BagProxy):GetSkinShopDiscountItemList())) do
+		if iter_22_1:CanUseForShop(self.id) then
+			table.insert(var_22_0, iter_22_1.id)
 		end
 	end
 
-	return var_20_0
+	return var_22_0
 end
 
 function CommonCommodity:getLimitCount()
-	for iter_21_0, iter_21_1 in ipairs(self:getConfig("limit_args") or {}) do
-		if iter_21_1[1] == "time" then
-			return iter_21_1[2]
+	for iter_23_0, iter_23_1 in ipairs(self:getConfig("limit_args") or {}) do
+		if iter_23_1[1] == "time" then
+			return iter_23_1[2]
 		end
 	end
 
@@ -188,20 +204,20 @@ function CommonCommodity:GetDiscountItem()
 	return nil
 end
 
-function CommonCommodity:isLevelLimit(arg_23_1, arg_23_2)
-	local var_23_0, var_23_1 = self:getLevelLimit()
+function CommonCommodity:isLevelLimit(arg_25_1, arg_25_2)
+	local var_25_0, var_25_1 = self:getLevelLimit()
 
-	if arg_23_2 and var_23_1 then
+	if arg_25_2 and var_25_1 then
 		return false
 	end
 
-	return var_23_0 > 0 and arg_23_1 < var_23_0
+	return var_25_0 > 0 and arg_25_1 < var_25_0
 end
 
 function CommonCommodity:getLevelLimit()
-	for iter_24_0, iter_24_1 in ipairs((self:getConfig("limit_args"))) do
-		if type(iter_24_1) == "table" and iter_24_1[1] == "level" then
-			return iter_24_1[2], iter_24_1[3]
+	for iter_26_0, iter_26_1 in ipairs((self:getConfig("limit_args"))) do
+		if type(iter_26_1) == "table" and iter_26_1[1] == "level" then
+			return iter_26_1[2], iter_26_1[3]
 		end
 	end
 
@@ -290,20 +306,20 @@ function CommonCommodity:getDropInfo()
 end
 
 function CommonCommodity:GetDropList()
-	local var_34_0 = {}
-	local var_34_1 = Item.getConfigData(self:getConfig("effect_args")[1]).display_icon
+	local var_36_0 = {}
+	local var_36_1 = Item.getConfigData(self:getConfig("effect_args")[1]).display_icon
 
-	if type(var_34_1) == "table" then
-		for iter_34_0, iter_34_1 in ipairs(var_34_1) do
-			table.insert(var_34_0, {
-				type = iter_34_1[1],
-				id = iter_34_1[2],
-				count = iter_34_1[3]
+	if type(var_36_1) == "table" then
+		for iter_36_0, iter_36_1 in ipairs(var_36_1) do
+			table.insert(var_36_0, {
+				type = iter_36_1[1],
+				id = iter_36_1[2],
+				count = iter_36_1[3]
 			})
 		end
 	end
 
-	return var_34_0
+	return var_36_0
 end
 
 function CommonCommodity:IsGroupLimit()
@@ -311,40 +327,40 @@ function CommonCommodity:IsGroupLimit()
 		return false
 	end
 
-	local var_35_0 = self:getConfig("group_limit")
-	local var_35_2
+	local var_37_0 = self:getConfig("group_limit")
+	local var_37_2
 
-	if var_35_0 > 0 then
-		if var_35_0 > (self.groupCount or 0) then
-			var_35_2 = false
+	if var_37_0 > 0 then
+		if var_37_0 > (self.groupCount or 0) then
+			var_37_2 = false
 
-			goto label_35_0
+			goto label_37_0
 		end
 	end
 
-	::label_35_0::
+	::label_37_0::
 
 	return true
 end
 
 function CommonCommodity:GetLimitDesc()
-	local var_36_0 = self:getLimitCount()
+	local var_38_0 = self:getLimitCount()
 
-	if var_36_0 > 0 then
-		return i18n("charge_limit_all", var_36_0 - self:getBuyCount(), var_36_0)
+	if var_38_0 > 0 then
+		return i18n("charge_limit_all", var_38_0 - self:getBuyCount(), var_38_0)
 	end
 
-	local var_36_1 = self:getConfig("group_limit")
+	local var_38_1 = self:getConfig("group_limit")
 
-	if var_36_1 > 0 then
-		local var_36_2 = self:getConfig("group_type") or 0
+	if var_38_1 > 0 then
+		local var_38_2 = self:getConfig("group_type") or 0
 
-		if var_36_2 == 1 then
-			return i18n("charge_limit_daily", var_36_1 - self.groupCount, var_36_1)
-		elseif var_36_2 == 2 then
-			return i18n("charge_limit_weekly", var_36_1 - self.groupCount, var_36_1)
-		elseif var_36_2 == 3 then
-			return i18n("charge_limit_monthly", var_36_1 - self.groupCount, var_36_1)
+		if var_38_2 == 1 then
+			return i18n("charge_limit_daily", var_38_1 - self.groupCount, var_38_1)
+		elseif var_38_2 == 2 then
+			return i18n("charge_limit_weekly", var_38_1 - self.groupCount, var_38_1)
+		elseif var_38_2 == 3 then
+			return i18n("charge_limit_monthly", var_38_1 - self.groupCount, var_38_1)
 		end
 	end
 
@@ -371,10 +387,10 @@ end
 
 function CommonCommodity:isTip()
 	if self:isGiftPackage() or self:isActGiftPackage() then
-		local var_39_0 = self:getConfig("akashi_pick") > 0 and "payshop_pack_red_dot" or "gemshop_pack_red_dot"
-		local var_39_1, var_39_2 = unpack(getGameset(var_39_0))
+		local var_41_0 = self:getConfig("akashi_pick") > 0 and "payshop_pack_red_dot" or "gemshop_pack_red_dot"
+		local var_41_1, var_41_2 = unpack(getGameset(var_41_0))
 
-		if PlayerPrefs.GetInt(var_39_0, 0) ~= var_39_1 and table.contains(var_39_2[1], self.id) then
+		if PlayerPrefs.GetInt(var_41_0, 0) ~= var_41_1 and table.contains(var_41_2[1], self.id) then
 			return true
 		end
 

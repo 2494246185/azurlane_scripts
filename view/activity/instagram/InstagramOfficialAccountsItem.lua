@@ -23,7 +23,7 @@ function InstagramOfficialAccountsItem:SetData(arg_3_1)
 end
 
 function InstagramOfficialAccountsItem:RefreshUI()
-	setText(self.uiNameText, shortenString(getProxy(InstagramProxy):GetOfficialAccounts()[self.id]:getConfig("title"), 26))
+	setText(self.uiNameText, shortenString(HXSet.hxLan(getProxy(InstagramProxy):GetOfficialAccounts()[self.id]:getConfig("title")), 26))
 	self:RefreshTip()
 end
 

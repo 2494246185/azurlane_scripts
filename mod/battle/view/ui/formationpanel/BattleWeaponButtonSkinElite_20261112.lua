@@ -11,43 +11,7 @@ function BattleWeaponButtonSkinElite_20261112:ConfigSkin(arg_1_1)
 	self._glowEff = self._filled:Find("gizmos")
 end
 
-function BattleWeaponButtonSkinElite_20261112:SetToCombatUIPreview(arg_2_1)
-	if arg_2_1 ~= CombatUIPreviewer.WeaponButtonPreviewMode.UNFILLED then
-		SetActive(self._filled, true)
-		SetActive(self._unfill, false)
-
-		self._progressBar.fillAmount = 1
-
-		if self._bgEff then
-			self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 1
-		end
-
-		self._countTxt.text = "1/1"
-
-		if self._gizmos1 then
-			SetActive(self._gizmos1, true)
-			SetActive(self._gizmosXue, true)
-		end
-	else
-		SetActive(self._unfill, true)
-		SetActive(self._filled, false)
-
-		self._progressBar.fillAmount = 0
-
-		if self._bgEff then
-			self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 0
-		end
-
-		self._countTxt.text = "0/0"
-
-		if self._gizmos1 then
-			SetActive(self._gizmos1, false)
-			SetActive(self._gizmosXue, false)
-		end
-	end
-end
-
-function BattleWeaponButtonSkinElite_20261112:OnTotalChange(arg_3_1)
+function BattleWeaponButtonSkinElite_20261112:OnTotalChange(arg_2_1)
 	if self._progressInfo:GetTotal() <= 0 then
 		self._block:SetActive(true)
 
@@ -66,8 +30,8 @@ function BattleWeaponButtonSkinElite_20261112:OnTotalChange(arg_3_1)
 		self:OnCountChange()
 		self:SetControllerActive(true)
 
-		if arg_3_1 then
-			if arg_3_1.Data.index and arg_3_1.Data.index == 1 then
+		if arg_2_1 then
+			if arg_2_1.Data.index and arg_2_1.Data.index == 1 then
 				self:OnUnSelect()
 			end
 		end
@@ -93,7 +57,7 @@ function BattleWeaponButtonSkinElite_20261112:OnCountChange()
 	SetActive(self._gizmosXue, self._progressInfo:GetTotal() > 0 and self._progressInfo:GetCount() > 0)
 end
 
-function BattleWeaponButtonSkinElite_20261112:OnOverLoadChange(arg_7_1)
+function BattleWeaponButtonSkinElite_20261112:OnOverLoadChange(arg_6_1)
 	if self._progressInfo:IsOverLoad() then
 		self._block:SetActive(true)
 		self:OnUnfill()
@@ -102,17 +66,17 @@ function BattleWeaponButtonSkinElite_20261112:OnOverLoadChange(arg_7_1)
 		self:OnFilled()
 	end
 
-	if self._progressInfo:GetCount() >= 1 and arg_7_1 and arg_7_1.Data then
-		if arg_7_1.Data.preCast then
-			if arg_7_1.Data.preCast == 0 then
+	if self._progressInfo:GetCount() >= 1 and arg_6_1 and arg_6_1.Data then
+		if arg_6_1.Data.preCast then
+			if arg_6_1.Data.preCast == 0 then
 				quickCheckAndPlayAnimator(self._skin, "weapon_button_progress_filled")
-			elseif arg_7_1.Data.preCast > 0 then
+			elseif arg_6_1.Data.preCast > 0 then
 				quickCheckAndPlayAnimator(self._skin, "weapon_button_progress_charge")
 			end
 		end
 	end
 
-	if arg_7_1 and arg_7_1.Data and arg_7_1.Data.postCast then
+	if arg_6_1 and arg_6_1.Data and arg_6_1.Data.postCast then
 		quickCheckAndPlayAnimator(self._skin, "weapon_button_progress_use")
 	end
 
@@ -122,10 +86,10 @@ function BattleWeaponButtonSkinElite_20261112:OnOverLoadChange(arg_7_1)
 end
 
 function BattleWeaponButtonSkinElite_20261112:updateProgressBar()
-	local var_8_0 = self._progressInfo:GetCurrent() / self._progressInfo:GetMax()
+	local var_7_0 = self._progressInfo:GetCurrent() / self._progressInfo:GetMax()
 
-	self._progressBar.fillAmount = var_8_0
-	self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = self._progressInfo.GetCount and self._progressInfo:GetCount() > 0 and 1 or var_8_0
+	self._progressBar.fillAmount = var_7_0
+	self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = self._progressInfo.GetCount and self._progressInfo:GetCount() > 0 and 1 or var_7_0
 end
 
 return BattleWeaponButtonSkinElite_20261112

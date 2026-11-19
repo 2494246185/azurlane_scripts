@@ -69,7 +69,18 @@ function Dorm3dInsCharRoom:SetCare(arg_10_1)
 end
 
 function Dorm3dInsCharRoom:ShouldTip()
-	return self:GetInsContent() or self:GetChatContent() or self:GetChatContent()
+	if not self:IsDownloaded() then
+		return false
+	end
+
+	local var_11_0 = getProxy(Dorm3dInsProxy):AnyInstagramShouldTip(self.groupId)
+
+	if not var_11_0 then
+		var_11_0 = getProxy(Dorm3dInsProxy):ShoudTipPhoneById(self.groupId)
+		var_11_0 = var_11_0 or getProxy(Dorm3dChatProxy):ShouldShowShipTip(self.groupId)
+	end
+
+	return var_11_0
 end
 
 function Dorm3dInsCharRoom:GetInsContent()

@@ -188,6 +188,9 @@ function Dorm3dInsMainLayer:didEnter()
 		self:OpenOrCloseSelectPanel()
 	end)
 	onButton(self, self._tf:Find("left/btn_expand"), function()
+		DormGroupConst.WithDownloadResourceSnapshot(function()
+			self.expandItemList:align(#self.roomIdList)
+		end)
 		setActive(self.expandPanel, true)
 		self.expandPanel:SetAsLastSibling()
 	end)
@@ -198,15 +201,15 @@ function Dorm3dInsMainLayer:didEnter()
 		self:OnClickDownload(self.selectedId)
 	end)
 
-	local function var_22_0(arg_29_0)
+	local function var_22_0(arg_30_0)
 		if not self.roomDataDic[self.selectedId]:IsDownloaded() then
 			pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_privatechat_room_unlock"))
 		else
-			existCall(arg_29_0)
+			existCall(arg_30_0)
 		end
 	end
 
-	self:bind(Dorm3dInsMainLayer.OPEN_INS, function(arg_30_0)
+	self:bind(Dorm3dInsMainLayer.OPEN_INS, function(arg_31_0)
 		var_22_0(function()
 			self:ClosePrePage()
 
@@ -215,7 +218,7 @@ function Dorm3dInsMainLayer:didEnter()
 			self:emit(Dorm3dInsMainMediator.OPEN_JUUS, self.roomDataDic[self.selectedId].groupId)
 		end)
 	end)
-	self:bind(Dorm3dInsMainLayer.OPEN_CHAT, function(arg_32_0)
+	self:bind(Dorm3dInsMainLayer.OPEN_CHAT, function(arg_33_0)
 		var_22_0(function()
 			self:ClosePrePage()
 
@@ -224,7 +227,7 @@ function Dorm3dInsMainLayer:didEnter()
 			self:emit(Dorm3dInsMainMediator.OPEN_CHAT, self.roomDataDic[self.selectedId].groupId)
 		end)
 	end)
-	self:bind(Dorm3dInsMainLayer.OPEN_PHONE, function(arg_34_0)
+	self:bind(Dorm3dInsMainLayer.OPEN_PHONE, function(arg_35_0)
 		var_22_0(function()
 			if DORM_LOCK_INS_PHONE then
 				pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_privatechat_telephone"))
@@ -239,9 +242,9 @@ function Dorm3dInsMainLayer:didEnter()
 			self:emit(Dorm3dInsMainMediator.OPEN_PHONE, self.roomDataDic[self.selectedId].groupId)
 		end)
 	end)
-	self:bind(Dorm3dInsMainLayer.FLUSH_LEFT, function(arg_36_0)
+	self:bind(Dorm3dInsMainLayer.FLUSH_LEFT, function(arg_37_0)
 		self:SortRoomList()
-		self.roomItemList:align(#self.roomIdList)
+		self:FlushLeft()
 	end)
 
 	self.selectedId = self.roomIdList[1]
@@ -257,15 +260,15 @@ function Dorm3dInsMainLayer:didEnter()
 	end
 end
 
-function Dorm3dInsMainLayer:UpdateRoomList(arg_37_1, arg_37_2)
-	local var_37_0 = self.roomDataDic[self.roomIdList[arg_37_1 + 1]]
+function Dorm3dInsMainLayer:UpdateRoomList(arg_38_1, arg_38_2)
+	local var_38_0 = self.roomDataDic[self.roomIdList[arg_38_1 + 1]]
 
-	setActive(arg_37_2:Find("selected"), self.roomDataDic[self.roomIdList[arg_37_1 + 1]].id == self.selectedId)
-	setActive(arg_37_2:Find("like"), var_37_0:IsCare())
-	GetImageSpriteFromAtlasAsync(var_37_0:GetIcon(), "", arg_37_2:Find("mask/icon"), true)
-	setActive(arg_37_2:Find("tip"), var_37_0:ShouldTip())
-	onButton(self, arg_37_2, function()
-		self.selectedId = var_37_0.id
+	setActive(arg_38_2:Find("selected"), self.roomDataDic[self.roomIdList[arg_38_1 + 1]].id == self.selectedId)
+	setActive(arg_38_2:Find("like"), var_38_0:IsCare())
+	GetImageSpriteFromAtlasAsync(var_38_0:GetIcon(), "", arg_38_2:Find("mask/icon"), true)
+	setActive(arg_38_2:Find("tip"), var_38_0:ShouldTip())
+	onButton(self, arg_38_2, function()
+		self.selectedId = var_38_0.id
 
 		if self.curPage ~= var_0_6 then
 			self:OpenMain()
@@ -284,31 +287,37 @@ function Dorm3dInsMainLayer:OpenMain()
 end
 
 function Dorm3dInsMainLayer:Flush()
-	local var_40_0 = self.roomDataDic[self.selectedId]:GetType()
+	DormGroupConst.WithDownloadResourceSnapshot(function()
+		local var_42_0 = self.roomDataDic[self.selectedId]:GetType()
 
-	self.mainPages[(function(arg_41_0)
-		return #self.mainPages - arg_41_0 + 1
-	end)(var_40_0)]:Hide()
-	self.mainPages[var_40_0]:Show()
-	self.mainPages[var_40_0]:Flush(self.roomDataDic[self.selectedId])
-	self.roomItemList:align(#self.roomIdList)
-	self.expandItemList:align(#self.roomIdList)
-	self:FlushDownload()
+		self.mainPages[(function(arg_43_0)
+			return #self.mainPages - arg_43_0 + 1
+		end)(var_42_0)]:Hide()
+		self.mainPages[var_42_0]:Show()
+		self.mainPages[var_42_0]:Flush(self.roomDataDic[self.selectedId])
+		self:FlushLeft()
+		self:FlushDownload()
+	end)
 end
 
 function Dorm3dInsMainLayer:FlushLeft()
-	self.roomItemList:align(#self.roomIdList)
+	DormGroupConst.WithDownloadResourceSnapshot(function()
+		self.roomItemList:align(#self.roomIdList)
+
+		if isActive(self.expandPanel) then
+			self.expandItemList:align(#self.roomIdList)
+		end
+	end)
 end
 
-function Dorm3dInsMainLayer:InitSelectItem(arg_43_1, arg_43_2)
-	local var_43_0 = self.selectOptions[arg_43_1 + 1]
+function Dorm3dInsMainLayer:InitSelectItem(arg_46_1, arg_46_2)
+	local var_46_0 = self.selectOptions[arg_46_1 + 1]
 
-	setText(arg_43_2:Find("label"), self.selectOptions[arg_43_1 + 1].label)
-	onButton(self, arg_43_2, function()
-		self:FilterRoomList(var_43_0.mode, var_43_0.arg)
+	setText(arg_46_2:Find("label"), self.selectOptions[arg_46_1 + 1].label)
+	onButton(self, arg_46_2, function()
+		self:FilterRoomList(var_46_0.mode, var_46_0.arg)
 		self:SortRoomList()
-		self.roomItemList:align(#self.roomIdList)
-		self.expandItemList:align(#self.roomIdList)
+		self:FlushLeft()
 	end)
 end
 
@@ -326,37 +335,37 @@ local var_0_9 = 1
 local var_0_10 = 2
 local var_0_11 = 3
 
-function Dorm3dInsMainLayer:CheckCurrentDownloadState(arg_46_1)
-	if DormGroupConst.DormDownloadLock and DormGroupConst.DormDownloadLock.roomId == arg_46_1 then
+function Dorm3dInsMainLayer:CheckCurrentDownloadState(arg_49_1)
+	if DormGroupConst.DormDownloadLock and DormGroupConst.DormDownloadLock.roomId == arg_49_1 then
 		return var_0_11
 	end
 
-	return (self.roomDataDic[arg_46_1]:IsDownloaded() or nil) and (var_0_10 or var_0_9)
+	return (self.roomDataDic[arg_49_1]:IsDownloaded() or nil) and (var_0_10 or var_0_9)
 end
 
-function Dorm3dInsMainLayer:FlushDownload(arg_47_1)
-	arg_47_1 = arg_47_1 or self:CheckCurrentDownloadState(self.selectedId)
+function Dorm3dInsMainLayer:FlushDownload(arg_50_1)
+	arg_50_1 = arg_50_1 or self:CheckCurrentDownloadState(self.selectedId)
 
-	setActive(self.download, arg_47_1 == var_0_9)
-	setActive(self.delete, arg_47_1 == var_0_10)
-	setActive(self.downloading, arg_47_1 == var_0_11)
-	self:FlushDownloadSlider(arg_47_1)
+	setActive(self.download, arg_50_1 == var_0_9)
+	setActive(self.delete, arg_50_1 == var_0_10)
+	setActive(self.downloading, arg_50_1 == var_0_11)
+	self:FlushDownloadSlider(arg_50_1)
 end
 
-function Dorm3dInsMainLayer:FlushDownloadSlider(arg_48_1)
-	setActive(self.downloadProgress, arg_48_1 == var_0_11)
+function Dorm3dInsMainLayer:FlushDownloadSlider(arg_51_1)
+	setActive(self.downloadProgress, arg_51_1 == var_0_11)
 
-	if arg_48_1 == var_0_11 then
+	if arg_51_1 == var_0_11 then
 		setSlider(self.slider, 0, DormGroupConst.DormDownloadLock.totalSize, DormGroupConst.DormDownloadLock.curSize)
 	end
 end
 
-function Dorm3dInsMainLayer:DownloadUpdate(arg_49_1, arg_49_2)
-	if arg_49_1 ~= self.selectedId then
+function Dorm3dInsMainLayer:DownloadUpdate(arg_52_1, arg_52_2)
+	if arg_52_1 ~= self.selectedId then
 		return
 	end
 
-	switch(arg_49_2, {
+	switch(arg_52_2, {
 		start = function()
 			self:FlushDownload(var_0_11)
 		end,
@@ -372,7 +381,7 @@ function Dorm3dInsMainLayer:DownloadUpdate(arg_49_1, arg_49_2)
 	})
 end
 
-function Dorm3dInsMainLayer:OnClickDownload(arg_54_1)
+function Dorm3dInsMainLayer:OnClickDownload(arg_57_1)
 	if getProxy(ApartmentProxy):getRoom(1) then
 		if not pg.NewStoryMgr.GetInstance():IsPlayed("DORM3D_GUIDE_02") then
 			pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_guide_tip"))
@@ -381,20 +390,20 @@ function Dorm3dInsMainLayer:OnClickDownload(arg_54_1)
 		end
 	end
 
-	switch(self:CheckCurrentDownloadState(arg_54_1), {
+	switch(self:CheckCurrentDownloadState(arg_57_1), {
 		[var_0_10] = function()
-			self:DeleteRoom(arg_54_1)
+			self:DeleteRoom(arg_57_1)
 		end,
 		[var_0_9] = function()
-			if not getProxy(ApartmentProxy):getRoom(arg_54_1) then
-				if self.roomDataDic[arg_54_1]:GetType() == 1 then
-					self:emit(Dorm3dInsMainMediator.OPEN_ROOM_UNLOCK_WINDOW, arg_54_1)
-				elseif self.roomDataDic[arg_54_1]:GetType() == 2 then
-					self:emit(Dorm3dInsMainMediator.ON_UNLOCK_DORM_ROOM, arg_54_1)
+			if not getProxy(ApartmentProxy):getRoom(arg_57_1) then
+				if self.roomDataDic[arg_57_1]:GetType() == 1 then
+					self:emit(Dorm3dInsMainMediator.OPEN_ROOM_UNLOCK_WINDOW, arg_57_1)
+				elseif self.roomDataDic[arg_57_1]:GetType() == 2 then
+					self:emit(Dorm3dInsMainMediator.ON_UNLOCK_DORM_ROOM, arg_57_1)
 				end
 			else
 				self:TryDownloadResource({
-					roomId = arg_54_1
+					roomId = arg_57_1
 				})
 			end
 		end,
@@ -404,52 +413,52 @@ function Dorm3dInsMainLayer:OnClickDownload(arg_54_1)
 	})
 end
 
-function Dorm3dInsMainLayer:TryDownloadResource(arg_58_1, arg_58_2)
+function Dorm3dInsMainLayer:TryDownloadResource(arg_61_1, arg_61_2)
 	if DormGroupConst.IsDownloading() then
 		pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_now_is_downloading"))
 
 		return
 	end
 
-	local var_58_0 = getProxy(ApartmentProxy):getRoom(arg_58_1.roomId)
-	local var_58_1 = var_58_0:getDownloadNameList()
+	local var_61_0 = getProxy(ApartmentProxy):getRoom(arg_61_1.roomId)
+	local var_61_1 = var_61_0:getDownloadNameList()
 
-	if #var_58_1 > 0 then
+	if #var_61_1 > 0 then
 		DormGroupConst.DormDownload({
 			isShowBox = true,
-			fileList = var_58_1,
-			finishFunc = function(arg_59_0)
-				if arg_59_0 then
+			fileList = var_61_1,
+			finishFunc = function(arg_62_0)
+				if arg_62_0 then
 					pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_resource_download_complete"))
 				end
 			end,
-			roomId = var_58_0.configId
+			roomId = var_61_0.configId
 		})
 	else
-		existCall(arg_58_2)
+		existCall(arg_61_2)
 	end
 end
 
-function Dorm3dInsMainLayer:DeleteRoom(arg_60_1)
+function Dorm3dInsMainLayer:DeleteRoom(arg_63_1)
 	self:TryDownloadResource({
-		roomId = arg_60_1
+		roomId = arg_63_1
 	}, function()
-		local var_61_0 = getProxy(ApartmentProxy):getRoom(arg_60_1)
-		local var_61_1 = var_61_0:getConfig("room")
+		local var_64_0 = getProxy(ApartmentProxy):getRoom(arg_63_1)
+		local var_64_1 = var_64_0:getConfig("room")
 
-		if var_61_0:isPersonalRoom() then
-			var_61_1 = ShipGroup.getDefaultShipNameByGroupID(var_61_0:getPersonalGroupId())
+		if var_64_0:isPersonalRoom() then
+			var_64_1 = ShipGroup.getDefaultShipNameByGroupID(var_64_0:getPersonalGroupId())
 		end
 
-		local var_61_2 = var_61_0:isPersonalRoom() and DormGroupConst.GetDelRoomSize(string.lower(var_61_0:getConfig("resource_name")), {
+		local var_64_2 = var_64_0:isPersonalRoom() and DormGroupConst.GetDelRoomSize(string.lower(var_64_0:getConfig("resource_name")), {
 			"room",
 			"apartment"
-		}) or DormGroupConst.GetDelRoomSize(string.lower(var_61_0:getConfig("resource_name")), {
+		}) or DormGroupConst.GetDelRoomSize(string.lower(var_64_0:getConfig("resource_name")), {
 			"room"
 		})
 
 		pg.MsgboxMgr.GetInstance():ShowMsgBox({
-			content = i18n("dorm3d_role_assets_delete", var_61_1, var_61_2),
+			content = i18n("dorm3d_role_assets_delete", var_64_1, var_64_2),
 			onYes = function()
 				if IsUnityEditor then
 					pg.TipsMgr.GetInstance():ShowTips(i18n("common_no_open"))
@@ -457,20 +466,20 @@ function Dorm3dInsMainLayer:DeleteRoom(arg_60_1)
 					return
 				end
 
-				if var_61_0:isPersonalRoom() then
-					DormGroupConst.DelRoom(string.lower(var_61_0:getConfig("resource_name")), {
+				if var_64_0:isPersonalRoom() then
+					DormGroupConst.DelRoom(string.lower(var_64_0:getConfig("resource_name")), {
 						"room",
 						"apartment"
 					})
 				else
-					DormGroupConst.DelRoom(string.lower(var_61_0:getConfig("resource_name")), {
+					DormGroupConst.DelRoom(string.lower(var_64_0:getConfig("resource_name")), {
 						"room"
 					})
 				end
 
 				pg.TipsMgr.GetInstance():ShowTips(i18n("dorm3d_delete_finish"))
-				pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataDownload(var_61_0.id, 3))
-				self:emit(Dorm3dInsMainMediator.NotifyDormDelete, arg_60_1)
+				pg.m02:sendNotification(GAME.APARTMENT_TRACK, Dorm3dTrackCommand.BuildDataDownload(var_64_0.id, 3))
+				self:emit(Dorm3dInsMainMediator.NotifyDormDelete, arg_63_1)
 			end
 		})
 	end)

@@ -311,55 +311,287 @@ function BattleWeaponButton:Update()
 end
 
 function BattleWeaponButton:SetToCombatUIPreview(arg_30_1)
-	if arg_30_1 ~= CombatUIPreviewer.WeaponButtonPreviewMode.UNFILLED then
-		SetActive(self._filled, true)
-		SetActive(self._unfill, false)
+	local var_30_0 = CombatUIPreviewer.WeaponButtonPreviewMode
 
-		self._progressBar.fillAmount = 1
+	switch(arg_30_1, {
+		[CombatUIPreviewer.WeaponButtonPreviewMode.UNFILLED] = function()
+			SetActive(self._unfill, true)
+			SetActive(self._filled, false)
 
-		if self._bgEff then
-			self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 1
+			self._progressBar.fillAmount = 0
+
+			if self._bgEff then
+				self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 0
+			end
+
+			self._countTxt.text = "0/0"
+
+			if self._gizmos1 then
+				SetActive(self._gizmos1, false)
+				SetActive(self._gizmosXue, false)
+			end
+		end,
+		[CombatUIPreviewer.WeaponButtonPreviewMode.FILLED] = function()
+			SetActive(self._filled, true)
+			SetActive(self._unfill, false)
+
+			self._progressBar.fillAmount = 1
+
+			if self._bgEff then
+				self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 1
+			end
+
+			self._countTxt.text = "1/1"
+
+			if self._gizmos1 then
+				SetActive(self._gizmos1, true)
+				SetActive(self._gizmosXue, true)
+			end
+		end,
+		[CombatUIPreviewer.WeaponButtonPreviewMode.LOOP] = function()
+			self:SetToCombatUIPreview(var_30_0.FILLED)
+		end,
+		[CombatUIPreviewer.WeaponButtonPreviewMode.USABLE] = function()
+			local var_34_0 = self:GetProgressFaker(1)
+
+			var_34_0.current = var_34_0.max
+			var_34_0.count = 1
+			self._progressInfo = var_34_0
+
+			self:OnCountChange()
+			self:OnOverLoadChange()
 		end
+	})
+end
 
-		self._countTxt.text = "1/1"
+BattleWeaponButton.PREVIEW_LOOP_CONFIG = {
+	usableDuration = 2,
+	useInterval = 1.5,
+	restartDelay = 1.5,
+	chargeDurations = {
+		4,
+		2
+	}
+}
 
-		if self._gizmos1 then
-			SetActive(self._gizmos1, true)
-			SetActive(self._gizmosXue, true)
-		end
+local var_0_2 = 0.033
+local var_0_3 = {
+	CHARGE = 1,
+	USE = 3,
+	USABLE = 2
+}
+
+function BattleWeaponButton:getPreviewGCD()
+	if self.PREVIEW_LOOP_CONFIG.gcd then
+		return self.PREVIEW_LOOP_CONFIG.gcd
+	end
+
+	return ({
+		var_0_0.Battle.BattleConfig.ChargeWeaponConfig.GCD,
+		var_0_0.Battle.BattleConfig.TorpedoCFG.GCD,
+		var_0_0.Battle.BattleConfig.AirAssistCFG.GCD
+	})[self._iconIndex] or var_0_0.Battle.BattleConfig.TorpedoCFG.GCD
+end
+
+function BattleWeaponButton:GetProgressFaker(arg_36_1)
+	local var_36_0 = {
+		current = 0,
+		count = 0,
+		max = 1,
+		total = arg_36_1 or 1
+	}
+
+	function var_36_0.GetCurrent()
+		return var_36_0.current
+	end
+
+	function var_36_0.GetMax()
+		return var_36_0.max
+	end
+
+	function var_36_0.GetCount()
+		return var_36_0.count
+	end
+
+	function var_36_0.GetTotal()
+		return var_36_0.total
+	end
+
+	function var_36_0.IsOverLoad()
+		return var_36_0.current < var_36_0.max or var_36_0.count < 1
+	end
+
+	function var_36_0.GetCurrentWeaponIconIndex()
+		return self._iconIndex
+	end
+
+	function var_36_0.RegisterEventListener()
+		return
+	end
+
+	function var_36_0.UnregisterEventListener()
+		return
+	end
+
+	return var_36_0
+end
+
+function BattleWeaponButton:StartCombatUIPreviewLoop()
+	local var_45_0 = self:GetProgressFaker(#self.PREVIEW_LOOP_CONFIG.chargeDurations)
+
+	self._progressInfo = var_45_0
+	self._previewProgress = var_45_0
+
+	self:enterCombatUIPreviewStep(var_0_3.CHARGE)
+end
+
+function BattleWeaponButton:StopCombatUIPreviewLoop()
+	self._previewStep = nil
+	self._previewElapsed = nil
+	self._previewProgress = nil
+end
+
+function BattleWeaponButton:previewPlus()
+	self._previewProgress.count = self._previewProgress.count + 1
+	self._previewProgress.current = 1
+	self._previewProgress.max = 1
+
+	self:OnCountChange()
+	self:OnfilledEffect()
+	self:OnOverLoadChange({
+		Data = {
+			preCast = self._previewProgress.count
+		}
+	})
+end
+
+function BattleWeaponButton:previewDeduct()
+	self._previewProgress.count = math.max(self._previewProgress.count - 1, 0)
+
+	if self._previewProgress.count > 0 then
+		self._previewProgress.max = self:getPreviewGCD()
+	end
+
+	self._previewProgress.current = 0
+
+	self:OnCountChange()
+	self:OnOverLoadChange({
+		Data = {
+			postCast = true
+		}
+	})
+end
+
+function BattleWeaponButton:updatePreviewGCD(arg_49_1)
+	if self._previewProgress.count <= 0 or self._previewProgress.current >= self._previewProgress.max then
+		return
+	end
+
+	self._previewProgress.current = self._previewProgress.current + arg_49_1
+
+	if self._previewProgress.current >= self._previewProgress.max then
+		self._previewProgress.current = self._previewProgress.max
+
+		self:OnOverLoadChange()
 	else
-		SetActive(self._unfill, true)
-		SetActive(self._filled, false)
-
-		self._progressBar.fillAmount = 0
-
-		if self._bgEff then
-			self._skin:Find("ActCtl/bg_eff"):GetComponent(typeof(CanvasGroup)).alpha = 0
-		end
-
-		self._countTxt.text = "0/0"
-
-		if self._gizmos1 then
-			SetActive(self._gizmos1, false)
-			SetActive(self._gizmosXue, false)
-		end
+		self:updateProgressBar()
 	end
 end
 
-function BattleWeaponButton:updateProgressBar()
-	local var_31_0 = self._progressInfo:GetCurrent() / self._progressInfo:GetMax()
+function BattleWeaponButton:enterCombatUIPreviewStep(arg_50_1)
+	local var_50_0 = self._previewProgress
 
-	self._progressBar.fillAmount = var_31_0
+	self._previewStep = arg_50_1
+	self._previewElapsed = 0
+
+	switch(arg_50_1, {
+		[var_0_3.CHARGE] = function()
+			var_50_0.count = 0
+			var_50_0.current = 0
+			var_50_0.max = self.PREVIEW_LOOP_CONFIG.chargeDurations[1]
+			self._previewLayer = 1
+
+			self:OnCountChange()
+			self:OnOverLoadChange()
+		end,
+		[var_0_3.USABLE] = function()
+			return
+		end,
+		[var_0_3.USE] = function()
+			self._previewUseTimes = 1
+
+			self:previewDeduct()
+		end
+	})
+end
+
+function BattleWeaponButton:UpdateCombatUIPreviewLoop(arg_54_1)
+	if not self._previewStep then
+		return
+	end
+
+	arg_54_1 = arg_54_1 or var_0_2
+
+	local var_54_0 = self.PREVIEW_LOOP_CONFIG
+	local var_54_1 = self._previewProgress
+
+	self._previewElapsed = self._previewElapsed + arg_54_1
+
+	switch(self._previewStep, {
+		[var_0_3.CHARGE] = function()
+			if var_54_1.count == 0 then
+				var_54_1.current = math.min(self._previewElapsed, var_54_1.max)
+
+				self:updateProgressBar()
+			end
+
+			if var_54_0.chargeDurations[self._previewLayer] <= self._previewElapsed then
+				self._previewElapsed = self._previewElapsed - var_54_0.chargeDurations[self._previewLayer]
+				self._previewLayer = self._previewLayer + 1
+
+				self:previewPlus()
+
+				if var_54_1.count >= var_54_1.total then
+					self:enterCombatUIPreviewStep(var_0_3.USABLE)
+				end
+			end
+		end,
+		[var_0_3.USABLE] = function()
+			if self._previewElapsed >= var_54_0.usableDuration then
+				self:enterCombatUIPreviewStep(var_0_3.USE)
+			end
+		end,
+		[var_0_3.USE] = function()
+			self:updatePreviewGCD(arg_54_1)
+
+			if self._previewUseTimes < var_54_1.total then
+				if self._previewElapsed >= var_54_0.useInterval then
+					self._previewElapsed = self._previewElapsed - var_54_0.useInterval
+					self._previewUseTimes = self._previewUseTimes + 1
+
+					self:previewDeduct()
+				end
+			elseif self._previewElapsed >= var_54_0.restartDelay then
+				self:enterCombatUIPreviewStep(var_0_3.CHARGE)
+			end
+		end
+	})
+end
+
+function BattleWeaponButton:updateProgressBar()
+	local var_58_0 = self._progressInfo:GetCurrent() / self._progressInfo:GetMax()
+
+	self._progressBar.fillAmount = var_58_0
 
 	if self._bgEff then
-		self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = self._progressInfo.GetCount and self._progressInfo:GetCount() > 0 and 1 or var_31_0
+		self._bgEff:GetComponent(typeof(CanvasGroup)).alpha = self._progressInfo.GetCount and self._progressInfo:GetCount() > 0 and 1 or var_58_0
 	end
 end
 
 function BattleWeaponButton:Dispose()
 	if self.eventTriggers then
-		for iter_32_0, iter_32_1 in pairs(self.eventTriggers) do
-			ClearEventTrigger(iter_32_0)
+		for iter_59_0, iter_59_1 in pairs(self.eventTriggers) do
+			ClearEventTrigger(iter_59_0)
 		end
 
 		self.eventTriggers = nil
