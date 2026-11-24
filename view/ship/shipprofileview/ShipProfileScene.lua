@@ -576,7 +576,7 @@ function ShipProfileScene:CreateLive2D()
 		offset = var_51_1,
 		parent = self.l2dRoot
 	}), function(arg_52_0)
-		arg_52_0:setSortingModeFrontZ()
+		arg_52_0:setSortingLayer(LayerWeightConst.L2D_DEFAULT_LAYER)
 		self.live2DBtn:SetEnable(true)
 	end)
 
