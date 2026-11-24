@@ -1,4 +1,4 @@
-local BossRushEscapeManorScene = class("BossRushEscapeManorScene", import("view.base.BaseUI"))
+local BossRushEscapeManorScene = class("BossRushEscapeManorScene", import("view.activity.BossRush.BossRushBaseScene"))
 
 BossRushEscapeManorScene.DISPLAY = {
 	STORY = "Story",

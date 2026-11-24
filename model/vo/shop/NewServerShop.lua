@@ -26,8 +26,13 @@ function NewServerShop:Ctor(arg_1_1)
 	end
 end
 
-function NewServerShop:GetPtId()
-	return pg.newserver_shop_template[getProxy(ActivityProxy):getActivityById(self.activityId):getConfig("config_data")[1]].resource_type
+function NewServerShop:GetPtDrop()
+	local var_2_0 = getProxy(ActivityProxy)
+
+	return Drop.New({
+		type = var_2_0.resource_category,
+		id = pg.newserver_shop_template[var_2_0:getActivityById(self.activityId):getConfig("config_data")[1]].resource_type
+	})
 end
 
 function NewServerShop:WrapPhaseGoods(arg_3_1, arg_3_2, arg_3_3)

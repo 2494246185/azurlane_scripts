@@ -6,12 +6,17 @@ function DreamTourMedalDetailPanel:InitUI()
 	self._stateBg = findTF(self._tf, "state_bg")
 	self._progressLockText = findTF(self._tf, "progress/lock/label")
 
-	setText(self._progressLockText, i18n("word_lock"))
+	if self._progressLockText then
+		setText(self._progressLockText, i18n("word_lock"))
+	end
 end
 
 function DreamTourMedalDetailPanel:UpdateMedal()
 	DreamTourMedalDetailPanel.super.UpdateMedal(self)
-	SetActive(self._stateBg, self._medalGroup:GetMedalGroupState() ~= ActivityMedalGroup.STATE_ACTIVE)
+
+	if self._stateBg then
+		SetActive(self._stateBg, self._medalGroup:GetMedalGroupState() ~= ActivityMedalGroup.STATE_ACTIVE)
+	end
 end
 
 return DreamTourMedalDetailPanel

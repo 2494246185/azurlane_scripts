@@ -78,6 +78,14 @@ function HelenaMainPage:updateUI()
 	onButton(self, self.fight, function()
 		self:emit(ActivityMediator.SPECIAL_BATTLE_OPERA)
 	end)
+
+	if self.rpManual then
+		setActive(self.rpManual, ActivityMedalGroup.showTip(self.activity:getConfig("config_client").medal_group_id or self:GetMedalAlbumView().GROUP_ID))
+	end
+end
+
+function HelenaMainPage:GetMedalAlbumView()
+	return TianqiongMedalAlbumView
 end
 
 return HelenaMainPage

@@ -4,6 +4,16 @@ pg.word_legal_template_15 = {}
 local var_0_0 = pg.word_legal_template_15
 
 function temp()
+	var_0_0.滨 = {
+		江 = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
 	var_0_0.冈 = {
 		依 = {
 			沙 = {
@@ -445,16 +455,6 @@ function temp()
 			this = true
 		},
 		B = {
-			this = true
-		}
-	}
-end
-
-temp()
-
-function temp()
-	var_0_0["3"] = {
-		["3"] = {
 			this = true
 		}
 	}

@@ -83,6 +83,7 @@ function FinishStageCommand:SendRequest(arg_4_1, arg_4_2)
 	pg.ConnectionMgr.GetInstance():Send(40003, arg_4_1, 40004, function(arg_5_0)
 		if arg_5_0.result == 0 or arg_5_0.result == 1030 then
 			arg_4_2(arg_5_0)
+			FinishStageCommand.CheckChapterAutoRecord(arg_4_1)
 		else
 			self:RequestFailStandardProcess(arg_5_0)
 		end
@@ -240,6 +241,12 @@ function FinishStageCommand:GenerateCommanderExp(arg_12_1, arg_12_2)
 		surfaceCMD = var_12_2(arg_12_1),
 		submarineCMD = (arg_12_2 or nil) and var_12_2(arg_12_2)
 	}
+end
+
+function FinishStageCommand:CheckChapterAutoRecord()
+	if self.system == SYSTEM_ACT_BOSS and self.auto_before == 1 and self.auto_after == 1 and self.auto_switch_time == 0 then
+		getProxy(ChapterAutoProxy):UpdateRecord(ChapterAutoProxy.TYPE.BOSS, self.data, self.total_time)
+	end
 end
 
 return FinishStageCommand

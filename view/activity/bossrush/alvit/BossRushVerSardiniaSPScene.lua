@@ -1,4 +1,4 @@
-local BossRushVerSardiniaSPScene = class("BossRushVerSardiniaSPScene", import("view.base.BaseUI"))
+local BossRushVerSardiniaSPScene = class("BossRushVerSardiniaSPScene", import("view.activity.BossRush.BossRushBaseScene"))
 
 BossRushVerSardiniaSPScene.DISPLAY = {
 	STORY = "Story",

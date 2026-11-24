@@ -236,6 +236,7 @@ function StoreHouseScene:didEnter()
 	onButton(self, self.topItems:Find("adapt/stamp"), function()
 		getProxy(TaskProxy):dealMingshiTouchFlag(2)
 	end, SFX_CONFIRM)
+	self:InitEasterEgg()
 	onButton(self, self.helpBtn, function()
 		local var_19_0
 
@@ -440,13 +441,18 @@ function StoreHouseScene:didEnter()
 	onToggle(self, self.materialToggle, function(arg_37_0)
 		self.inMaterial = arg_37_0
 
-		if arg_37_0 and self.contextData.warp ~= StoreHouseConst.WARP_TO_MATERIAL then
-			self.contextData.warp = StoreHouseConst.WARP_TO_MATERIAL
+		if arg_37_0 then
+			if self.contextData.warp ~= StoreHouseConst.WARP_TO_MATERIAL then
+				self.contextData.warp = StoreHouseConst.WARP_TO_MATERIAL
 
-			setText(self.tip, i18n("equipment_select_materials_tip"))
-			setActive(self.capacityTF.parent, false)
-			setActive(self.tip, true)
-			self:sortItems()
+				setText(self.tip, i18n("equipment_select_materials_tip"))
+				setActive(self.capacityTF.parent, false)
+				setActive(self.tip, true)
+				self:sortItems()
+				self:ShowEasterEgg()
+			end
+		else
+			self:HideEasterEgg()
 		end
 
 		setActive(self.helpBtn, not arg_37_0)
@@ -1456,9 +1462,85 @@ function StoreHouseScene:SwitchEquipmentType(arg_134_1)
 	self.searchBar:ClearInputText()
 end
 
+function StoreHouseScene:Scroll2Item(arg_135_1, arg_135_2)
+	if self.contextData.warp ~= StoreHouseConst.WARP_TO_MATERIAL or not self.itemRect or not self.itemRect.isStart then
+		return
+	end
+
+	for iter_135_0, iter_135_1 in ipairs(self.itemVOs or {}) do
+		if iter_135_1.id == arg_135_1 then
+			local var_135_0 = math.clamp(self.itemRect:HeadIndexToValue(iter_135_0 - 1), 0, 1)
+
+			if math.abs(var_135_0 - self.itemRect.value) < 0.001 then
+				return
+			end
+
+			if arg_135_2 then
+				self.itemRect:ScrollTo(var_135_0, false)
+
+				break
+			end
+
+			local var_135_1 = math.clamp(math.abs(var_135_0 - self.itemRect.value) * 1.5, 0.2, 0.8)
+			local var_135_2 = go(self.itemView)
+
+			LeanTween.cancel(var_135_2)
+			LeanTween.value(var_135_2, self.itemRect.value, var_135_0, var_135_1):setEase(LeanTweenType.easeInOutCirc):setOnUpdate(System.Action_float(function(arg_136_0)
+				self.itemRect:ScrollTo(arg_136_0, false)
+			end))
+
+			break
+		end
+	end
+end
+
+function StoreHouseScene:InitEasterEgg()
+	if EasterEggTools.IsEnabled(EasterEggTools.GetActivity(), EasterEggConst.SCENE.StoreHouseScene) then
+		self.easterEggView = EasterEggView.New(findTF(self.topItems, "adapt/easterEggBtn"), self, EasterEggConst.SCENE.StoreHouseScene)
+
+		local var_137_0
+
+		self.easterEggView:SetEasterEggCallBack(function(arg_138_0, arg_138_1)
+			var_137_0 = arg_138_0
+
+			arg_138_1()
+		end, function(arg_139_0)
+			self:emit(BaseUI.ON_ACHIEVE, PlayerConst.addTranDrop(var_137_0.award_list), function()
+				pg.UIMgr.GetInstance():LoadingOn(false)
+				self:Scroll2Item(var_137_0.award_list[1].id, true)
+				self.easterEggView:AddHideEasterEggTimer(1, function()
+					pg.UIMgr.GetInstance():LoadingOff()
+					arg_139_0()
+				end)
+			end)
+		end)
+	end
+end
+
+function StoreHouseScene:ShowEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:ShowEasterEgg()
+	end
+end
+
+function StoreHouseScene:HideEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:HideEasterEgg()
+	end
+end
+
+function StoreHouseScene:ExitEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:willExit()
+	end
+
+	self.easterEggView = nil
+end
+
 function StoreHouseScene:willExit()
 	self:UnOverlayPanel(self.blurPanel, self._tf)
 	self:UnOverlayPanel(self.topItems, self._tf)
+	self:ExitEasterEgg()
 
 	if self.bulinTip then
 		self.bulinTip:Destroy()

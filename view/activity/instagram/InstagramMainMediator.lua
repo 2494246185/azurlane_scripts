@@ -45,6 +45,9 @@ function InstagramMainMediator:register()
 	self:bind(InstagramMainMediator.INS_BACK_PRESSED, function(arg_8_0)
 		self:sendNotification(InstagramMediator.BACK_PRESSED)
 	end)
+	self:bind(EasterEggView.ON_CLICK_EASTER_EGG, function(arg_9_0, arg_9_1)
+		self:sendNotification(GAME.PUZZLE_PIECE_OP, arg_9_1)
+	end)
 end
 
 function InstagramMainMediator:listNotificationInterests()
@@ -55,15 +58,15 @@ function InstagramMainMediator:listNotificationInterests()
 	}
 end
 
-function InstagramMainMediator:handleNotification(arg_10_1)
-	local var_10_0 = arg_10_1:getName()
-	local var_10_1 = arg_10_1:getBody()
+function InstagramMainMediator:handleNotification(arg_11_1)
+	local var_11_0 = arg_11_1:getName()
+	local var_11_1 = arg_11_1:getBody()
 
-	if var_10_0 == InstagramMainMediator.CHANGE_CHAT_TIP then
+	if var_11_0 == InstagramMainMediator.CHANGE_CHAT_TIP then
 		self.viewComponent:ChangeChatTip()
-	elseif var_10_0 == InstagramMainMediator.CHANGE_JUUS_TIP then
+	elseif var_11_0 == InstagramMainMediator.CHANGE_JUUS_TIP then
 		self.viewComponent:ChangeJuusTip()
-	elseif var_10_0 == InstagramMainMediator.CLOSE_ALL then
+	elseif var_11_0 == InstagramMainMediator.CLOSE_ALL then
 		self.viewComponent:closeView()
 	end
 end

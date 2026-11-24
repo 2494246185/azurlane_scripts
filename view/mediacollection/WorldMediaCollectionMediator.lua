@@ -37,6 +37,9 @@ function WorldMediaCollectionMediator:register()
 	self:bind(WorldMediaCollectionMediator.TRIGGER_PERSONAL_TASK, function(arg_6_0, arg_6_1, arg_6_2)
 		self:TriggerPersonalTask(arg_6_1, arg_6_2)
 	end)
+	self:bind(EasterEggView.ON_CLICK_EASTER_EGG, function(arg_7_0, arg_7_1)
+		self:sendNotification(GAME.PUZZLE_PIECE_OP, arg_7_1)
+	end)
 end
 
 function WorldMediaCollectionMediator:listNotificationInterests()
@@ -48,37 +51,37 @@ function WorldMediaCollectionMediator:listNotificationInterests()
 	}
 end
 
-function WorldMediaCollectionMediator:handleNotification(arg_8_1)
-	local var_8_0 = arg_8_1:getName()
-	local var_8_1 = arg_8_1:getBody()
+function WorldMediaCollectionMediator:handleNotification(arg_9_1)
+	local var_9_0 = arg_9_1:getName()
+	local var_9_1 = arg_9_1:getBody()
 
-	if var_8_0 == PlayerProxy.UPDATED then
+	if var_9_0 == PlayerProxy.UPDATED then
 		self.viewComponent:UpdateView()
-	elseif var_8_0 == GAME.BEGIN_STAGE_DONE then
-		self:sendNotification(GAME.GO_SCENE, SCENE.COMBATLOAD, var_8_1)
-	elseif var_8_0 == GAME.UNLOCK_LOVE_LETTER_DONE then
+	elseif var_9_0 == GAME.BEGIN_STAGE_DONE then
+		self:sendNotification(GAME.GO_SCENE, SCENE.COMBATLOAD, var_9_1)
+	elseif var_9_0 == GAME.UNLOCK_LOVE_LETTER_DONE then
 		pg.EasyRedDotMgr.GetInstance():TriggerMarks("love_letter_unlock_letter")
-	elseif var_8_0 == GAME.STORY_UPDATE_DONE then
+	elseif var_9_0 == GAME.STORY_UPDATE_DONE then
 		self.contextData.listenStoryDic = self.contextData.listenStoryDic or {}
 
-		existCall(self.contextData.listenStoryDic[var_8_1.storyName])
+		existCall(self.contextData.listenStoryDic[var_9_1.storyName])
 
-		self.contextData.listenStoryDic[var_8_1.storyName] = nil
+		self.contextData.listenStoryDic[var_9_1.storyName] = nil
 	end
 end
 
-function WorldMediaCollectionMediator:TriggerPersonalTask(arg_9_1, arg_9_2)
-	assert(arg_9_1 and arg_9_1 ~= 0, "invalid groupId:" .. tostring(arg_9_1))
+function WorldMediaCollectionMediator:TriggerPersonalTask(arg_10_1, arg_10_2)
+	assert(arg_10_1 and arg_10_1 ~= 0, "invalid groupId:" .. tostring(arg_10_1))
 
-	local var_9_0 = (pg.task_data_trigger.get_id_list_by_group_id[arg_9_1] or {})[1] and pg.task_data_trigger[(pg.task_data_trigger.get_id_list_by_group_id[arg_9_1] or {})[1]].task_id
+	local var_10_0 = (pg.task_data_trigger.get_id_list_by_group_id[arg_10_1] or {})[1] and pg.task_data_trigger[(pg.task_data_trigger.get_id_list_by_group_id[arg_10_1] or {})[1]].task_id
 
-	assert((pg.task_data_trigger.get_id_list_by_group_id[arg_9_1] or {})[1] and pg.task_data_trigger[(pg.task_data_trigger.get_id_list_by_group_id[arg_9_1] or {})[1]].task_id and var_9_0 ~= 0, "invalid taskId for groupId:" .. tostring(arg_9_1))
+	assert((pg.task_data_trigger.get_id_list_by_group_id[arg_10_1] or {})[1] and pg.task_data_trigger[(pg.task_data_trigger.get_id_list_by_group_id[arg_10_1] or {})[1]].task_id and var_10_0 ~= 0, "invalid taskId for groupId:" .. tostring(arg_10_1))
 
-	if not getProxy(TaskProxy):getFinishTaskById(var_9_0) then
+	if not getProxy(TaskProxy):getFinishTaskById(var_10_0) then
 		self.contextData.listenStoryDic = self.contextData.listenStoryDic or {}
-		self.contextData.listenStoryDic[pg.task_data_template[var_9_0].story_id] = arg_9_2
+		self.contextData.listenStoryDic[pg.task_data_template[var_10_0].story_id] = arg_10_2
 
-		pg.m02:sendNotification(GAME.TRIGGER_TASK, var_9_0)
+		pg.m02:sendNotification(GAME.TRIGGER_TASK, var_10_0)
 	end
 end
 

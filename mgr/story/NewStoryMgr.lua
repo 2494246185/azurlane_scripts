@@ -670,6 +670,7 @@ function var_0_0:OnStart()
 	removeOnButton(self.skipBtn)
 	removeOnButton(self.autoBtn)
 	removeOnButton(self.recordBtn)
+	setActive(self.frontEvtTr, false)
 
 	self.mainImage.color = Color(0, 0, 0, self.storyScript:GetStoryAlpha())
 
@@ -987,8 +988,8 @@ function var_0_0:Quit()
 end
 
 function var_0_0:Fix()
-	local var_106_1
 	local var_106_0
+	local var_106_1
 
 	if getProxy(PlayerProxy):getRawData():GetRegisterTime() <= pg.TimeMgr.GetInstance():parseTimeFromConfig({
 		{

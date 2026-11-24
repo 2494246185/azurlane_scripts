@@ -270,7 +270,9 @@ function EventListScene:Flush(arg_21_1)
 	if not false then
 		self.labelShipNums.text = var_21_0.maxFleetNums - var_21_0:countBusyFleetNums() .. "/" .. var_21_0.maxFleetNums
 
-		if self.contextData.selectedEventId then
+		if self.contextData.selectedEventId and not self.restoringDetail then
+			self.restoringDetail = true
+
 			pg.UIMgr.GetInstance():LoadingOn()
 			seriesAsync({
 				function(arg_22_0)
@@ -306,6 +308,8 @@ function EventListScene:Flush(arg_21_1)
 					arg_23_0()
 				end
 			}, function()
+				self.restoringDetail = false
+
 				pg.UIMgr.GetInstance():LoadingOff()
 			end)
 		end

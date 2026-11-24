@@ -74,6 +74,10 @@ function ActivityBossSceneTemplate:init()
 		y = -1080
 	})
 	self:buildCommanderPanel()
+
+	self.chapterAutoDetailPanel = ChapterAutoDetailPanelTypeBoss.New(self._tf, self.event, self.contextData)
+
+	self.chapterAutoDetailPanel:RegisterView(self)
 end
 
 function ActivityBossSceneTemplate:GetBonusWindow()
@@ -273,81 +277,115 @@ function ActivityBossSceneTemplate:GetEXTicket()
 end
 
 function ActivityBossSceneTemplate:ShowNormalFleet(arg_27_1, arg_27_2)
+	local var_27_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
+
+	if var_27_0 and var_27_0 ~= ChapterAutoProxy.TYPE.WORLD then
+		self:CheckChapterAutoOccupied(var_27_0)
+
+		return
+	end
+
 	self.contextData.actFleets[arg_27_1] = self.contextData.actFleets[arg_27_1] or self:CreateNewFleet(arg_27_1)
 	self.contextData.actFleets[arg_27_1 + 10] = self.contextData.actFleets[arg_27_1 + 10] or self:CreateNewFleet(arg_27_1 + 10)
 
-	local var_27_0 = self.contextData.actFleets[arg_27_1]
+	local var_27_1 = self.contextData.actFleets[arg_27_1]
 
-	if arg_27_2 and #var_27_0.ships <= 0 then
+	if arg_27_2 and #var_27_1.ships <= 0 then
 		for iter_27_0 = #self.contextData.normalStageIDs, 1, -1 do
 			if iter_27_0 ~= arg_27_1 and self.contextData.actFleets[iter_27_0] and self.contextData.actFleets[iter_27_0]:isLegalToFight() == true then
-				var_27_0:updateShips(self.contextData.actFleets[iter_27_0].ships)
+				var_27_1:updateShips(self.contextData.actFleets[iter_27_0].ships)
 
 				break
 			end
 		end
 	end
 
-	local var_27_1 = self:GetFleetEditPanel()
+	local var_27_2 = self:GetFleetEditPanel()
 
-	var_27_1.buffer:SetSettings(1, 1, false)
-	var_27_1.buffer:SetFleets({
+	var_27_2.buffer:SetSettings(1, 1, false)
+	var_27_2.buffer:SetFleets({
 		self.contextData.actFleets[arg_27_1],
 		self.contextData.actFleets[arg_27_1 + 10]
 	})
-	var_27_1.buffer:SetOilLimit((not self.contextData.activity:IsOilLimit(self.contextData.normalStageIDs[arg_27_1]) or nil) and {
+	var_27_2.buffer:SetOilLimit((not self.contextData.activity:IsOilLimit(self.contextData.normalStageIDs[arg_27_1]) or nil) and {
 		0,
 		0
 	})
 
 	self.contextData.editFleet = arg_27_1
 
-	var_27_1.buffer:UpdateView()
-	var_27_1.buffer:Show()
+	var_27_2.buffer:UpdateView()
+	var_27_2.buffer:Show()
 end
 
 function ActivityBossSceneTemplate:ShowEXFleet()
-	self.contextData.actFleets[#self.contextData.normalStageIDs + 1] = self.contextData.actFleets[#self.contextData.normalStageIDs + 1] or self:CreateNewFleet(#self.contextData.normalStageIDs + 1)
-	self.contextData.actFleets[#self.contextData.normalStageIDs + 1 + 10] = self.contextData.actFleets[#self.contextData.normalStageIDs + 1 + 10] or self:CreateNewFleet(#self.contextData.normalStageIDs + 1 + 10)
+	local var_28_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
 
-	local var_28_0 = self:GetFleetEditPanel()
+	if var_28_0 and var_28_0 ~= ChapterAutoProxy.TYPE.WORLD then
+		self:CheckChapterAutoOccupied(var_28_0)
 
-	var_28_0.buffer:SetSettings(1, 1, true)
-	var_28_0.buffer:SetFleets({
-		self.contextData.actFleets[#self.contextData.normalStageIDs + 1],
-		self.contextData.actFleets[#self.contextData.normalStageIDs + 1 + 10]
+		return
+	end
+
+	local var_28_1 = #self.contextData.normalStageIDs + 1
+
+	if not self.contextData.actFleets[#self.contextData.normalStageIDs + 1] then
+		self.contextData.actFleets[var_28_1] = self:CreateNewFleet(var_28_1)
+	end
+
+	self.contextData.actFleets[var_28_1 + 10] = self.contextData.actFleets[var_28_1 + 10] or self:CreateNewFleet(var_28_1 + 10)
+
+	local var_28_2 = self:GetFleetEditPanel()
+
+	var_28_2.buffer:SetSettings(1, 1, true)
+	var_28_2.buffer:SetFleets({
+		self.contextData.actFleets[var_28_1],
+		self.contextData.actFleets[var_28_1 + 10]
 	})
-	var_28_0.buffer:SetOilLimit((not self.contextData.activity:IsOilLimit(self.contextData.exStageID) or nil) and {
+	var_28_2.buffer:SetOilLimit((not self.contextData.activity:IsOilLimit(self.contextData.exStageID) or nil) and {
 		0,
 		0
 	})
 
-	self.contextData.editFleet = #self.contextData.normalStageIDs + 1
+	self.contextData.editFleet = var_28_1
 
-	var_28_0.buffer:UpdateView()
-	var_28_0.buffer:Show()
+	var_28_2.buffer:UpdateView()
+	var_28_2.buffer:Show()
 end
 
 function ActivityBossSceneTemplate:ShowSPFleet()
-	self.contextData.actFleets[#self.contextData.normalStageIDs + 2] = self.contextData.actFleets[#self.contextData.normalStageIDs + 2] or self:CreateNewFleet(#self.contextData.normalStageIDs + 2)
-	self.contextData.actFleets[#self.contextData.normalStageIDs + 2 + 10] = self.contextData.actFleets[#self.contextData.normalStageIDs + 2 + 10] or self:CreateNewFleet(#self.contextData.normalStageIDs + 2 + 10)
+	local var_29_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
 
-	local var_29_0 = self:GetFleetEditPanel()
+	if var_29_0 and var_29_0 ~= ChapterAutoProxy.TYPE.WORLD then
+		self:CheckChapterAutoOccupied(var_29_0)
 
-	var_29_0.buffer:SetSettings(1, 1, false)
-	var_29_0.buffer:SetFleets({
-		self.contextData.actFleets[#self.contextData.normalStageIDs + 2],
-		self.contextData.actFleets[#self.contextData.normalStageIDs + 2 + 10]
+		return
+	end
+
+	local var_29_1 = #self.contextData.normalStageIDs + 2
+
+	if not self.contextData.actFleets[#self.contextData.normalStageIDs + 2] then
+		self.contextData.actFleets[var_29_1] = self:CreateNewFleet(var_29_1)
+	end
+
+	self.contextData.actFleets[var_29_1 + 10] = self.contextData.actFleets[var_29_1 + 10] or self:CreateNewFleet(var_29_1 + 10)
+
+	local var_29_2 = self:GetFleetEditPanel()
+
+	var_29_2.buffer:SetSettings(1, 1, false)
+	var_29_2.buffer:SetFleets({
+		self.contextData.actFleets[var_29_1],
+		self.contextData.actFleets[var_29_1 + 10]
 	})
-	var_29_0.buffer:SetOilLimit({
+	var_29_2.buffer:SetOilLimit({
 		0,
 		0
 	})
 
-	self.contextData.editFleet = #self.contextData.normalStageIDs + 2
+	self.contextData.editFleet = var_29_1
 
-	var_29_0.buffer:UpdateView()
-	var_29_0.buffer:Show()
+	var_29_2.buffer:UpdateView()
+	var_29_2.buffer:Show()
 end
 
 function ActivityBossSceneTemplate:commitEdit()
@@ -509,6 +547,68 @@ function ActivityBossSceneTemplate:UpdateDropItems()
 	end
 end
 
+function ActivityBossSceneTemplate:OnStartChapterAuto()
+	self:hideFleetEdit()
+end
+
+function ActivityBossSceneTemplate:OnEndChapterAuto()
+	if self.chapterAutoDetailPanel:isShowing() then
+		self.chapterAutoDetailPanel:Hide()
+	end
+end
+
+function ActivityBossSceneTemplate:OnAddChapterAutoTimeDone()
+	self:GetFleetEditPanel():RefreshChapterAutoPanel()
+end
+
+function ActivityBossSceneTemplate:OnZeroHour()
+	self:GetFleetEditPanel():RefreshChapterAutoPanel()
+end
+
+function ActivityBossSceneTemplate:CheckChapterAutoOccupied(arg_53_1)
+	switch(arg_53_1, {
+		[ChapterAutoProxy.TYPE.SLG] = function()
+			local var_54_0 = getProxy(ChapterProxy):GetAutoChapterId()
+			local var_54_1 = pg.chapter_template[var_54_0].map
+
+			pg.MsgboxMgr.GetInstance():ShowMsgBox({
+				content = i18n("auto_drop_is_activation", (getProxy(ChapterAutoProxy):GetCommissionList()[1]:GetOccupiedName())),
+				onYes = function()
+					pg.m02:sendNotification(GAME.GO_SCENE, SCENE.LEVEL, {
+						chapterId = var_54_0,
+						mapIdx = var_54_1
+					})
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			self.chapterAutoDetailPanel:ExecuteAction("Enter", (getProxy(ChapterAutoProxy):GetCommissionList()[1]:GetID()))
+		end,
+		[ChapterAutoProxy.TYPE.RUSH] = function()
+			local var_57_0 = getProxy(ChapterAutoProxy):GetCommissionList()[1]
+			local var_57_1 = pg.activity_series_enemy_auto[getProxy(ChapterAutoProxy):GetCommissionList()[1].id].link_id
+			local var_57_2 = BossRushChapterRemasterHelper.GetRemasterByActivityId(var_57_0) ~= nil
+
+			pg.MsgboxMgr.GetInstance():ShowMsgBox({
+				content = i18n("auto_drop_is_activation", (var_57_0:GetOccupiedName())),
+				onYes = function()
+					if var_57_2 then
+						pg.m02:sendNotification(GAME.GO_SCENE, SCENE.BOSSRUSH_REMASTER, {
+							id = var_57_1
+						})
+					else
+						pg.m02:sendNotification(GAME.GO_SCENE, SCENE.BOSSRUSH_MAIN)
+					end
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
+		end
+	})
+end
+
 function ActivityBossSceneTemplate:onBackPressed()
 	if self.bonusWindow and self.bonusWindow:IsShowing() then
 		self.bonusWindow.buffer:Hide()
@@ -523,6 +623,12 @@ function ActivityBossSceneTemplate:willExit()
 	self:DestroyBonusWindow()
 	self:DestroyFleetEditPanel()
 	self:destroyCommanderPanel()
+
+	if self.chapterAutoDetailPanel then
+		self.chapterAutoDetailPanel:Destroy()
+
+		self.chapterAutoDetailPanel = nil
+	end
 end
 
 return ActivityBossSceneTemplate

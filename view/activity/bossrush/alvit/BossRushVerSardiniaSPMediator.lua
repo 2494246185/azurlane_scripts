@@ -23,6 +23,14 @@ function BossRushVerSardiniaSPMediator:register()
 		self:sendNotification(GAME.GO_SCENE, arg_4_1, ...)
 	end)
 	self:bind(BossRushVerSardiniaSPMediator.ON_FLEET_SELECT, function(arg_5_0, arg_5_1)
+		local var_5_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
+
+		if var_5_0 and var_5_0 ~= ChapterAutoProxy.TYPE.WORLD then
+			self.viewComponent:CheckChapterAutoOccupied(var_5_0)
+
+			return
+		end
+
 		BossRushVerZenkerPassedLayer.seriesId = arg_5_1.configId
 
 		self:addSubLayers(Context.New({
@@ -85,7 +93,9 @@ function BossRushVerSardiniaSPMediator:listNotificationInterests()
 		ActivityProxy.ACTIVITY_UPDATED,
 		GAME.SUBMIT_TASK_AWARD_DOWN,
 		GAME.BEGIN_STAGE_DONE,
-		BossRushTotalRewardPanelMediator.ON_WILL_EXIT
+		BossRushTotalRewardPanelMediator.ON_WILL_EXIT,
+		GAME.START_CHAPTER_AUTO_DONE,
+		GAME.END_CHAPTER_AUTO_DONE
 	}
 end
 
@@ -133,6 +143,20 @@ function BossRushVerSardiniaSPMediator:handleNotification(arg_12_1)
 
 		self.viewComponent:resumeBubble()
 		self.viewComponent:UpdateView()
+	elseif var_12_0 == GAME.START_CHAPTER_AUTO_DONE then
+		self.viewComponent:OnStartChapterAuto(var_12_1)
+	elseif var_12_0 == GAME.END_CHAPTER_AUTO_DONE then
+		self.viewComponent:OnEndChapterAuto(var_12_1)
+		self:addSubLayers(Context.New({
+			viewComponent = ChapterAutoTotalRewardLayer,
+			mediator = ChapterAutoTotalRewardMediator,
+			data = {
+				rewards = var_12_1.awards,
+				totalTimes = var_12_1.allCnt,
+				finishTimes = var_12_1.finishCnt,
+				proficiency = var_12_1.proficiency
+			}
+		}), true)
 	end
 end
 

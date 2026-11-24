@@ -25,6 +25,11 @@ function MapBuilderPermanent:UpdateMapItems()
 	MapBuilderPermanent.super.UpdateMapItems(self)
 
 	local var_5_0 = self.contextData.map
+
+	if not self.contextData.map then
+		return
+	end
+
 	local var_5_1 = self.contextData.map:getConfig("cloud_suffix")
 
 	if var_5_1 == "" then

@@ -8,6 +8,14 @@ BossRushKurskMediator.ON_PERFORM_COMBAT = "BossRushKurskMediator:ON_PERFORM_COMB
 
 function BossRushKurskMediator:register()
 	self:bind(BossRushKurskMediator.ON_FLEET_SELECT, function(arg_2_0, arg_2_1)
+		local var_2_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
+
+		if var_2_0 and var_2_0 ~= ChapterAutoProxy.TYPE.WORLD then
+			self.viewComponent:CheckChapterAutoOccupied(var_2_0)
+
+			return
+		end
+
 		self:addSubLayers(Context.New({
 			mediator = BossRushFleetSelectMediator,
 			viewComponent = BossRushFleetSelectView,
@@ -64,7 +72,9 @@ function BossRushKurskMediator:listNotificationInterests()
 		GAME.SUBMIT_TASK_DONE,
 		GAME.SUBMIT_ACTIVITY_TASK_DONE,
 		GAME.BEGIN_STAGE_DONE,
-		BossRushTotalRewardPanelMediator.ON_WILL_EXIT
+		BossRushTotalRewardPanelMediator.ON_WILL_EXIT,
+		GAME.START_CHAPTER_AUTO_DONE,
+		GAME.END_CHAPTER_AUTO_DONE
 	}
 end
 
@@ -96,6 +106,20 @@ function BossRushKurskMediator:handleNotification(arg_10_1)
 	elseif var_10_0 == BossRushTotalRewardPanelMediator.ON_WILL_EXIT then
 		self.viewComponent:resumeBubble()
 		self.viewComponent:UpdateView()
+	elseif var_10_0 == GAME.START_CHAPTER_AUTO_DONE then
+		self.viewComponent:OnStartChapterAuto(var_10_1)
+	elseif var_10_0 == GAME.END_CHAPTER_AUTO_DONE then
+		self.viewComponent:OnEndChapterAuto(var_10_1)
+		self:addSubLayers(Context.New({
+			viewComponent = ChapterAutoTotalRewardLayer,
+			mediator = ChapterAutoTotalRewardMediator,
+			data = {
+				rewards = var_10_1.awards,
+				totalTimes = var_10_1.allCnt,
+				finishTimes = var_10_1.finishCnt,
+				proficiency = var_10_1.proficiency
+			}
+		}), true)
 	end
 end
 

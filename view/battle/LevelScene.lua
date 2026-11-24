@@ -779,6 +779,7 @@ function LevelScene:didEnter()
 		self.contextData.open_remaster = nil
 	end
 
+	self:InitEasterEgg()
 	self:ShowEntranceUI(self.contextData.entranceStatus)
 
 	if not self.contextData.entranceStatus then
@@ -935,6 +936,10 @@ function LevelScene:ShowEntranceUI(arg_71_1)
 
 		self.contextData.mapIdx = nil
 		self.contextData.map = nil
+
+		self:ShowEasterEgg()
+	else
+		self:HideEasterEgg()
 	end
 
 	self:PlayBGM()
@@ -3750,7 +3755,38 @@ function LevelScene:DestroyChapterAutoDetailPanel()
 	end
 end
 
+function LevelScene:InitEasterEgg()
+	if EasterEggTools.IsEnabled(EasterEggTools.GetActivity(), EasterEggConst.SCENE.LevelScene) then
+		self.easterEggView = EasterEggView.New(findTF(self.entranceLayer, "easterEggBtn"), self, EasterEggConst.SCENE.LevelScene)
+
+		self.easterEggView:SetEasterEggCallBack(function(arg_336_0, arg_336_1)
+			arg_336_1()
+		end, function(arg_337_0)
+			arg_337_0()
+		end)
+	end
+end
+
+function LevelScene:ShowEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:ShowEasterEgg()
+	end
+end
+
+function LevelScene:HideEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:HideEasterEgg()
+	end
+end
+
+function LevelScene:ExitEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:willExit()
+	end
+end
+
 function LevelScene:willExit()
+	self:ExitEasterEgg()
 	self:ClearMapTransitions()
 	self.loader:Clear()
 
@@ -3768,9 +3804,9 @@ function LevelScene:willExit()
 	if self.levelFleetView and self.levelFleetView.selectIds then
 		self.contextData.selectedFleetIDs = {}
 
-		for iter_335_0, iter_335_1 in pairs(self.levelFleetView.selectIds) do
-			for iter_335_2, iter_335_3 in pairs(iter_335_1) do
-				self.contextData.selectedFleetIDs[#self.contextData.selectedFleetIDs + 1] = iter_335_3
+		for iter_341_0, iter_341_1 in pairs(self.levelFleetView.selectIds) do
+			for iter_341_2, iter_341_3 in pairs(iter_341_1) do
+				self.contextData.selectedFleetIDs[#self.contextData.selectedFleetIDs + 1] = iter_341_3
 			end
 		end
 	end
@@ -3797,21 +3833,21 @@ function LevelScene:willExit()
 	PoolMgr.GetInstance():DestroyPrefab("chapter/cell", "")
 	PoolMgr.GetInstance():DestroyPrefab("chapter/plane", "")
 
-	for iter_335_4, iter_335_5 in pairs(self.mbDict) do
-		iter_335_5:Destroy()
+	for iter_341_4, iter_341_5 in pairs(self.mbDict) do
+		iter_341_5:Destroy()
 	end
 
 	self.mbDict = nil
 
-	for iter_335_6, iter_335_7 in pairs(self.tweens) do
-		LeanTween.cancel(iter_335_7)
+	for iter_341_6, iter_341_7 in pairs(self.tweens) do
+		LeanTween.cancel(iter_341_7)
 	end
 
 	self.tweens = nil
 
 	if self.cloudTimer then
-		_.each(self.cloudTimer, function(arg_336_0)
-			LeanTween.cancel(arg_336_0)
+		_.each(self.cloudTimer, function(arg_342_0)
+			LeanTween.cancel(arg_342_0)
 		end)
 
 		self.cloudTimer = nil
@@ -3823,8 +3859,8 @@ function LevelScene:willExit()
 		self.newChapterCDTimer = nil
 	end
 
-	for iter_335_8, iter_335_9 in ipairs(self.damageTextActive) do
-		LeanTween.cancel(iter_335_9)
+	for iter_341_8, iter_341_9 in ipairs(self.damageTextActive) do
+		LeanTween.cancel(iter_341_9)
 	end
 
 	LeanTween.cancel(go(self.avoidText))
@@ -3834,12 +3870,12 @@ function LevelScene:willExit()
 	self.float.localScale = Vector3.one
 	self.float.pivot = Vector2(0.5, 0.5)
 
-	for iter_335_10, iter_335_11 in ipairs(self.mapTFs) do
-		clearImageSprite(iter_335_11)
+	for iter_341_10, iter_341_11 in ipairs(self.mapTFs) do
+		clearImageSprite(iter_341_11)
 	end
 
-	_.each(self.cloudRTFs, function(arg_337_0)
-		clearImageSprite(arg_337_0)
+	_.each(self.cloudRTFs, function(arg_343_0)
+		clearImageSprite(arg_343_0)
 	end)
 	Destroy(self.enemyTpl)
 	self:RecordLastMapOnExit()

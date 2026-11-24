@@ -23,6 +23,8 @@ function CommissionInfoChapterAutoItem:Init()
 	setActive(self.lockTF, not self:CanOpen())
 
 	self.detailPanel = ChapterAutoDetailPanel.New(self._tf, self.view.event)
+	self.detailTypeBossPanel = ChapterAutoDetailPanelTypeBoss.New(self._tf, self.view.event)
+	self.detailTypeRushPanel = ChapterAutoDetailPanelTypeRush.New(self._tf, self.view.event)
 end
 
 function CommissionInfoChapterAutoItem:OnFlush()
@@ -117,6 +119,20 @@ function CommissionInfoChapterAutoItem:OnSkip()
 		end,
 		[ChapterAutoProxy.TYPE.WORLD] = function()
 			self:emit(CommissionInfoMediator.GO_WORLD)
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			if self.isLeisure then
+				self:emit(CommissionInfoMediator.GO_BATTLE)
+			else
+				self.detailTypeBossPanel:ExecuteAction("Enter", (self:GetList()[1]:GetID()))
+			end
+		end,
+		[ChapterAutoProxy.TYPE.RUSH] = function()
+			if self.isLeisure then
+				self:emit(CommissionInfoMediator.GO_BATTLE)
+			else
+				self.detailTypeRushPanel:ExecuteAction("Enter", (self:GetList()[1]:GetID()))
+			end
 		end
 	}, function()
 		self:emit(CommissionInfoMediator.GO_BATTLE)
@@ -135,6 +151,18 @@ function CommissionInfoChapterAutoItem:Dispose()
 		self.detailPanel:Destroy()
 
 		self.detailPanel = nil
+	end
+
+	if self.detailTypeBossPanel then
+		self.detailTypeBossPanel:Destroy()
+
+		self.detailTypeBossPanel = nil
+	end
+
+	if self.detailTypeRushPanel then
+		self.detailTypeRushPanel:Destroy()
+
+		self.detailTypeRushPanel = nil
 	end
 end
 

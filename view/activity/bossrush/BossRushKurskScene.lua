@@ -1,4 +1,4 @@
-local BossRushKurskScene = class("BossRushKurskScene", import("view.base.BaseUI"))
+local BossRushKurskScene = class("BossRushKurskScene", import("view.activity.BossRush.BossRushBaseScene"))
 local PoolPlural = require("Mgr/Pool/PoolPlural")
 
 BossRushKurskScene.DISPLAY = {

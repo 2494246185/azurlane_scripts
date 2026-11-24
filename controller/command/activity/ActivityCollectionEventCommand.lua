@@ -6,18 +6,17 @@ function ActivityCollectionEventCommand:execute(arg_1_1)
 	local var_1_2 = var_1_0.arg1
 	local var_1_3 = var_1_0.onConfirm
 	local var_1_4 = var_1_0.callBack
-	local var_1_5 = getProxy(EventProxy)
-	local var_1_6 = getProxy(ActivityProxy)
-	local var_1_7 = var_1_6:getActivityByType(ActivityConst.ACTIVITY_TYPE_COLLECTION_EVENT)
+	local var_1_5 = getProxy(ActivityProxy)
+	local var_1_6 = var_1_5:getActivityByType(ActivityConst.ACTIVITY_TYPE_COLLECTION_EVENT)
 
-	if not var_1_7 or var_1_7:isEnd() then
+	if not var_1_6 or var_1_6:isEnd() then
 		pg.TipsMgr.GetInstance():ShowTips(i18n("common_activity_end"))
 
 		return
 	end
 
-	pg.ConnectionMgr.GetInstance():Send(11202, {
-		activity_id = var_1_7.id,
+	getProxy(EventProxy):SendEventRequest(11202, {
+		activity_id = var_1_6.id,
 		cmd = var_1_0.cmd,
 		arg1 = var_1_0.arg1,
 		arg2 = var_1_0.arg2,
@@ -35,8 +34,8 @@ function ActivityCollectionEventCommand:execute(arg_1_1)
 					var_1_3()
 				end
 			elseif var_1_0.cmd == ActivityConst.COLLETION_EVENT_OP_SUBMIT then
-				table.insert(var_1_7.data1_list, var_1_2)
-				var_1_6:updateActivity(var_1_7)
+				table.insert(var_1_6.data1_list, var_1_2)
+				var_1_5:updateActivity(var_1_6)
 				EventFinishCommand.OnFinish(var_1_2, {
 					exp = arg_2_0.number[1],
 					drop_list = arg_2_0.award_list,
@@ -61,7 +60,7 @@ function ActivityCollectionEventCommand:execute(arg_1_1)
 				end
 			end
 		else
-			pg.TipsMgr.GetInstance():ShowTips(ERROR_MESSAGE[arg_2_0.result] .. arg_2_0.result)
+			pg.TipsMgr.GetInstance():ShowTips(((not ERROR_MESSAGE[arg_2_0.result] or nil) and "") .. arg_2_0.result)
 		end
 	end)
 end

@@ -7,6 +7,14 @@ BossRushDALCollabMediator.GO_SHOPS_LAYER = "BossRushDALCollabMediator:GO_SHOPS_L
 
 function BossRushDALCollabMediator:register()
 	self:bind(BossRushDALCollabMediator.ON_FLEET_SELECT, function(arg_2_0, arg_2_1)
+		local var_2_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
+
+		if var_2_0 and var_2_0 ~= ChapterAutoProxy.TYPE.WORLD then
+			self.viewComponent:CheckChapterAutoOccupied(var_2_0)
+
+			return
+		end
+
 		self:addSubLayers(Context.New({
 			mediator = BossRushFleetSelectMediator,
 			viewComponent = BossRushDALFleetSelectView,
@@ -58,7 +66,9 @@ function BossRushDALCollabMediator:listNotificationInterests()
 		GAME.SUBMIT_ACTIVITY_TASK_DONE,
 		GAME.BEGIN_STAGE_DONE,
 		BossRushTotalRewardPanelMediator.ON_WILL_EXIT,
-		GAME.COLLABRATE_BOSS_RUSH_REQUEST_DATA_DONE
+		GAME.COLLABRATE_BOSS_RUSH_REQUEST_DATA_DONE,
+		GAME.START_CHAPTER_AUTO_DONE,
+		GAME.END_CHAPTER_AUTO_DONE
 	}
 end
 
@@ -95,6 +105,20 @@ function BossRushDALCollabMediator:handleNotification(arg_8_1)
 	elseif var_8_0 == GAME.COLLABRATE_BOSS_RUSH_REQUEST_DATA_DONE then
 		self.viewComponent:SetActivity((getProxy(ActivityProxy):getActivityByType(ActivityConst.ACTIVITY_TYPE_BOSS_RUSH_DAL_COLLAB)))
 		self.viewComponent:UpdateView()
+	elseif var_8_0 == GAME.START_CHAPTER_AUTO_DONE then
+		self.viewComponent:OnStartChapterAuto(var_8_1)
+	elseif var_8_0 == GAME.END_CHAPTER_AUTO_DONE then
+		self.viewComponent:OnEndChapterAuto(var_8_1)
+		self:addSubLayers(Context.New({
+			viewComponent = ChapterAutoTotalRewardLayer,
+			mediator = ChapterAutoTotalRewardMediator,
+			data = {
+				rewards = var_8_1.awards,
+				totalTimes = var_8_1.allCnt,
+				finishTimes = var_8_1.finishCnt,
+				proficiency = var_8_1.proficiency
+			}
+		}), true)
 	end
 end
 

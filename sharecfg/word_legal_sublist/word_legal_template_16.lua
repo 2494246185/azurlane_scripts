@@ -4,6 +4,16 @@ pg.word_legal_template_16 = {}
 local var_0_0 = pg.word_legal_template_16
 
 function temp()
+	var_0_0["3"] = {
+		["3"] = {
+			this = true
+		}
+	}
+end
+
+temp()
+
+function temp()
 	var_0_0.久 = {
 		远 = {
 			this = true

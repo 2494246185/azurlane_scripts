@@ -4,6 +4,9 @@ function EventProxy:register()
 	self.eventDic = {}
 	self.countDownList = {}
 	self.lastFlushTime = 0
+	self.dirty = false
+	self.flushing = false
+	self.flushingTime = 0
 
 	self:on(13002, function(arg_2_0)
 		self.maxFleetNums = arg_2_0.max_team
@@ -349,6 +352,47 @@ end
 
 function EventProxy:CanStartEvent()
 	return self:countBusyFleetNums() < self.maxFleetNums
+end
+
+function EventProxy:SetDirty(arg_42_1)
+	self.dirty = arg_42_1
+end
+
+function EventProxy:IsDirty()
+	return self.dirty
+end
+
+local var_0_1 = 30
+
+function EventProxy:SetFlushing(arg_44_1)
+	self.flushing = arg_44_1
+
+	if arg_44_1 then
+		self.flushingTime = pg.TimeMgr.GetInstance():GetServerTime() or 0
+	end
+end
+
+function EventProxy:IsFlushing()
+	return self.flushing and pg.TimeMgr.GetInstance():GetServerTime() - self.flushingTime < var_0_1
+end
+
+function EventProxy:FlushIfDirty()
+	if self.dirty then
+		self.facade:sendNotification(GAME.EVENT_FLUSH_ALL)
+	end
+end
+
+function EventProxy:SendEventRequest(arg_47_1, arg_47_2, arg_47_3, arg_47_4)
+	self:SetDirty(true)
+	pg.ConnectionMgr.GetInstance():Send(arg_47_1, arg_47_2, arg_47_3, function(arg_48_0)
+		if arg_48_0.result == 0 then
+			self:SetDirty(false)
+		else
+			self.facade:sendNotification(GAME.EVENT_FLUSH_ALL)
+		end
+
+		arg_47_4(arg_48_0)
+	end)
 end
 
 return EventProxy

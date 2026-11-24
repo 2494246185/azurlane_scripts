@@ -745,6 +745,10 @@ function DialogueStep:GetSubActorName()
 end
 
 function DialogueStep:IsSamePainting(arg_78_1)
+	if not arg_78_1:GetIsExecuted() then
+		return false
+	end
+
 	return (function()
 		return self:GetPainting() == arg_78_1:GetPainting() and self:IsShowNPainting() == arg_78_1:IsShowNPainting() and self:IsShowWJZPainting() == arg_78_1:IsShowWJZPainting()
 	end)() and self:IsLive2dPainting() == arg_78_1:IsLive2dPainting() and self:IsSpinePainting() == arg_78_1:IsSpinePainting() and not (function()

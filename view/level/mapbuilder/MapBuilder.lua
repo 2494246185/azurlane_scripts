@@ -161,7 +161,7 @@ function MapBuilder:TryOpenChapterInfo(arg_28_1, arg_28_2, arg_28_3)
 	local var_28_1 = getProxy(ChapterAutoProxy)
 
 	if var_28_1:IsCommissionDoing() and not var_28_1:HasTypeCommission(ChapterAutoProxy.TYPE.WORLD) then
-		self:ChapterAutoOccupied(var_28_0)
+		self:CheckChapterAutoOccupied(var_28_0)
 
 		return
 	end
@@ -218,7 +218,7 @@ function MapBuilder:TryOpenChapterInfo(arg_28_1, arg_28_2, arg_28_3)
 	end
 end
 
-function MapBuilder:ChapterAutoOccupied(arg_29_1)
+function MapBuilder:CheckChapterAutoOccupied(arg_29_1)
 	switch(getProxy(ChapterAutoProxy):GetCommissionDoingType(), {
 		[ChapterAutoProxy.TYPE.SLG] = function()
 			local var_30_0 = getProxy(ChapterProxy):GetAutoChapterId()
@@ -239,6 +239,36 @@ function MapBuilder:ChapterAutoOccupied(arg_29_1)
 					})
 				end
 			end
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			self.sceneParent:HandleShowMsgBox({
+				content = i18n("auto_drop_is_activation", (getProxy(ChapterAutoProxy):GetCommissionList()[1]:GetOccupiedName())),
+				onYes = function()
+					pg.m02:sendNotification(GAME.GO_SCENE, SCENE.ACT_BOSS_BATTLE)
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
+		end,
+		[ChapterAutoProxy.TYPE.RUSH] = function()
+			local var_34_0 = getProxy(ChapterAutoProxy):GetCommissionList()[1]
+			local var_34_1 = pg.activity_series_enemy_auto[getProxy(ChapterAutoProxy):GetCommissionList()[1].id].link_id
+			local var_34_2 = BossRushChapterRemasterHelper.GetRemasterByActivityId(var_34_0) ~= nil
+
+			self.sceneParent:HandleShowMsgBox({
+				content = i18n("auto_drop_is_activation", (var_34_0:GetOccupiedName())),
+				onYes = function()
+					if var_34_2 then
+						pg.m02:sendNotification(GAME.GO_SCENE, SCENE.BOSSRUSH_REMASTER, {
+							id = var_34_1
+						})
+					else
+						pg.m02:sendNotification(GAME.GO_SCENE, SCENE.BOSSRUSH_MAIN)
+					end
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
 		end
 	})
 end

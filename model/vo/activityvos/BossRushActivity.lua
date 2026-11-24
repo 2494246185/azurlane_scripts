@@ -27,19 +27,31 @@ function BossRushActivity:AddUsedBonus(arg_5_1)
 end
 
 function BossRushActivity:GetPassCounts()
-	return self.data2_list
+	return table.mergeArray(self.data2_list, self.data3_list, true)
 end
 
-function BossRushActivity:AddPassSeries(arg_7_1)
-	if self:HasPassSeries(arg_7_1) then
-		return
-	end
+function BossRushActivity:AddPassSeries(arg_7_1, arg_7_2)
+	if arg_7_2 then
+		if table.contains(self.data2_list, arg_7_1) then
+			return
+		end
 
-	table.insert(self:GetPassCounts(), arg_7_1)
+		table.insert(self.data2_list, arg_7_1)
+	else
+		if table.contains(self.data3_list, arg_7_1) then
+			return
+		end
+
+		table.insert(self.data3_list, arg_7_1)
+	end
 end
 
 function BossRushActivity:HasPassSeries(arg_8_1)
 	return table.contains(self:GetPassCounts(), arg_8_1)
+end
+
+function BossRushActivity:IsPassWithMulti(arg_9_1)
+	return table.contains(self.data3_list, arg_9_1)
 end
 
 function BossRushActivity:GetActiveSeriesIds()

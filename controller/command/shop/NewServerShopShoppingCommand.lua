@@ -28,12 +28,9 @@ function NewServerShopShoppingCommand:execute(arg_1_1)
 	local var_1_9 = var_1_8:getData()
 	local var_1_10 = var_1_6:GetCommodityById(var_1_1)
 	local var_1_11 = var_1_10:GetConsume()
-
-	assert(var_1_11.type == 1, "暂不支持资源以为的类型")
-
 	local var_1_12 = var_1_11.count
 
-	if var_1_9:getResource(var_1_11.id) < var_1_11.count * var_1_7 then
+	if var_1_11:getOwnedCount() < var_1_11.count * var_1_7 then
 		pg.TipsMgr.GetInstance():ShowTips(i18n("common_no_resource"))
 
 		return
@@ -109,12 +106,18 @@ function NewServerShopShoppingCommand:execute(arg_1_1)
 				end
 			end
 
-			local var_2_0 = getProxy(PlayerProxy):getData()
+			if var_1_11.type == DROP_TYPE_VITEM and var_1_11:getConfig("virtual_type") == 103 then
+				local var_2_0 = getProxy(ActivityProxy)
+				local var_2_1 = var_2_0:getActivityById(var_1_11:getConfig("link_id"))
 
-			var_2_0:consume({
-				[id2res((var_1_10:getConfig("resource_type")))] = var_1_12 * var_1_7
-			})
-			var_1_8:updatePlayer(var_2_0)
+				if var_2_1 and not var_2_1:isEnd() and var_2_1:getConfig("type") == ActivityConst.ACTIVITY_TYPE_PT_BUFF_MARK2 then
+					var_2_1.data4 = math.max(0, (var_2_1.data4 or 0) - var_1_12 * var_1_7)
+
+					var_2_0:updateActivity(var_2_1)
+				end
+			end
+
+			var_1_8:updatePlayer((getProxy(PlayerProxy):getData()))
 			self:sendNotification(GAME.NEW_SERVER_SHOP_SHOPPING_DONE, {
 				awards = PlayerConst.addTranDrop(arg_2_0.drop_list)
 			})

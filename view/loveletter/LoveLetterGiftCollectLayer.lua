@@ -141,7 +141,7 @@ function LoveLetterGiftCollectLayer:ConfirmItem(arg_12_1, arg_12_2)
 
 	for iter_12_0, iter_12_1 in pairs(self.heapDic) do
 		if table.removebyvalue(iter_12_1, arg_12_1) > 0 then
-			self.heap:UpdateValue(arg_12_1)
+			self.heap:UpdateValue(iter_12_0)
 		end
 	end
 end
@@ -197,7 +197,7 @@ function LoveLetterGiftCollectLayer:OpenSelectWindow(arg_15_1)
 	end)
 	triggerToggle(self.rtSelectScrollContent:GetChild(0), true)
 	onButton(self, self.btnSelectConfirm, function()
-		self.heap:POP(arg_15_1)
+		self.heap:POP(var_15_1)
 		self:ConfirmItem(arg_15_1, var_15_1)
 		self:DropHump()
 		self:UpdateDisplay()

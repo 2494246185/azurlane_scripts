@@ -10,15 +10,18 @@ function BossRushConst:GetPassedLayer()
 		end,
 		[ActivityConst.ESCAPE_BOSS_RUSH_ID] = function()
 			return BossRushEscapeManorPassedLayer
+		end,
+		[ActivityConst.VERITASACADEMY_BOSS_RUSH_ACT_ID] = function()
+			return BossRushVeritasAcademyPassedLayer
 		end
 	}, function()
-		local var_5_0 = checkExist(pg.activity_template[self], {
+		local var_6_0 = checkExist(pg.activity_template[self], {
 			"config_client"
 		}, {
 			"passed"
 		})
 
-		return (var_5_0 or nil) and (_G[var_5_0] or BossRushPassedCombatLoadLayer)
+		return (var_6_0 or nil) and (_G[var_6_0] or BossRushPassedCombatLoadLayer)
 	end)
 end
 
@@ -32,15 +35,18 @@ function BossRushConst:GetEXBattleResultLayer()
 		end,
 		[ActivityConst.ESCAPE_BOSS_RUSH_ID] = function()
 			return BossRushEscapeManorBattleResultLayer
+		end,
+		[ActivityConst.VERITASACADEMY_BOSS_RUSH_ACT_ID] = function()
+			return BossRushVeritasAcademyBattleResultLayer
 		end
 	}, function()
-		local var_10_0 = checkExist(pg.activity_template[self], {
+		local var_12_0 = checkExist(pg.activity_template[self], {
 			"config_client"
 		}, {
 			"result"
 		})
 
-		return (var_10_0 or nil) and (_G[var_10_0] or BossRushEXBattleResultLayer)
+		return (var_12_0 or nil) and (_G[var_12_0] or BossRushEXBattleResultLayer)
 	end)
 end
 

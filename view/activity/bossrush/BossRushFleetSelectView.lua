@@ -17,11 +17,14 @@ end
 function BossRushFleetSelectView:init()
 	pg.UIMgr.GetInstance():BlurPanel(self._tf)
 	self:InitUI()
+
+	self.autoPanel = ChapterAutoPanelTypeRush.New(self._tf, self.event, self.contextData)
 end
 
 function BossRushFleetSelectView:InitUI()
 	local var_4_0 = self._tf:Find("Panel")
 
+	self.infoPanel = var_4_0:Find("Info")
 	self.tfFleets = {
 		[FleetType.Normal] = self._tf:Find("Panel/Fleet/Normal"),
 		[FleetType.Submarine] = self._tf:Find("Panel/Fleet/Submarine")
@@ -47,6 +50,7 @@ function BossRushFleetSelectView:InitUI()
 
 	self.btnBack = var_4_0:Find("Info/Title/BtnClose")
 	self.btnGo = var_4_0:Find("Info/Start")
+	self.btnAuto = var_4_0:Find("Info/Auto")
 
 	setText(self._tf:Find("Panel/Fleet/SonarRange/Text"), i18n("fleet_antisub_range") .. ":")
 	setText(self._tf:Find("Panel/Fleet/CostLimit/Title"), i18n("formationScene_use_oil_limit_tip_worldboss"))
@@ -67,10 +71,6 @@ function BossRushFleetSelectView:didEnter()
 	local var_5_0 = self.contextData.seriesData
 
 	onButton(self, self.btnGo, function()
-		if StartChapterAutoCommand.CheckOccupied() then
-			return
-		end
-
 		for iter_6_0 = 1, #self.contextData.fleets - 1 do
 			if self.contextData.fleets[iter_6_0]:isLegalToFight() ~= true then
 				pg.TipsMgr.GetInstance():ShowTips(i18n("series_enemy_team_notenough"))
@@ -248,6 +248,7 @@ function BossRushFleetSelectView:didEnter()
 
 	self:updateToggles()
 	triggerToggle(self.fleetIndexToggles[self.contextData.fleetIndex], true)
+	self:UpdateAutoBtn()
 end
 
 local var_0_1 = {
@@ -279,6 +280,12 @@ function BossRushFleetSelectView:ShowDropDetail(arg_23_1)
 end
 
 function BossRushFleetSelectView:willExit()
+	if self.autoPanel then
+		self.autoPanel:Destroy()
+
+		self.autoPanel = nil
+	end
+
 	pg.UIMgr.GetInstance():UnOverlayPanel(self._tf)
 end
 
@@ -400,6 +407,7 @@ function BossRushFleetSelectView:updateToggles()
 			self.fleetIndexToggles[arg_35_1] = arg_35_0
 		end
 	end)
+	self:UpdateAutoBtn()
 end
 
 function BossRushFleetSelectView:updateEliteFleets()
@@ -532,6 +540,117 @@ function BossRushFleetSelectView:initCommander(arg_45_1, arg_45_2)
 			self:emit(BossRushFleetSelectMediator.OPEN_COMMANDER_PANEL, arg_45_1)
 		end, SFX_PANEL)
 	end
+end
+
+function BossRushFleetSelectView:UpdateAutoBtn()
+	if not self.btnAuto then
+		return
+	end
+
+	local var_48_0 = self.contextData.seriesData.id
+	local var_48_1 = ChapterAutoProxy.IsSystemOpen()
+
+	setActive(self.btnAuto, pg.activity_series_enemy_auto[self.contextData.seriesData.id])
+	self:FixAutoInfoLayout(pg.activity_series_enemy_auto[self.contextData.seriesData.id])
+
+	if not pg.activity_series_enemy_auto[self.contextData.seriesData.id] then
+		return
+	end
+
+	local var_48_2 = getProxy(ChapterAutoProxy):GetRecord(ChapterAutoProxy.TYPE.RUSH, var_48_0)
+	local var_48_3 = getProxy(ActivityProxy):getActivityById(self.contextData.seriesData.actId):IsPassWithMulti(var_48_0)
+	local var_48_4 = self.contextData.mode == BossRushSeriesData.MODE.MULTIPLE
+	local var_48_5 = var_48_1 and var_48_2 > 0 and (not var_48_4 or var_48_3)
+
+	setGray(self.btnAuto, not (var_48_1 and var_48_2 > 0 and (not var_48_4 or var_48_3)), true)
+	onButton(self, self.btnAuto, function()
+		if var_48_5 then
+			local var_49_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
+
+			if not var_49_0 then
+				self:ShowChapterAutoPanel()
+			else
+				self:CheckChapterAutoOccupied(var_49_0)
+			end
+		elseif not var_48_1 then
+			pg.TipsMgr.GetInstance():ShowTips(i18n("auto_battle_unlock_tip"))
+		elseif var_48_2 <= 0 then
+			pg.TipsMgr.GetInstance():ShowTips(i18n("auto_chapter_unlock_tip_series"))
+		elseif var_48_4 and not var_48_3 then
+			pg.TipsMgr.GetInstance():ShowTips(i18n("auto_chapter_unlock_tip_series_multi"))
+		end
+	end, SFX_PANEL)
+end
+
+function BossRushFleetSelectView:GetAutoInfoLayout()
+	return nil
+end
+
+function BossRushFleetSelectView:FixAutoInfoLayout(arg_51_1)
+	local var_51_0 = self:GetAutoInfoLayout()
+
+	if not var_51_0 then
+		return
+	end
+
+	for iter_51_0, iter_51_1 in pairs(var_51_0) do
+		local var_51_1 = self.infoPanel:Find(iter_51_0)
+
+		if var_51_1 then
+			setAnchoredPosition(var_51_1, (arg_51_1 or nil) and (iter_51_1[2] or iter_51_1[1]))
+		end
+	end
+end
+
+function BossRushFleetSelectView:ShowChapterAutoPanel()
+	self.autoPanel:ExecuteAction("Enter", self.contextData.seriesData.id)
+end
+
+function BossRushFleetSelectView:RefreshChapterAutoPanel()
+	if self.autoPanel:isShowing() then
+		self.autoPanel:ExecuteAction("RefreshView")
+	end
+end
+
+function BossRushFleetSelectView:HideChapterAutoPanel()
+	self.autoPanel:ExecuteAction("Hide")
+end
+
+function BossRushFleetSelectView:CheckChapterAutoOccupied(arg_55_1)
+	local var_55_0 = getProxy(ChapterAutoProxy):GetCommissionList()[1]:GetOccupiedName()
+
+	switch(arg_55_1, {
+		[ChapterAutoProxy.TYPE.WORLD] = function()
+			pg.MsgboxMgr.GetInstance():ShowMsgBox({
+				content = i18n("auto_battle_in_world"),
+				onYes = function()
+					pg.m02:sendNotification(GAME.GO_SCENE, SCENE.WORLD)
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
+		end,
+		[ChapterAutoProxy.TYPE.SLG] = function()
+			pg.MsgboxMgr.GetInstance():ShowMsgBox({
+				content = i18n("auto_battle_in_world"),
+				onYes = function()
+					pg.m02:sendNotification(GAME.GO_SCENE, SCENE.LEVEL)
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			pg.MsgboxMgr.GetInstance():ShowMsgBox({
+				content = i18n("auto_battle_in_world"),
+				onYes = function()
+					pg.m02:sendNotification(GAME.GO_SCENE, SCENE.ACT_BOSS_BATTLE)
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
+		end
+	})
 end
 
 return BossRushFleetSelectView

@@ -1,5 +1,9 @@
 local StoryStep = class("StoryStep")
 
+StoryStep.OPTION_ANIM_ONLY_BTN = 1
+StoryStep.OPTION_ANIM_ONLY_ICON = 2
+StoryStep.OPTION_ANIM_BOTH = 3
+
 function StoryStep:Ctor(arg_1_1)
 	self.flashout = arg_1_1.flashout
 	self.flashin = arg_1_1.flashin
@@ -24,6 +28,7 @@ function StoryStep:Ctor(arg_1_1)
 	self.movableNode = arg_1_1.movableNode
 	self.options = arg_1_1.options
 	self.optionForceCenter = arg_1_1.option_force_center
+	self.optionsEffect = arg_1_1.optionsEffect
 	self.important = arg_1_1.important
 	self.branchCode = arg_1_1.optionFlag
 	self.globalBranchCode = arg_1_1.globalOptionFlag
@@ -46,17 +51,40 @@ function StoryStep:Ctor(arg_1_1)
 	self.placeholderType = 0
 	self.defaultTb = arg_1_1.defaultTb
 	self.optionIndex = 0
+	self.isExecuted = false
 end
 
-function StoryStep:IsValid(arg_2_1)
+function StoryStep:MarkIsExecuted()
+	self.isExecuted = true
+end
+
+function StoryStep:GetIsExecuted()
+	return self.isExecuted
+end
+
+function StoryStep:GetOptionEffects()
+	if not self.optionsEffect then
+		return nil
+	end
+
+	local var_4_0 = self.optionsEffect[1] or 1
+	local var_4_1 = self.optionsEffect[2] or 1
+
+	return {
+		string.format("StoryOptionEffect%s", var_4_0),
+		string.format("StoryOptionEffect%sIcon", var_4_1)
+	}, self.optionsEffect[3] or StoryStep.OPTION_ANIM_BOTH
+end
+
+function StoryStep:IsValid(arg_5_1)
 	if self.code == -1 then
 		return true
 	end
 
 	if type(self.code) == "string" or type(self.code) == "number" then
-		return self.code == arg_2_1
+		return self.code == arg_5_1
 	elseif type(self.code) == "table" then
-		return table.contains(self.code, arg_2_1)
+		return table.contains(self.code, arg_5_1)
 	end
 
 	return false
@@ -70,14 +98,14 @@ function StoryStep:GetShakeTime()
 	return self.shakeTime
 end
 
-function StoryStep:SetDefaultTb(arg_5_1)
+function StoryStep:SetDefaultTb(arg_8_1)
 	if not self.defaultTb or self.defaultTb <= 0 then
-		self.defaultTb = arg_5_1
+		self.defaultTb = arg_8_1
 	end
 end
 
-function StoryStep:SetPlaceholderType(arg_6_1)
-	self.placeholderType = arg_6_1
+function StoryStep:SetPlaceholderType(arg_9_1)
+	self.placeholderType = arg_9_1
 end
 
 function StoryStep:ShouldReplacePlayer()
@@ -96,70 +124,70 @@ function StoryStep:ShouldReplaceCar2026()
 	return bit.band(self.placeholderType, Story.CAR2026) > 0
 end
 
-function StoryStep:ReplacePlayerName(arg_11_1)
+function StoryStep:ReplacePlayerName(arg_14_1)
 	if getProxy(PlayerProxy) then
 		if not getProxy(PlayerProxy):getRawData() then
-			return arg_11_1
+			return arg_14_1
 		end
 	end
 
-	arg_11_1 = string.gsub(arg_11_1, "{playername}", (getProxy(PlayerProxy):getRawData():GetName()))
+	arg_14_1 = string.gsub(arg_14_1, "{playername}", (getProxy(PlayerProxy):getRawData():GetName()))
 
-	return arg_11_1
+	return arg_14_1
 end
 
-function StoryStep:ReplaceTbName(arg_12_1)
+function StoryStep:ReplaceTbName(arg_15_1)
 	if pg.NewStoryMgr.GetInstance():IsReView() then
-		return string.gsub(arg_12_1, "{tb}", i18n("child_story_name"))
+		return string.gsub(arg_15_1, "{tb}", i18n("child_story_name"))
 	end
 
 	if not getProxy(EducateProxy) or not getProxy(NewEducateProxy) then
-		return arg_12_1
+		return arg_15_1
 	end
 
 	if not getProxy(NewEducateProxy):GetCurChar() then
-		local var_12_0, var_12_1 = getProxy(EducateProxy):GetStoryInfo()
+		local var_15_0, var_15_1 = getProxy(EducateProxy):GetStoryInfo()
 
-		arg_12_1 = string.gsub(arg_12_1, "{tb}", var_12_1)
+		arg_15_1 = string.gsub(arg_15_1, "{tb}", var_15_1)
 	else
-		local var_12_2, var_12_3 = getProxy(NewEducateProxy):GetStoryInfo()
+		local var_15_2, var_15_3 = getProxy(NewEducateProxy):GetStoryInfo()
 
-		arg_12_1 = string.gsub(arg_12_1, "{tb}", var_12_3)
+		arg_15_1 = string.gsub(arg_15_1, "{tb}", var_15_3)
 	end
 
-	return arg_12_1
+	return arg_15_1
 end
 
-function StoryStep:ReplaceDormName(arg_13_1)
+function StoryStep:ReplaceDormName(arg_16_1)
 	if not self.actorName then
-		return arg_13_1
+		return arg_16_1
 	end
 
-	local var_13_0 = getProxy(ApartmentProxy):getApartment(self.actorName)
+	local var_16_0 = getProxy(ApartmentProxy):getApartment(self.actorName)
 
-	arg_13_1 = string.gsub(arg_13_1, "{dorm3d}", var_13_0 and var_13_0:GetCallName() or self.actorName)
+	arg_16_1 = string.gsub(arg_16_1, "{dorm3d}", var_16_0 and var_16_0:GetCallName() or self.actorName)
 
-	return arg_13_1
+	return arg_16_1
 end
 
-function StoryStep:ReplaceCar2026Name(arg_14_1)
-	local var_14_0 = getProxy(ActivityProxy)
-	local var_14_1 = var_14_0:getActivityByType(ActivityConst.ACTIVITY_TYPE_MONOPOLY)
-	local var_14_2 = ""
+function StoryStep:ReplaceCar2026Name(arg_17_1)
+	local var_17_0 = getProxy(ActivityProxy)
+	local var_17_1 = var_17_0:getActivityByType(ActivityConst.ACTIVITY_TYPE_MONOPOLY)
+	local var_17_2 = ""
 
 	if getProxy(PlayerProxy) then
-		var_14_2 = getProxy(PlayerProxy):getRawData():GetName()
+		var_17_2 = getProxy(PlayerProxy):getRawData():GetName()
 	end
 
-	if var_14_1 then
-		local var_14_3 = var_14_0:RawGetActivityById(var_14_1:getConfig("config_client").link_act)
+	if var_17_1 then
+		local var_17_3 = var_17_0:RawGetActivityById(var_17_1:getConfig("config_client").link_act)
 
-		if var_14_3 and not var_14_3:isEnd() then
-			var_14_2 = var_14_3.str_data1
+		if var_17_3 and not var_17_3:isEnd() then
+			var_17_2 = var_17_3.str_data1
 		end
 	end
 
-	return string.gsub(arg_14_1, "{car2026}", var_14_2)
+	return string.gsub(arg_17_1, "{car2026}", var_17_2)
 end
 
 function StoryStep:ExistDispatcher()
@@ -175,9 +203,9 @@ function StoryStep:IsRecallDispatcher()
 		return false
 	end
 
-	local var_17_0 = self:GetDispatcher()
+	local var_20_0 = self:GetDispatcher()
 
-	return var_17_0.callbackData ~= nil and var_17_0.callbackData.name ~= nil
+	return var_20_0.callbackData ~= nil and var_20_0.callbackData.name ~= nil
 end
 
 function StoryStep:GetDispatcherRecallName()
@@ -204,8 +232,8 @@ function StoryStep:GetIconData()
 	return self.icon
 end
 
-function StoryStep:SetId(arg_22_1)
-	self.id = arg_22_1
+function StoryStep:SetId(arg_25_1)
+	self.id = arg_25_1
 end
 
 function StoryStep:GetId()
@@ -232,8 +260,8 @@ function StoryStep:IsOptionForceCenter()
 	return self.optionForceCenter
 end
 
-function StoryStep:SetBranchCode(arg_28_1)
-	self.selectedBranchCode = arg_28_1
+function StoryStep:SetBranchCode(arg_31_1)
+	self.selectedBranchCode = arg_31_1
 end
 
 function StoryStep:GetSelectedBranchCode()
@@ -245,127 +273,127 @@ function StoryStep:ExistLocation()
 end
 
 function StoryStep:GetLocation()
-	local var_31_0 = {}
+	local var_34_0 = {}
 
-	var_31_0.text = self.location[1] or ""
-	var_31_0.time = self.location[2] or 999
+	var_34_0.text = self.location[1] or ""
+	var_34_0.time = self.location[2] or 999
 
-	return var_31_0
+	return var_34_0
 end
 
 function StoryStep:ExistMovableNode()
 	return self.movableNode ~= nil and type(self.movableNode) == "table" and #self.movableNode > 0
 end
 
-function StoryStep:GetPathByString(arg_33_1, arg_33_2)
-	local var_33_0 = {}
-	local var_33_1 = pg.NewStoryMgr.GetInstance():GetRectSize()
-	local var_33_2 = Vector3(-var_33_1.x * 0.5, var_33_1.y * 0.5, 0)
-	local var_33_3 = Vector3(var_33_1.x * 0.5, var_33_1.y * 0.5, 0)
-	local var_33_4 = Vector3(-var_33_1.x * 0.5, -var_33_1.y * 0.5, 0)
-	local var_33_5 = Vector3(var_33_1.x * 0.5, -var_33_1.y * 0.5, 0)
-	local var_33_6 = arg_33_2 or 200
+function StoryStep:GetPathByString(arg_36_1, arg_36_2)
+	local var_36_0 = {}
+	local var_36_1 = pg.NewStoryMgr.GetInstance():GetRectSize()
+	local var_36_2 = Vector3(-var_36_1.x * 0.5, var_36_1.y * 0.5, 0)
+	local var_36_3 = Vector3(var_36_1.x * 0.5, var_36_1.y * 0.5, 0)
+	local var_36_4 = Vector3(-var_36_1.x * 0.5, -var_36_1.y * 0.5, 0)
+	local var_36_5 = Vector3(var_36_1.x * 0.5, -var_36_1.y * 0.5, 0)
+	local var_36_6 = arg_36_2 or 200
 
-	if arg_33_1 == "LTLB" then
-		local var_33_7 = Vector3(var_33_6, 0, 0)
+	if arg_36_1 == "LTLB" then
+		local var_36_7 = Vector3(var_36_6, 0, 0)
 
-		var_33_0 = {
-			var_33_2 + var_33_7,
-			var_33_4 + var_33_7
+		var_36_0 = {
+			var_36_2 + var_36_7,
+			var_36_4 + var_36_7
 		}
-	elseif arg_33_1 == "LBLT" then
-		local var_33_8 = Vector3(var_33_6, 0, 0)
+	elseif arg_36_1 == "LBLT" then
+		local var_36_8 = Vector3(var_36_6, 0, 0)
 
-		var_33_0 = {
-			var_33_4 + var_33_8,
-			var_33_2 + var_33_8
+		var_36_0 = {
+			var_36_4 + var_36_8,
+			var_36_2 + var_36_8
 		}
-	elseif arg_33_1 == "LTRT" then
-		local var_33_9 = Vector3(0, -var_33_6, 0)
+	elseif arg_36_1 == "LTRT" then
+		local var_36_9 = Vector3(0, -var_36_6, 0)
 
-		var_33_0 = {
-			var_33_2 + var_33_9,
-			var_33_3 + var_33_9
+		var_36_0 = {
+			var_36_2 + var_36_9,
+			var_36_3 + var_36_9
 		}
-	elseif arg_33_1 == "RTLT" then
-		local var_33_10 = Vector3(0, -var_33_6, 0)
+	elseif arg_36_1 == "RTLT" then
+		local var_36_10 = Vector3(0, -var_36_6, 0)
 
-		var_33_0 = {
-			var_33_3 + var_33_10,
-			var_33_2 + var_33_10
+		var_36_0 = {
+			var_36_3 + var_36_10,
+			var_36_2 + var_36_10
 		}
-	elseif arg_33_1 == "RTRB" then
-		local var_33_11 = Vector3(var_33_6, 0, 0)
+	elseif arg_36_1 == "RTRB" then
+		local var_36_11 = Vector3(var_36_6, 0, 0)
 
-		var_33_0 = {
-			var_33_3 + var_33_11,
-			var_33_5 + var_33_11
+		var_36_0 = {
+			var_36_3 + var_36_11,
+			var_36_5 + var_36_11
 		}
-	elseif arg_33_1 == "RBRT" then
-		local var_33_12 = Vector3(var_33_6, 0, 0)
+	elseif arg_36_1 == "RBRT" then
+		local var_36_12 = Vector3(var_36_6, 0, 0)
 
-		var_33_0 = {
-			var_33_5 + var_33_12,
-			var_33_3 + var_33_12
+		var_36_0 = {
+			var_36_5 + var_36_12,
+			var_36_3 + var_36_12
 		}
-	elseif arg_33_1 == "LBRB" then
-		local var_33_13 = Vector3(0, -(arg_33_2 or 0), 0)
+	elseif arg_36_1 == "LBRB" then
+		local var_36_13 = Vector3(0, -(arg_36_2 or 0), 0)
 
-		var_33_0 = {
-			var_33_4 + var_33_13,
-			var_33_5 + var_33_13
+		var_36_0 = {
+			var_36_4 + var_36_13,
+			var_36_5 + var_36_13
 		}
-	elseif arg_33_1 == "RBLB" then
-		local var_33_14 = Vector3(0, -(arg_33_2 or 0), 0)
+	elseif arg_36_1 == "RBLB" then
+		local var_36_14 = Vector3(0, -(arg_36_2 or 0), 0)
 
-		var_33_0 = {
-			var_33_5 + var_33_14,
-			var_33_4 + var_33_14
+		var_36_0 = {
+			var_36_5 + var_36_14,
+			var_36_4 + var_36_14
 		}
 	end
 
-	return var_33_0
+	return var_36_0
 end
 
-function StoryStep:GenMoveNode(arg_34_1)
-	local var_34_0 = {}
+function StoryStep:GenMoveNode(arg_37_1)
+	local var_37_0 = {}
 
-	if type(arg_34_1.path) == "table" then
-		for iter_34_0, iter_34_1 in ipairs(arg_34_1.path) do
-			table.insert(var_34_0, Vector3(iter_34_1[1], iter_34_1[2], 0))
+	if type(arg_37_1.path) == "table" then
+		for iter_37_0, iter_37_1 in ipairs(arg_37_1.path) do
+			table.insert(var_37_0, Vector3(iter_37_1[1], iter_37_1[2], 0))
 		end
 	else
-		var_34_0 = type(arg_34_1.path) == "string" and self:GetPathByString(arg_34_1.path, arg_34_1.offset) or self:GetPathByString("LTRT")
+		var_37_0 = type(arg_37_1.path) == "string" and self:GetPathByString(arg_37_1.path, arg_37_1.offset) or self:GetPathByString("LTRT")
 	end
 
-	local var_34_1 = type(arg_34_1.spine) == "table" or arg_34_1.spine == true
-	local var_34_2
+	local var_37_1 = type(arg_37_1.spine) == "table" or arg_37_1.spine == true
+	local var_37_2
 
-	if arg_34_1.spine == true then
-		var_34_2 = {
+	if arg_37_1.spine == true then
+		var_37_2 = {
 			action = "walk",
 			scale = 0.5
 		}
-	elseif var_34_1 then
-		local var_34_3 = {}
+	elseif var_37_1 then
+		local var_37_3 = {}
 
-		var_34_3.action = arg_34_1.spine.action or "walk"
-		var_34_3.scale = arg_34_1.spine.scale or 0.5
-		var_34_2 = var_34_3
+		var_37_3.action = arg_37_1.spine.action or "walk"
+		var_37_3.scale = arg_37_1.spine.scale or 0.5
+		var_37_2 = var_37_3
 	end
 
-	local var_34_4 = {
-		name = arg_34_1.name,
-		isSpine = var_34_1,
-		spineData = var_34_2,
-		path = var_34_0,
-		time = arg_34_1.time
+	local var_37_4 = {
+		name = arg_37_1.name,
+		isSpine = var_37_1,
+		spineData = var_37_2,
+		path = var_37_0,
+		time = arg_37_1.time
 	}
 
-	var_34_4.delay = arg_34_1.delay or 0
-	var_34_4.easeType = arg_34_1.easeType or LeanTweenType.linear
+	var_37_4.delay = arg_37_1.delay or 0
+	var_37_4.easeType = arg_37_1.easeType or LeanTweenType.linear
 
-	return var_34_4
+	return var_37_4
 end
 
 function StoryStep:GetMovableNode()
@@ -373,13 +401,13 @@ function StoryStep:GetMovableNode()
 		return {}
 	end
 
-	local var_35_0 = {}
+	local var_38_0 = {}
 
-	for iter_35_0, iter_35_1 in pairs(self.movableNode or {}) do
-		table.insert(var_35_0, (self:GenMoveNode(iter_35_1)))
+	for iter_38_0, iter_38_1 in pairs(self.movableNode or {}) do
+		table.insert(var_38_0, (self:GenMoveNode(iter_38_1)))
 	end
 
-	return var_35_0
+	return var_38_0
 end
 
 function StoryStep:OldPhotoEffect()
@@ -390,20 +418,20 @@ function StoryStep:ShouldBgGlitchArt()
 	return self.bgGlitchArt
 end
 
-function StoryStep:IsSameBranch(arg_38_1)
-	return not self.branchCode or self.branchCode == arg_38_1
+function StoryStep:IsSameBranch(arg_41_1)
+	return not self.branchCode or self.branchCode == arg_41_1
 end
 
 function StoryStep:IsGlobalFlagHit()
-	local var_39_0 = StoryStep.GetGlobalFlagKey(self.globalBranchCode.id)
-	local var_39_1 = 0
+	local var_42_0 = StoryStep.GetGlobalFlagKey(self.globalBranchCode.id)
+	local var_42_1 = 0
 
-	while PlayerPrefs.HasKey(var_39_0 .. 1) do
-		var_39_1 = var_39_1 + PlayerPrefs.GetInt(var_39_0 .. 1)
+	while PlayerPrefs.HasKey(var_42_0 .. 1) do
+		var_42_1 = var_42_1 + PlayerPrefs.GetInt(var_42_0 .. 1)
 	end
 
-	for iter_39_0, iter_39_1 in ipairs(self.globalBranchCode.section) do
-		if var_39_1 >= iter_39_1[1] and var_39_1 <= iter_39_1[2] then
+	for iter_42_0, iter_42_1 in ipairs(self.globalBranchCode.section) do
+		if var_42_1 >= iter_42_1[1] and var_42_1 <= iter_42_1[2] then
 			return true
 		end
 	end
@@ -515,8 +543,8 @@ function StoryStep:GetOptionCnt()
 	end
 end
 
-function StoryStep:SetOptionSelCodes(arg_64_1)
-	self.optionSelCode = arg_64_1
+function StoryStep:SetOptionSelCodes(arg_67_1)
+	self.optionSelCode = arg_67_1
 end
 
 function StoryStep:IsBlackFrontGround()
@@ -524,27 +552,27 @@ function StoryStep:IsBlackFrontGround()
 end
 
 function StoryStep:GetOptionIndexByAutoSel()
-	local var_66_0 = 0
-	local var_66_1 = 0
+	local var_69_0 = 0
+	local var_69_1 = 0
 
-	for iter_66_0, iter_66_1 in ipairs(self.options) do
-		if self.optionSelCode and iter_66_1.flag == self.optionSelCode then
-			var_66_0 = iter_66_0
+	for iter_69_0, iter_69_1 in ipairs(self.options) do
+		if self.optionSelCode and iter_69_1.flag == self.optionSelCode then
+			var_69_0 = iter_69_0
 
 			break
 		end
 
-		if iter_66_1.autochoice and iter_66_1.autochoice == 1 then
-			var_66_1 = iter_66_0
+		if iter_69_1.autochoice and iter_69_1.autochoice == 1 then
+			var_69_1 = iter_69_0
 		end
 	end
 
-	if var_66_0 > 0 then
-		return var_66_0
+	if var_69_0 > 0 then
+		return var_69_0
 	end
 
-	if var_66_1 > 0 then
-		return var_66_1
+	if var_69_1 > 0 then
+		return var_69_1
 	end
 
 	return nil
@@ -554,8 +582,8 @@ function StoryStep:IsImport()
 	return self.important
 end
 
-function StoryStep:SetOptionIndex(arg_68_1)
-	self.optionIndex = arg_68_1
+function StoryStep:SetOptionIndex(arg_71_1)
+	self.optionIndex = arg_71_1
 end
 
 function StoryStep:GetOptionIndex()
@@ -563,34 +591,34 @@ function StoryStep:GetOptionIndex()
 end
 
 function StoryStep:GetOptions()
-	return _.map(self.options or {}, function(arg_71_0)
-		local var_71_0 = arg_71_0.content
+	return _.map(self.options or {}, function(arg_74_0)
+		local var_74_0 = arg_74_0.content
 
 		if self:ShouldReplacePlayer() then
-			var_71_0 = self:ReplacePlayerName(var_71_0)
+			var_74_0 = self:ReplacePlayerName(var_74_0)
 		end
 
 		if self:ShouldReplaceTb() then
-			var_71_0 = self:ReplaceTbName(var_71_0)
+			var_74_0 = self:ReplaceTbName(var_74_0)
 		end
 
 		if self:ShouldReplaceDorm() then
-			var_71_0 = self:ReplaceDormName(var_71_0)
+			var_74_0 = self:ReplaceDormName(var_74_0)
 		end
 
-		local var_71_1
+		local var_74_1
 
 		if self:ShouldReplaceCar2026() then
-			var_71_0 = self:ReplaceCar2026Name(var_71_0)
-			var_71_1 = {}
+			var_74_0 = self:ReplaceCar2026Name(var_74_0)
+			var_74_1 = {}
 		end
 
-		var_71_1[1] = HXSet.hxLan(var_71_0)
-		var_71_1[2] = arg_71_0.flag
-		var_71_1[3] = arg_71_0.type
-		var_71_1[4] = arg_71_0.globalFlag
+		var_74_1[1] = HXSet.hxLan(var_74_0)
+		var_74_1[2] = arg_74_0.flag
+		var_74_1[3] = arg_74_0.type
+		var_74_1[4] = arg_74_0.globalFlag
 
-		return var_71_1
+		return var_74_1
 	end)
 end
 
@@ -615,102 +643,102 @@ function StoryStep:GetUsingPaintingNames()
 end
 
 function StoryStep:GetResList()
-	local var_77_0 = {}
-	local var_77_1 = self:GetBgName()
+	local var_80_0 = {}
+	local var_80_1 = self:GetBgName()
 
-	if var_77_1 then
-		table.insert(var_77_0, var_77_1)
+	if var_80_1 then
+		table.insert(var_80_0, var_80_1)
 	end
 
 	if self.GetSubBg then
-		local var_77_2 = self:GetSubBg()
+		local var_80_2 = self:GetSubBg()
 
-		if var_77_2 then
-			table.insert(var_77_0, var_77_2)
+		if var_80_2 then
+			table.insert(var_80_0, var_80_2)
 		end
 	end
 
-	local var_77_3 = _.map(var_77_0, function(arg_78_0)
-		return ResPathSupport.CombinePath(ResPathSupport.ConstPath.BG.Base, arg_78_0)
+	local var_80_3 = _.map(var_80_0, function(arg_81_0)
+		return ResPathSupport.CombinePath(ResPathSupport.ConstPath.BG.Base, arg_81_0)
 	end)
-	local var_77_4 = {}
-	local var_77_5 = {}
-	local var_77_6, var_77_7, var_77_8 = self:GetBgmData()
+	local var_80_4 = {}
+	local var_80_5 = {}
+	local var_80_6, var_80_7, var_80_8 = self:GetBgmData()
 
-	if var_77_6 then
-		table.insert(var_77_4, var_77_6)
+	if var_80_6 then
+		table.insert(var_80_4, var_80_6)
 	end
 
 	if self:ShouldPlaySoundEffect() then
-		local var_77_9, var_77_10 = self:GetSoundeffect()
+		local var_80_9, var_80_10 = self:GetSoundeffect()
 
-		if var_77_9 then
-			local var_77_11 = pg.CriMgr.GetInstance():CheckFModeEvent(var_77_9, function()
+		if var_80_9 then
+			local var_80_11 = pg.CriMgr.GetInstance():CheckFModeEvent(var_80_9, function()
 				return
 			end, function()
 				return
 			end)
 
-			if var_77_11 then
-				table.insert(var_77_4, var_77_11)
+			if var_80_11 then
+				table.insert(var_80_4, var_80_11)
 			end
 		end
 	end
 
 	if self:ShouldPlayVoice() then
-		local var_77_12, var_77_13 = self:GetVoice()
+		local var_80_12, var_80_13 = self:GetVoice()
 
-		if var_77_12 then
-			local var_77_14 = pg.CriMgr.GetInstance():CheckFModeEvent(var_77_12, function()
+		if var_80_12 then
+			local var_80_14 = pg.CriMgr.GetInstance():CheckFModeEvent(var_80_12, function()
 				return
 			end, function()
 				return
 			end)
 
-			if var_77_14 then
-				table.insert(var_77_4, var_77_14)
+			if var_80_14 then
+				table.insert(var_80_4, var_80_14)
 			end
 		end
 	end
 
-	_.each(var_77_4, function(arg_83_0)
-		table.insertto(var_77_5, (ResPathSupport.GetSoundResList(arg_83_0)))
+	_.each(var_80_4, function(arg_86_0)
+		table.insertto(var_80_5, (ResPathSupport.GetSoundResList(arg_86_0)))
 	end)
 
-	local var_77_15 = {}
+	local var_80_15 = {}
 
-	_.each(self:GetEffects(), function(arg_84_0)
-		table.insert(var_77_15, arg_84_0.name)
+	_.each(self:GetEffects(), function(arg_87_0)
+		table.insert(var_80_15, arg_87_0.name)
 	end)
 
-	local var_77_16 = {}
+	local var_80_16 = {}
 
-	_.each(var_77_15, function(arg_85_0)
-		table.insert(var_77_16, (ResPathSupport.CombinePath(ResPathSupport.ConstPath.UI.Base, arg_85_0)))
-		table.insert(var_77_16, (ResPathSupport.CombinePath(ResPathSupport.ConstPath.UI.Effect, arg_85_0)))
+	_.each(var_80_15, function(arg_88_0)
+		table.insert(var_80_16, (ResPathSupport.CombinePath(ResPathSupport.ConstPath.UI.Base, arg_88_0)))
+		table.insert(var_80_16, (ResPathSupport.CombinePath(ResPathSupport.ConstPath.UI.Effect, arg_88_0)))
 	end)
 
-	local var_77_17 = {}
+	local var_80_17 = {}
 
 	if self:ExistIcon() then
-		local var_77_18 = self:GetIconData()
+		local var_80_18 = self:GetIconData()
 
-		if var_77_18 and var_77_18.image then
-			table.insert(var_77_17, var_77_18.image)
+		if var_80_18 and var_80_18.image then
+			table.insert(var_80_17, var_80_18.image)
 		end
 	end
 
-	local var_77_19 = {}
-	local var_77_20 = StoryRecorder.New()
+	local var_80_19 = {}
+	local var_80_20 = StoryRecorder.New()
 
-	var_77_20:Add(self)
-	_.each(var_77_20:GetContentList(), function(arg_86_0)
-		if arg_86_0.icon then
-			table.insertto(var_77_19, (ResPathSupport.GetPaintingSquareIconListByPaintingName(arg_86_0.icon)))
+	var_80_20:Add(self)
+	_.each(var_80_20:GetContentList(), function(arg_89_0)
+		if arg_89_0.icon then
+			table.insertto(var_80_19, (ResPathSupport.GetPaintingSquareIconListByPaintingName(arg_89_0.icon)))
 		end
 	end)
 
-	return (ResPathSupport.MergeLuaArr(var_77_3, var_77_5, var_77_16, var_77_17, var_77_19))
+	return (ResPathSupport.MergeLuaArr(var_80_3, var_80_5, var_80_16, var_80_17, var_80_19))
 end
 
 return StoryStep

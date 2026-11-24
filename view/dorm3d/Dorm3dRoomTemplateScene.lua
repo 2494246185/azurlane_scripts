@@ -1900,6 +1900,14 @@ end
 
 function Dorm3dRoomTemplateScene:PlayTimeline(arg_220_1, arg_220_2)
 	local var_220_0 = {}
+	local var_220_1 = self.dormSceneMgr.artSceneInfo
+	local var_220_2
+
+	if arg_220_1.scene and arg_220_1.sceneRoot then
+		var_220_2 = arg_220_1.scene .. "|" .. arg_220_1.sceneRoot or self.dormSceneMgr.artSceneInfo
+	end
+
+	local var_220_3 = Dorm3dSceneMgr.IsSameSceneInfo(var_220_2, self.dormSceneMgr.sceneInfo)
 
 	if self.waitForTimeline then
 		table.insert(var_220_0, function(arg_221_0)
@@ -1913,120 +1921,126 @@ function Dorm3dRoomTemplateScene:PlayTimeline(arg_220_1, arg_220_2)
 	table.insert(var_220_0, function(arg_222_0)
 		self:LoadTimelineScene(arg_220_1.name, false, nil, arg_222_0)
 	end)
+	table.insert(var_220_0, function(arg_223_0)
+		self:ChangeArtScene(var_220_2, arg_223_0)
+	end)
 
-	if arg_220_1.scene and arg_220_1.sceneRoot then
-		table.insert(var_220_0, function(arg_223_0)
-			self:ChangeArtScene(arg_220_1.scene .. "|" .. arg_220_1.sceneRoot, arg_223_0)
+	if var_220_3 then
+		table.insert(var_220_0, function(arg_224_0)
+			self:emit(FurnitureSystem.REFRESH_SLOTS_DEFAULT, function()
+				setActive(self.slotRoot, true)
+				arg_224_0()
+			end)
 		end)
 	end
 
-	table.insert(var_220_0, function(arg_224_0)
-		local var_224_0 = Dorm3dHxHelper.GetTimelineMainCharacter()
+	table.insert(var_220_0, function(arg_226_0)
+		local var_226_0 = Dorm3dHxHelper.GetTimelineMainCharacter()
 
 		Dorm3dHxHelper.ShowHolyLight({
-			var_224_0
+			var_226_0
 		}, self.holyLightRoot)
 
-		local var_224_1 = GameObject.Find("[actor]").transform
+		local var_226_1 = GameObject.Find("[actor]").transform
 
-		table.IpairsCArray(var_224_1:GetComponentsInChildren(typeof(Animator), true), function(arg_225_0, arg_225_1)
-			GetOrAddComponent(arg_225_1.transform, typeof(DftAniEvent))
+		table.IpairsCArray(var_226_1:GetComponentsInChildren(typeof(Animator), true), function(arg_227_0, arg_227_1)
+			GetOrAddComponent(arg_227_1.transform, typeof(DftAniEvent))
 		end)
 
-		var_224_0 = var_224_0 or var_224_1:GetComponentInChildren(typeof("BLHXCharacterPropertiesController")).transform
+		var_226_0 = var_226_0 or var_226_1:GetComponentInChildren(typeof("BLHXCharacterPropertiesController")).transform
 
-		local var_224_2
+		local var_226_2
 
-		eachChild(GameObject.Find("[camera]").transform, function(arg_226_0)
-			if arg_226_0.tag == "MainCamera" then
-				var_224_2 = arg_226_0
+		eachChild(GameObject.Find("[camera]").transform, function(arg_228_0)
+			if arg_228_0.tag == "MainCamera" then
+				var_226_2 = arg_228_0
 			end
 		end)
-		assert(var_224_2, "Missing MainCamera")
+		assert(var_226_2, "Missing MainCamera")
 
 		self.nowTimelinePlayer = TimelinePlayer.New(GameObject.Find("[sequence]").transform)
 
 		TimelineSupport.InitSubtitle(self.nowTimelinePlayer.comDirector, self.apartment:GetCallName())
-		self.nowTimelinePlayer:Register(arg_220_1.time, function(arg_227_0, arg_227_1, arg_227_2)
-			switch(arg_227_1.stringParameter, {
+		self.nowTimelinePlayer:Register(arg_220_1.time, function(arg_229_0, arg_229_1, arg_229_2)
+			switch(arg_229_1.stringParameter, {
 				TimelinePause = function()
-					arg_227_0:SetSpeed(0)
+					arg_229_0:SetSpeed(0)
 				end,
 				TimelineResume = function()
-					arg_227_0:SetSpeed(1)
+					arg_229_0:SetSpeed(1)
 				end,
 				TimelinePlayOnTime = function()
-					if arg_227_1.intParameter == 0 or arg_227_1.intParameter == arg_227_2.selectIndex then
-						arg_227_0:SetTime(arg_227_1.floatParameter)
+					if arg_229_1.intParameter == 0 or arg_229_1.intParameter == arg_229_2.selectIndex then
+						arg_229_0:SetTime(arg_229_1.floatParameter)
 					end
 				end,
 				TimelineSelectStart = function()
-					arg_227_2.selectIndex = nil
+					arg_229_2.selectIndex = nil
 
 					if arg_220_1.options then
-						local var_231_0 = arg_220_1.options[arg_227_1.intParameter]
+						local var_233_0 = arg_220_1.options[arg_229_1.intParameter]
 
-						self:DoTimelineOption(arg_220_1.options[arg_227_1.intParameter], function(arg_232_0)
-							arg_227_2.selectIndex = arg_232_0
-							arg_227_2.optionIndex = var_231_0[arg_232_0].flag
+						self:DoTimelineOption(arg_220_1.options[arg_229_1.intParameter], function(arg_234_0)
+							arg_229_2.selectIndex = arg_234_0
+							arg_229_2.optionIndex = var_233_0[arg_234_0].flag
 
-							arg_227_0:Play()
+							arg_229_0:Play()
 						end)
 					end
 				end,
 				TimelineTouchStart = function()
-					arg_227_2.selectIndex = nil
+					arg_229_2.selectIndex = nil
 
 					if arg_220_1.touchs then
-						local var_233_0 = arg_220_1.touchs[arg_227_1.intParameter]
+						local var_235_0 = arg_220_1.touchs[arg_229_1.intParameter]
 
-						self:DoTimelineTouch(arg_220_1.touchs[arg_227_1.intParameter], function(arg_234_0)
-							arg_227_2.selectIndex = arg_234_0
-							arg_227_2.optionIndex = var_233_0[arg_234_0].flag
+						self:DoTimelineTouch(arg_220_1.touchs[arg_229_1.intParameter], function(arg_236_0)
+							arg_229_2.selectIndex = arg_236_0
+							arg_229_2.optionIndex = var_235_0[arg_236_0].flag
 						end)
 					end
 				end,
 				TimelineSelectLoop = function()
-					if not arg_227_2.selectIndex then
-						arg_227_0:RawSetTime(arg_227_1.floatParameter)
+					if not arg_229_2.selectIndex then
+						arg_229_0:RawSetTime(arg_229_1.floatParameter)
 					end
 				end,
 				TimelineSelect = function()
-					arg_227_2.selectIndex = arg_227_1.intParameter
+					arg_229_2.selectIndex = arg_229_1.intParameter
 				end,
 				TimelineAccompanyJump = function()
 					if self.canTriggerAccompanyPerformance then
 						self.canTriggerAccompanyPerformance = false
 
-						arg_227_0:SetTime(arg_220_1.accompanys[arg_227_1.intParameter][math.random(#arg_220_1.accompanys[arg_227_1.intParameter])])
+						arg_229_0:SetTime(arg_220_1.accompanys[arg_229_1.intParameter][math.random(#arg_220_1.accompanys[arg_229_1.intParameter])])
 					end
 				end,
 				TimelineIKStart = function()
-					arg_227_2.selectIndex = nil
+					arg_229_2.selectIndex = nil
 
-					self:emit(RoomIKSystem.SET_IK_TIMELINE_STATUS, var_224_0.gameObject, arg_227_1.intParameter, var_224_2)
+					self:emit(RoomIKSystem.SET_IK_TIMELINE_STATUS, var_226_0.gameObject, arg_229_1.intParameter, var_226_2)
 				end,
 				TimelineEnd = function()
-					arg_227_2.finish = true
+					arg_229_2.finish = true
 
-					arg_227_0:SetSpeed(0)
+					arg_229_0:SetSpeed(0)
 				end,
 				TimelineAimIKStart = function()
-					arg_227_2.selectIndex = nil
+					arg_229_2.selectIndex = nil
 
-					self:emit(AimIKSystem.ENTER_TIMELINE_AIMIK_STATUS, arg_227_1.intParameter)
+					self:emit(AimIKSystem.ENTER_TIMELINE_AIMIK_STATUS, arg_229_1.intParameter)
 				end
 			}, function()
-				warning("other event trigger:" .. arg_227_1.stringParameter)
+				warning("other event trigger:" .. arg_229_1.stringParameter)
 			end)
 
-			if arg_227_2.finish then
-				self.timelineMark = arg_227_2
+			if arg_229_2.finish then
+				self.timelineMark = arg_229_2
 				self.timelineFinishCall = nil
 
 				pg.m02:sendNotification(Dorm3dRoomTemplateScene.TIMELINE_END)
 				self:emit(RoomIKSystem.EXIT_IK_TIMELINE_STATUS)
-				arg_224_0()
+				arg_226_0()
 			end
 		end)
 
@@ -2038,29 +2052,26 @@ function Dorm3dRoomTemplateScene:PlayTimeline(arg_220_1, arg_220_2)
 
 		self:HideCharacter()
 		setActive(self.mainCameraTF, false)
-		setActive(var_224_2, true)
-		eachChild(self.rtTimelineScreen, function(arg_243_0)
-			setActive(arg_243_0, false)
+		setActive(var_226_2, true)
+		eachChild(self.rtTimelineScreen, function(arg_245_0)
+			setActive(arg_245_0, false)
 		end)
 		setActive(self.rtTimelineScreen, true)
 		setActive(self.rtTimelineScreen:Find("btn_skip"), self.inReplayTalk)
 		self.nowTimelinePlayer:Start()
 	end)
-	table.insert(var_220_0, function(arg_244_0)
+	table.insert(var_220_0, function(arg_246_0)
 		self:ShowBlackScreen(true, function()
 			self.nowTimelinePlayer:Stop()
 			self.nowTimelinePlayer:Dispose()
 
 			self.nowTimelinePlayer = nil
 
-			self:UnloadTimelineScene(arg_220_1.name, false, arg_244_0)
+			self:UnloadTimelineScene(arg_220_1.name, false, arg_246_0)
 		end)
 	end)
-
-	local var_220_1 = self.dormSceneMgr.artSceneInfo
-
-	table.insert(var_220_0, function(arg_246_0)
-		self:RevertArtScene(var_220_1, arg_246_0)
+	table.insert(var_220_0, function(arg_248_0)
+		self:RevertArtScene(var_220_1, arg_248_0, var_220_3)
 	end)
 	seriesAsync(var_220_0, function()
 		setActive(self.rtTimelineScreen, false)
@@ -2070,8 +2081,8 @@ function Dorm3dRoomTemplateScene:PlayTimeline(arg_220_1, arg_220_2)
 
 		self.timelineMark = nil
 
-		existCall(arg_220_2, self.timelineMark, function(arg_248_0)
-			self:ShowBlackScreen(false, arg_248_0)
+		existCall(arg_220_2, self.timelineMark, function(arg_250_0)
+			self:ShowBlackScreen(false, arg_250_0)
 		end)
 	end)
 end
@@ -2088,261 +2099,261 @@ function Dorm3dRoomTemplateScene:PlayCurrentSingleAction(...)
 	return self:PlaySingleAction(self:GetCurrentLadyEnv(), ...)
 end
 
-function Dorm3dRoomTemplateScene:PlaySingleAction(arg_251_1, arg_251_2, arg_251_3, arg_251_4)
-	arg_251_1:PlaySingleAction(arg_251_2, arg_251_3, arg_251_4)
+function Dorm3dRoomTemplateScene:PlaySingleAction(arg_253_1, arg_253_2, arg_253_3, arg_253_4)
+	arg_253_1:PlaySingleAction(arg_253_2, arg_253_3, arg_253_4)
 end
 
 function Dorm3dRoomTemplateScene:SwitchCurrentAnim(...)
 	return self:SwitchAnim(self:GetCurrentLadyEnv(), ...)
 end
 
-function Dorm3dRoomTemplateScene:SwitchAnim(arg_253_1, arg_253_2, arg_253_3, arg_253_4)
-	arg_253_1:SwitchAnim(arg_253_2, arg_253_3, arg_253_4)
+function Dorm3dRoomTemplateScene:SwitchAnim(arg_255_1, arg_255_2, arg_255_3, arg_255_4)
+	arg_255_1:SwitchAnim(arg_255_2, arg_255_3, arg_255_4)
 end
 
-function Dorm3dRoomTemplateScene:PlayFaceAnim(arg_254_1, arg_254_2, arg_254_3)
-	arg_254_1:PlayFaceAnim(arg_254_2, arg_254_3)
+function Dorm3dRoomTemplateScene:PlayFaceAnim(arg_256_1, arg_256_2, arg_256_3)
+	arg_256_1:PlayFaceAnim(arg_256_2, arg_256_3)
 end
 
-function Dorm3dRoomTemplateScene:RegisterAnimCallback(arg_255_1, arg_255_2)
-	self:GetCurrentLadyEnv().animCallbacks[arg_255_1] = arg_255_2
+function Dorm3dRoomTemplateScene:RegisterAnimCallback(arg_257_1, arg_257_2)
+	self:GetCurrentLadyEnv().animCallbacks[arg_257_1] = arg_257_2
 end
 
-function Dorm3dRoomTemplateScene:SetCharacterAnimSpeed(arg_256_1)
-	local var_256_0 = self:GetCurrentLadyEnv()
+function Dorm3dRoomTemplateScene:SetCharacterAnimSpeed(arg_258_1)
+	local var_258_0 = self:GetCurrentLadyEnv()
 
-	var_256_0.ladyAnimator.speed = arg_256_1
-	var_256_0.ladyHeadIKComp.blinkSpeed = var_256_0.ladyHeadIKData.blinkSpeed * arg_256_1
-	var_256_0.ladyHeadIKComp.DampTime = arg_256_1 > 0 and var_256_0.ladyHeadIKData.DampTime / arg_256_1 or var_256_0.ladyHeadIKData.DampTime * math.huge
+	var_258_0.ladyAnimator.speed = arg_258_1
+	var_258_0.ladyHeadIKComp.blinkSpeed = var_258_0.ladyHeadIKData.blinkSpeed * arg_258_1
+	var_258_0.ladyHeadIKComp.DampTime = arg_258_1 > 0 and var_258_0.ladyHeadIKData.DampTime / arg_258_1 or var_258_0.ladyHeadIKData.DampTime * math.huge
 end
 
-function Dorm3dRoomTemplateScene:OnAnimationEvent(arg_257_1)
-	if arg_257_1.animatorClipInfo.weight < 0.5 then
+function Dorm3dRoomTemplateScene:OnAnimationEvent(arg_259_1)
+	if arg_259_1.animatorClipInfo.weight < 0.5 then
 		return
 	end
 
-	existCall((table.removebykey(self.animEventCallbacks, arg_257_1.stringParameter)))
+	existCall((table.removebykey(self.animEventCallbacks, arg_259_1.stringParameter)))
 end
 
-function Dorm3dRoomTemplateScene:RegisterAnimEventCallback(arg_258_1, arg_258_2)
-	self.animEventCallbacks[arg_258_1] = arg_258_2
+function Dorm3dRoomTemplateScene:RegisterAnimEventCallback(arg_260_1, arg_260_2)
+	self.animEventCallbacks[arg_260_1] = arg_260_2
 end
 
-function Dorm3dRoomTemplateScene:PlaySceneItemAnim(arg_259_1, arg_259_2, arg_259_3)
+function Dorm3dRoomTemplateScene:PlaySceneItemAnim(arg_261_1, arg_261_2, arg_261_3)
 	self.sceneAnimatorDict = self.sceneAnimatorDict or {}
 
-	if not self.sceneAnimatorDict[arg_259_1] then
-		local var_259_0 = self:GetSceneItem(pg.dorm3d_scene_animator[arg_259_1].item_name)
+	if not self.sceneAnimatorDict[arg_261_1] then
+		local var_261_0 = self:GetSceneItem(pg.dorm3d_scene_animator[arg_261_1].item_name)
 
-		assert(var_259_0, "Missing Scene Animator in pg.dorm3d_scene_animator: " .. arg_259_1 .. " " .. pg.dorm3d_scene_animator[arg_259_1].item_name)
+		assert(var_261_0, "Missing Scene Animator in pg.dorm3d_scene_animator: " .. arg_261_1 .. " " .. pg.dorm3d_scene_animator[arg_261_1].item_name)
 
-		if not var_259_0 then
+		if not var_261_0 then
 			return
 		end
 
-		local var_259_1 = var_259_0:GetComponent(typeof(Animator))
+		local var_261_1 = var_261_0:GetComponent(typeof(Animator))
 
-		if not var_259_1 then
+		if not var_261_1 then
 			return
 		end
 
-		self.sceneAnimatorDict[arg_259_1] = {
-			trans = var_259_0,
-			animator = var_259_1
+		self.sceneAnimatorDict[arg_261_1] = {
+			trans = var_261_0,
+			animator = var_261_1
 		}
 	end
 
-	if not arg_259_3 then
-		if self.sceneAnimatorDict[arg_259_1].animator:GetCurrentAnimatorStateInfo(0):IsName(arg_259_2) then
+	if not arg_261_3 then
+		if self.sceneAnimatorDict[arg_261_1].animator:GetCurrentAnimatorStateInfo(0):IsName(arg_261_2) then
 			return
 		end
 	end
 
-	self.sceneAnimatorDict[arg_259_1].animator:PlayInFixedTime(arg_259_2, -1, arg_259_3 and 0 or -math.huge)
+	self.sceneAnimatorDict[arg_261_1].animator:PlayInFixedTime(arg_261_2, -1, arg_261_3 and 0 or -math.huge)
 end
 
-function Dorm3dRoomTemplateScene:ResetSceneItemAnimators(arg_260_1)
+function Dorm3dRoomTemplateScene:ResetSceneItemAnimators(arg_262_1)
 	if not self.sceneAnimatorDict then
 		return
 	end
 
-	table.Foreach(self.sceneAnimatorDict, function(arg_261_0, arg_261_1)
-		if arg_260_1 and table.contains(arg_260_1, arg_261_0) then
+	table.Foreach(self.sceneAnimatorDict, function(arg_263_0, arg_263_1)
+		if arg_262_1 and table.contains(arg_262_1, arg_263_0) then
 			return
 		end
 
-		setActive(arg_261_1.trans, false)
-		setActive(arg_261_1.trans, true)
+		setActive(arg_263_1.trans, false)
+		setActive(arg_263_1.trans, true)
 
-		self.sceneAnimatorDict[arg_261_0] = nil
+		self.sceneAnimatorDict[arg_263_0] = nil
 	end)
 end
 
-function Dorm3dRoomTemplateScene:LoadCharacterExtraItem(arg_262_1, arg_262_2, arg_262_3, arg_262_4, arg_262_5, arg_262_6, arg_262_7, arg_262_8)
-	local function var_262_0(arg_263_0)
-		if arg_262_6 then
-			local var_263_0 = arg_263_0:GetComponent(typeof(Animator))
+function Dorm3dRoomTemplateScene:LoadCharacterExtraItem(arg_264_1, arg_264_2, arg_264_3, arg_264_4, arg_264_5, arg_264_6, arg_264_7, arg_264_8)
+	local function var_264_0(arg_265_0)
+		if arg_264_6 then
+			local var_265_0 = arg_265_0:GetComponent(typeof(Animator))
 
-			if var_263_0 then
-				var_263_0:Play(arg_262_6, -1, arg_262_8 and 0 or -math.huge)
+			if var_265_0 then
+				var_265_0:Play(arg_264_6, -1, arg_264_8 and 0 or -math.huge)
 
-				var_263_0.speed = arg_262_7
+				var_265_0.speed = arg_264_7
 			end
 		end
 	end
 
 	self.extraItems = self.extraItems or {}
 
-	local var_262_1
+	local var_264_1
 
-	if arg_262_3 == "" then
-		var_262_1 = arg_262_1.lady
-	elseif arg_262_3 == "scene_root" then
-		var_262_1 = self.modelRoot
+	if arg_264_3 == "" then
+		var_264_1 = arg_264_1.lady
+	elseif arg_264_3 == "scene_root" then
+		var_264_1 = self.modelRoot
 	else
-		table.IpairsCArray(arg_262_1.lady:GetComponentsInChildren(typeof(Transform), true), function(arg_264_0, arg_264_1)
-			if arg_264_1.name == arg_262_3 then
-				var_262_1 = arg_264_1
+		table.IpairsCArray(arg_264_1.lady:GetComponentsInChildren(typeof(Transform), true), function(arg_266_0, arg_266_1)
+			if arg_266_1.name == arg_264_3 then
+				var_264_1 = arg_266_1
 			end
 		end)
 	end
 
-	if not var_262_1 then
+	if not var_264_1 then
 		return
 	end
 
-	local var_262_2 = self.extraItems[arg_262_2]
+	local var_264_2 = self.extraItems[arg_264_2]
 
-	if self.extraItems[arg_262_2] then
-		if var_262_2.handler == var_262_1 then
-			var_262_0(var_262_2.trans)
+	if self.extraItems[arg_264_2] then
+		if var_264_2.handler == var_264_1 then
+			var_264_0(var_264_2.trans)
 
 			return
 		end
 
-		self.loader:ReturnPrefab(var_262_2.trans.gameObject)
+		self.loader:ReturnPrefab(var_264_2.trans.gameObject)
 
-		self.extraItems[arg_262_2] = nil
+		self.extraItems[arg_264_2] = nil
 	end
 
-	self.loader:GetPrefab(string.lower("dorm3d/" .. arg_262_2), "", function(arg_265_0)
-		setParent(arg_265_0, var_262_1)
+	self.loader:GetPrefab(string.lower("dorm3d/" .. arg_264_2), "", function(arg_267_0)
+		setParent(arg_267_0, var_264_1)
 
-		if arg_262_4 then
-			setLocalPosition(arg_265_0, arg_262_4)
+		if arg_264_4 then
+			setLocalPosition(arg_267_0, arg_264_4)
 		end
 
-		if arg_262_5 then
-			setLocalRotation(arg_265_0, arg_262_5)
+		if arg_264_5 then
+			setLocalRotation(arg_267_0, arg_264_5)
 		end
 
-		var_262_0(arg_265_0)
+		var_264_0(arg_267_0)
 
-		self.extraItems[arg_262_2] = {
-			trans = arg_265_0.transform,
-			handler = var_262_1
+		self.extraItems[arg_264_2] = {
+			trans = arg_267_0.transform,
+			handler = var_264_1
 		}
 	end)
 end
 
-function Dorm3dRoomTemplateScene:ResetCharacterExtraItem(arg_266_1)
+function Dorm3dRoomTemplateScene:ResetCharacterExtraItem(arg_268_1)
 	if not self.extraItems then
 		return
 	end
 
-	table.Foreach(self.extraItems, function(arg_267_0, arg_267_1)
-		if arg_266_1 and table.contains(arg_266_1, arg_267_0) then
+	table.Foreach(self.extraItems, function(arg_269_0, arg_269_1)
+		if arg_268_1 and table.contains(arg_268_1, arg_269_0) then
 			return
 		end
 
-		self.loader:ReturnPrefab(arg_267_1.trans.gameObject)
+		self.loader:ReturnPrefab(arg_269_1.trans.gameObject)
 
-		self.extraItems[arg_267_0] = nil
+		self.extraItems[arg_269_0] = nil
 	end)
 end
 
-function Dorm3dRoomTemplateScene:RegisterCameraBlendFinished(arg_268_1, arg_268_2)
-	self.cameraBlendCallbacks[arg_268_1] = arg_268_2
+function Dorm3dRoomTemplateScene:RegisterCameraBlendFinished(arg_270_1, arg_270_2)
+	self.cameraBlendCallbacks[arg_270_1] = arg_270_2
 end
 
-function Dorm3dRoomTemplateScene:UnRegisterCameraBlendFinished(arg_269_1)
-	self.cameraBlendCallbacks[arg_269_1] = nil
+function Dorm3dRoomTemplateScene:UnRegisterCameraBlendFinished(arg_271_1)
+	self.cameraBlendCallbacks[arg_271_1] = nil
 end
 
-function Dorm3dRoomTemplateScene:OnCameraBlendFinished(arg_270_1)
-	if not arg_270_1 then
+function Dorm3dRoomTemplateScene:OnCameraBlendFinished(arg_272_1)
+	if not arg_272_1 then
 		return
 	end
 
-	existCall((table.removebykey(self.cameraBlendCallbacks, arg_270_1)))
+	existCall((table.removebykey(self.cameraBlendCallbacks, arg_272_1)))
 end
 
-function Dorm3dRoomTemplateScene:PlayHeartFX(arg_271_1)
-	setActive(self.ladyDict[arg_271_1].effectHeart, false)
-	setActive(self.ladyDict[arg_271_1].effectHeart, true)
+function Dorm3dRoomTemplateScene:PlayHeartFX(arg_273_1)
+	setActive(self.ladyDict[arg_273_1].effectHeart, false)
+	setActive(self.ladyDict[arg_273_1].effectHeart, true)
 	pg.CriMgr.GetInstance():PlaySE_V3("ui-dorm_joyful")
 end
 
-function Dorm3dRoomTemplateScene:PlayExpression(arg_272_1)
-	local var_272_0 = arg_272_1.name
+function Dorm3dRoomTemplateScene:PlayExpression(arg_274_1)
+	local var_274_0 = arg_274_1.name
 
-	if self.expressionDict[arg_272_1.name] then
-		self.expressionDict[arg_272_1.name].timer:Reset(nil, 5)
-		self.expressionDict[arg_272_1.name].timer:Start()
+	if self.expressionDict[arg_274_1.name] then
+		self.expressionDict[arg_274_1.name].timer:Reset(nil, 5)
+		self.expressionDict[arg_274_1.name].timer:Start()
 
-		if self.expressionDict[arg_272_1.name].instance then
-			setActive(self.expressionDict[arg_272_1.name].instance, false)
-			setActive(self.expressionDict[arg_272_1.name].instance, true)
+		if self.expressionDict[arg_274_1.name].instance then
+			setActive(self.expressionDict[arg_274_1.name].instance, false)
+			setActive(self.expressionDict[arg_274_1.name].instance, true)
 		end
 
 		return
 	end
 
-	local var_272_1 = {
-		name = arg_272_1.name,
+	local var_274_1 = {
+		name = arg_274_1.name,
 		timer = Timer.New(function()
-			self:RemoveExpression(var_272_0)
+			self:RemoveExpression(var_274_0)
 		end, 5, 1, true)
 	}
 
-	self.expressionDict[arg_272_1.name] = var_272_1
+	self.expressionDict[arg_274_1.name] = var_274_1
 
-	self.loader:GetPrefab("dorm3D/effect/prefab/expression/" .. arg_272_1.name, arg_272_1.name, function(arg_274_0)
-		var_272_1.instance = arg_274_0
+	self.loader:GetPrefab("dorm3D/effect/prefab/expression/" .. arg_274_1.name, arg_274_1.name, function(arg_276_0)
+		var_274_1.instance = arg_276_0
 
 		onNextTick(function()
-			setParent(arg_274_0, self:GetCurrentLadyEnv().ladyHeadCenter)
+			setParent(arg_276_0, self:GetCurrentLadyEnv().ladyHeadCenter)
 		end)
-		setLocalPosition(arg_274_0, Vector3(0, 0, -0.2))
-		setActive(arg_274_0, false)
-		setActive(arg_274_0, true)
-	end, var_272_1)
+		setLocalPosition(arg_276_0, Vector3(0, 0, -0.2))
+		setActive(arg_276_0, false)
+		setActive(arg_276_0, true)
+	end, var_274_1)
 end
 
-function Dorm3dRoomTemplateScene:RemoveExpression(arg_276_1)
-	if not self.expressionDict[arg_276_1] then
+function Dorm3dRoomTemplateScene:RemoveExpression(arg_278_1)
+	if not self.expressionDict[arg_278_1] then
 		return
 	end
 
-	self.loader:ClearRequest(self.expressionDict[arg_276_1])
+	self.loader:ClearRequest(self.expressionDict[arg_278_1])
 
-	if self.expressionDict[arg_276_1].instance then
-		self.loader:ReturnPrefab(self.expressionDict[arg_276_1].instance)
+	if self.expressionDict[arg_278_1].instance then
+		self.loader:ReturnPrefab(self.expressionDict[arg_278_1].instance)
 	end
 
-	self.expressionDict[arg_276_1] = nil
+	self.expressionDict[arg_278_1] = nil
 end
 
-function Dorm3dRoomTemplateScene:ShowOrHideCanWatchMark(arg_277_1, arg_277_2)
-	setActive(arg_277_1.ladyWatchFloat, arg_277_2)
+function Dorm3dRoomTemplateScene:ShowOrHideCanWatchMark(arg_279_1, arg_279_2)
+	setActive(arg_279_1.ladyWatchFloat, arg_279_2)
 end
 
 function Dorm3dRoomTemplateScene:GetCameraSettings()
-	local var_278_0 = self:GetExtraSystem(Dorm3dLightingSystem)
+	local var_280_0 = self:GetExtraSystem(Dorm3dLightingSystem)
 
-	assert(var_278_0, "Dorm3dLightingSystem is not initialized")
+	assert(var_280_0, "Dorm3dLightingSystem is not initialized")
 
-	return var_278_0:GetCameraSettings()
+	return var_280_0:GetCameraSettings()
 end
 
 function Dorm3dRoomTemplateScene:onBackPressed()
@@ -2353,173 +2364,180 @@ function Dorm3dRoomTemplateScene:onBackPressed()
 	end
 end
 
-function Dorm3dRoomTemplateScene:LoadTimelineScene(arg_280_1, arg_280_2, arg_280_3, arg_280_4)
+function Dorm3dRoomTemplateScene:LoadTimelineScene(arg_282_1, arg_282_2, arg_282_3, arg_282_4)
 	self.dormSceneMgr:LoadTimelineScene({
-		name = arg_280_1,
+		name = arg_282_1,
 		assetRootName = self.apartment:getConfig("asset_name"),
-		isCache = arg_280_2,
-		waitForTimeline = arg_280_3,
-		loadSceneFunc = function(arg_281_0, arg_281_1)
-			local var_281_0 = Dorm3dHxHelper.GetTimelineMainCharacter()
+		isCache = arg_282_2,
+		waitForTimeline = arg_282_3,
+		loadSceneFunc = function(arg_283_0, arg_283_1)
+			local var_283_0 = Dorm3dHxHelper.GetTimelineMainCharacter()
 
-			Dorm3dHxHelper.HideCharacterPart(var_281_0, nil, true)
-			self:HXCharacter(var_281_0)
+			Dorm3dHxHelper.HideCharacterPart(var_283_0, nil, true)
+			self:HXCharacter(var_283_0)
 		end
-	}, arg_280_4)
+	}, arg_282_4)
 end
 
-function Dorm3dRoomTemplateScene:UnloadTimelineScene(arg_282_1, arg_282_2, arg_282_3)
-	self.dormSceneMgr:UnloadTimelineScene(arg_282_1, arg_282_2, arg_282_3)
+function Dorm3dRoomTemplateScene:UnloadTimelineScene(arg_284_1, arg_284_2, arg_284_3)
+	self.dormSceneMgr:UnloadTimelineScene(arg_284_1, arg_284_2, arg_284_3)
 end
 
-function Dorm3dRoomTemplateScene:ChangeArtScene(arg_283_1, arg_283_2)
-	if Dorm3dSceneMgr.IsSameSceneInfo(arg_283_1, self.dormSceneMgr.artSceneInfo) then
-		existCall(arg_283_2)
+function Dorm3dRoomTemplateScene:ChangeArtScene(arg_285_1, arg_285_2)
+	if Dorm3dSceneMgr.IsSameSceneInfo(arg_285_1, self.dormSceneMgr.artSceneInfo) then
+		existCall(arg_285_2)
 
 		return
 	end
 
-	local var_283_0 = Dorm3dSceneMgr.IsSameSceneInfo(arg_283_1, self.dormSceneMgr.sceneInfo)
-	local var_283_1 = {}
+	local var_285_0 = Dorm3dSceneMgr.IsSameSceneInfo(arg_285_1, self.dormSceneMgr.sceneInfo)
+	local var_285_1 = {}
 
-	table.insert(var_283_1, function(arg_284_0)
-		self:emit(Dorm3dRoomTemplateScene.ART_SCENE_WILL_CHANGE, arg_283_1, var_283_0)
-		arg_284_0()
-	end)
-	table.insert(var_283_1, function(arg_285_0)
-		self.dormSceneMgr:ChangeArtScene(arg_283_1, arg_285_0)
-	end)
-	table.insert(var_283_1, function(arg_286_0)
-		self:RefreshArtSceneRefs()
-		self:emit(Dorm3dRoomTemplateScene.ART_SCENE_CHANGED, arg_283_1, var_283_0)
+	table.insert(var_285_1, function(arg_286_0)
+		self:emit(Dorm3dRoomTemplateScene.ART_SCENE_WILL_CHANGE, arg_285_1, var_285_0)
 		arg_286_0()
 	end)
-	table.insert(var_283_1, function(arg_287_0)
-		setActive(self.slotRoot, false)
-		arg_287_0()
+	table.insert(var_285_1, function(arg_287_0)
+		self.dormSceneMgr:ChangeArtScene(arg_285_1, arg_287_0)
 	end)
-	warning(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", arg_283_1, self.dormSceneMgr.sceneInfo, Dorm3dSceneMgr.IsSameSceneInfo(arg_283_1, self.dormSceneMgr.sceneInfo))
+	table.insert(var_285_1, function(arg_288_0)
+		self:RefreshArtSceneRefs()
+		self:emit(Dorm3dRoomTemplateScene.ART_SCENE_CHANGED, arg_285_1, var_285_0)
+		arg_288_0()
+	end)
+	table.insert(var_285_1, function(arg_289_0)
+		setActive(self.slotRoot, false)
+		arg_289_0()
+	end)
+	warning(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", arg_285_1, self.dormSceneMgr.sceneInfo, Dorm3dSceneMgr.IsSameSceneInfo(arg_285_1, self.dormSceneMgr.sceneInfo))
 
-	if Dorm3dSceneMgr.IsSameSceneInfo(arg_283_1, self.dormSceneMgr.sceneInfo) then
-		table.insert(var_283_1, function(arg_288_0)
+	if Dorm3dSceneMgr.IsSameSceneInfo(arg_285_1, self.dormSceneMgr.sceneInfo) then
+		table.insert(var_285_1, function(arg_290_0)
 			self:SwitchDayNight(1)
 			self:emit(CollectionSystem.TEMP_HIDE, true)
-			arg_288_0()
+			arg_290_0()
 		end)
 	end
 
-	seriesAsync(var_283_1, arg_283_2)
+	seriesAsync(var_285_1, arg_285_2)
 end
 
 function Dorm3dRoomTemplateScene:RefreshArtSceneRefs()
-	local var_289_0 = GameObject.Find("scene_root")
+	local var_291_0 = GameObject.Find("scene_root")
 
-	assert(var_289_0, "Missing scene_root after art scene change")
+	assert(var_291_0, "Missing scene_root after art scene change")
 
-	self.modelRoot = var_289_0.transform
+	self.modelRoot = var_291_0.transform
 end
 
-function Dorm3dRoomTemplateScene:MoveObjectToBaseScene(arg_290_1)
-	arg_290_1.transform:SetParent(nil)
-	SceneManager.MoveGameObjectToScene(arg_290_1, (SceneManager.GetSceneByName(Dorm3dSceneMgr.ParseInfo(self.dormSceneMgr.sceneInfo) .. "_base")))
+function Dorm3dRoomTemplateScene:MoveObjectToBaseScene(arg_292_1)
+	arg_292_1.transform:SetParent(nil)
+	SceneManager.MoveGameObjectToScene(arg_292_1, (SceneManager.GetSceneByName(Dorm3dSceneMgr.ParseInfo(self.dormSceneMgr.sceneInfo) .. "_base")))
 end
 
-function Dorm3dRoomTemplateScene:RevertArtScene(arg_291_1, arg_291_2)
-	local var_291_0 = {}
+function Dorm3dRoomTemplateScene:RevertArtScene(arg_293_1, arg_293_2, arg_293_3)
+	local var_293_0 = {}
 
-	table.insert(var_291_0, function(arg_292_0)
-		self:ChangeArtScene(arg_291_1, arg_292_0)
+	table.insert(var_293_0, function(arg_294_0)
+		self:ChangeArtScene(arg_293_1, arg_294_0)
 	end)
-	table.insert(var_291_0, function(arg_293_0)
+	table.insert(var_293_0, function(arg_295_0)
 		setActive(self.slotRoot, true)
-		arg_293_0()
+		arg_295_0()
 	end)
-	table.insert(var_291_0, function(arg_294_0)
+	table.insert(var_293_0, function(arg_296_0)
 		self:SwitchDayNight(self.contextData.timeIndex)
 		onNextTick(function()
-			self:RefreshSlots()
-			self:emit(CollectionSystem.TEMP_HIDE, false)
-			arg_294_0()
+			local function var_297_0()
+				self:emit(CollectionSystem.TEMP_HIDE, false)
+				arg_296_0()
+			end
+
+			self:RefreshSlots(nil, arg_293_3 and var_297_0 or nil)
+
+			if not arg_293_3 then
+				var_297_0()
+			end
 		end)
 	end)
-	seriesAsync(var_291_0, arg_291_2)
+	seriesAsync(var_293_0, arg_293_2)
 end
 
-function Dorm3dRoomTemplateScene:ChangeSubScene(arg_296_1, arg_296_2)
-	local var_296_0 = {}
+function Dorm3dRoomTemplateScene:ChangeSubScene(arg_299_1, arg_299_2)
+	local var_299_0 = {}
 
-	table.insert(var_296_0, function(arg_297_0)
-		self.dormSceneMgr:ChangeSubScene(arg_296_1, arg_297_0)
+	table.insert(var_299_0, function(arg_300_0)
+		self.dormSceneMgr:ChangeSubScene(arg_299_1, arg_300_0)
 	end)
 
-	local var_296_1 = self:GetCurrentLadyEnv()
-	local var_296_2 = self:GetBlackboardValue(var_296_1, "groupId")
+	local var_299_1 = self:GetCurrentLadyEnv()
+	local var_299_2 = self:GetBlackboardValue(var_299_1, "groupId")
 
-	table.insert(var_296_0, function(arg_298_0)
-		if Dorm3dSceneMgr.IsSameSceneInfo(arg_296_1, self.dormSceneMgr.sceneInfo) then
-			self:SetLadyActiveZone(var_296_2, var_296_1.walkBornPoint or self:GetLadyBaseZone(var_296_2))
+	table.insert(var_299_0, function(arg_301_0)
+		if Dorm3dSceneMgr.IsSameSceneInfo(arg_299_1, self.dormSceneMgr.sceneInfo) then
+			self:SetLadyActiveZone(var_299_2, var_299_1.walkBornPoint or self:GetLadyBaseZone(var_299_2))
 		else
-			self:SetLadyActiveZone(var_296_2, var_296_1.walkBornPoint or "Default")
+			self:SetLadyActiveZone(var_299_2, var_299_1.walkBornPoint or "Default")
 		end
 
-		arg_298_0()
+		arg_301_0()
 	end)
 
-	if not Dorm3dSceneMgr.IsSameSceneInfo(arg_296_1, self.dormSceneMgr.subSceneInfo) then
-		table.insert(var_296_0, function(arg_299_0)
-			local var_299_0, var_299_1 = Dorm3dSceneMgr.ParseInfo(arg_296_1)
+	if not Dorm3dSceneMgr.IsSameSceneInfo(arg_299_1, self.dormSceneMgr.subSceneInfo) then
+		table.insert(var_299_0, function(arg_302_0)
+			local var_302_0, var_302_1 = Dorm3dSceneMgr.ParseInfo(arg_299_1)
 
-			self:ResetSceneStructure(SceneManager.GetSceneByName(var_299_0 .. "_base"))
+			self:ResetSceneStructure(SceneManager.GetSceneByName(var_302_0 .. "_base"))
 
-			if Dorm3dSceneMgr.IsSameSceneInfo(arg_296_1, self.dormSceneMgr.sceneInfo) then
+			if Dorm3dSceneMgr.IsSameSceneInfo(arg_299_1, self.dormSceneMgr.sceneInfo) then
 				self:RefreshSlots()
 			else
-				self:SwitchAnim(var_296_1, Dorm3dRoomTemplateScene.ANIM.IDLE)
+				self:SwitchAnim(var_299_1, Dorm3dRoomTemplateScene.ANIM.IDLE)
 			end
 
 			if not Dorm3dSceneMgr.IsSameSceneInfo(self.dormSceneMgr.subSceneInfo, self.dormSceneMgr.sceneInfo) then
 				self:RefreshSlotsEmpty()
 			end
 
-			arg_299_0()
+			arg_302_0()
 		end)
 	end
 
-	table.insert(var_296_0, function(arg_300_0)
+	table.insert(var_299_0, function(arg_303_0)
 		onNextTick(function()
-			self:ChangeCharacterPosition(var_296_1)
-			self:ChangePlayerPosition(self:GetLadyActiveZone(var_296_2))
+			self:ChangeCharacterPosition(var_299_1)
+			self:ChangePlayerPosition(self:GetLadyActiveZone(var_299_2))
 			self:TriggerLadyDistance()
 			self:CheckInSector()
-			arg_300_0()
+			arg_303_0()
 		end)
 	end)
-	seriesAsync(var_296_0, arg_296_2)
+	seriesAsync(var_299_0, arg_299_2)
 end
 
-function Dorm3dRoomTemplateScene:IsPointInSector(arg_302_1)
-	local var_302_0 = arg_302_1 - self.Position
+function Dorm3dRoomTemplateScene:IsPointInSector(arg_305_1)
+	local var_305_0 = arg_305_1 - self.Position
 
-	if (arg_302_1 - self.Position).y > self.Radius then
+	if (arg_305_1 - self.Position).y > self.Radius then
 		return false
 	end
 
-	var_302_0.y = 0
+	var_305_0.y = 0
 
-	if var_302_0.magnitude > self.Radius then
+	if var_305_0.magnitude > self.Radius then
 		return false
 	end
 
-	return Vector3.Angle(self.Rotation * Vector3.forward, var_302_0) <= self.Angle / 2
+	return Vector3.Angle(self.Rotation * Vector3.forward, var_305_0) <= self.Angle / 2
 end
 
 function Dorm3dRoomTemplateScene:GetRestritedHeightRange()
 	if not self.isMultiFloor then
 		return self.restrictedHeightRange
 	else
-		for iter_303_0 = #self.restrictedHeightRange, 1, -1 do
-			if self.mainCameraTF.position.y >= self.restrictedHeightRange[iter_303_0][1] then
-				return self.restrictedHeightRange[iter_303_0]
+		for iter_306_0 = #self.restrictedHeightRange, 1, -1 do
+			if self.mainCameraTF.position.y >= self.restrictedHeightRange[iter_306_0][1] then
+				return self.restrictedHeightRange[iter_306_0]
 			end
 		end
 
@@ -2550,16 +2568,16 @@ function Dorm3dRoomTemplateScene:willExit()
 	GlobalClickEventMgr.Inst:RemoveEndPinchFunc()
 	pg.IKMgr.GetInstance():ResetActiveIKs()
 
-	for iter_304_0, iter_304_1 in pairs(self.ladyDict) do
-		GetComponent(iter_304_1.lady, typeof(EventTriggerListener)):ClearEvents()
+	for iter_307_0, iter_307_1 in pairs(self.ladyDict) do
+		GetComponent(iter_307_1.lady, typeof(EventTriggerListener)):ClearEvents()
 	end
 
 	self.camBrainEvenetHandler.OnBlendStarted = nil
 	self.camBrainEvenetHandler.OnBlendFinished = nil
 
 	self:UnOverlayPanel(self.blockLayer, self._tf)
-	table.Foreach(self.expressionDict, function(arg_305_0)
-		self:RemoveExpression(arg_305_0)
+	table.Foreach(self.expressionDict, function(arg_308_0)
+		self:RemoveExpression(arg_308_0)
 	end)
 	self.loader:Clear()
 

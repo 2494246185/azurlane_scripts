@@ -1,4 +1,4 @@
-local BossRushDALCollabScene = class("BossRushDALCollabScene", import("view.base.BaseUI"))
+local BossRushDALCollabScene = class("BossRushDALCollabScene", import("view.activity.BossRush.BossRushBaseScene"))
 
 function BossRushDALCollabScene:getUIName()
 	return "BossRushDALCollabUI"

@@ -159,6 +159,7 @@ function WorldMediaCollectionMemoryGroupLayer:OnInit()
 	end, function(arg_15_0, arg_15_1, arg_15_2)
 		self.viewParent.viewParent:WarpToRecord(arg_15_0, arg_15_1, arg_15_2)
 	end)
+	self:InitEasterEgg()
 end
 
 function WorldMediaCollectionMemoryGroupLayer:StoryLineBtnSetActive(arg_16_1)
@@ -381,6 +382,7 @@ function WorldMediaCollectionMemoryGroupLayer:UpdateActivityBar()
 end
 
 function WorldMediaCollectionMemoryGroupLayer:OnDestroy()
+	self:ExitEasterEgg()
 	WorldMediaCollectionMemoryGroupLayer.super.OnDestroy(self)
 	self.storyLineView:Dispose()
 	self:UnOverlayPanel(self.memoryTogGroup, self._tf)
@@ -398,6 +400,73 @@ function WorldMediaCollectionMemoryGroupLayer:GetMatchGroupList(arg_37_1, arg_37
 	end
 
 	return var_37_0
+end
+
+function WorldMediaCollectionMemoryGroupLayer:Scroll2MemoryGroup(arg_38_1, arg_38_2)
+	if self.currentMode ~= WorldMediaCollectionMemoryGroupLayer.FORM_MODE or not self.memoryGroupList or not self.memoryGroupList.isStart then
+		return
+	end
+
+	for iter_38_0, iter_38_1 in ipairs(self.searchGroupList or self.memoryGroups or {}) do
+		if iter_38_1.id == arg_38_1 then
+			local var_38_0 = math.clamp(self.memoryGroupList:HeadIndexToValue(iter_38_0 - 1), 0, 1)
+			local var_38_1 = go(self.memoryGroupList)
+
+			LeanTween.cancel(var_38_1)
+			self.memoryGroupList:StopMovement()
+
+			if math.abs(var_38_0 - self.memoryGroupList.value) < 0.001 then
+				return
+			end
+
+			if arg_38_2 then
+				self.memoryGroupList:ScrollTo(var_38_0, false)
+
+				break
+			end
+
+			LeanTween.value(var_38_1, self.memoryGroupList.value, var_38_0, (math.clamp(math.abs(var_38_0 - self.memoryGroupList.value) * 1.5, 0.2, 0.8))):setEase(LeanTweenType.easeInOutCirc):setOnUpdate(System.Action_float(function(arg_39_0)
+				self.memoryGroupList:ScrollTo(arg_39_0, false)
+			end))
+
+			break
+		end
+	end
+end
+
+function WorldMediaCollectionMemoryGroupLayer:InitEasterEgg()
+	if EasterEggTools.IsEnabled(EasterEggTools.GetActivity(), EasterEggConst.SCENE.CollectionMemory) then
+		self.easterEggView = EasterEggView.New(findTF(self._tf, "GroupRect/easterEggBtn"), self, EasterEggConst.SCENE.CollectionMemory)
+
+		self.easterEggView:SetEasterEggCallBack(function(arg_41_0, arg_41_1)
+			arg_41_1()
+		end, function(arg_42_0)
+			pg.UIMgr.GetInstance():LoadingOn(false)
+			self:Scroll2MemoryGroup(EasterEggConst.MEMORY_GROUP_ID, true)
+			self.easterEggView:AddHideEasterEggTimer(EasterEggConst.SCROLL_FREZZE_TIME, function()
+				pg.UIMgr.GetInstance():LoadingOff()
+				arg_42_0()
+			end)
+		end)
+	end
+end
+
+function WorldMediaCollectionMemoryGroupLayer:ShowEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:ShowEasterEgg()
+	end
+end
+
+function WorldMediaCollectionMemoryGroupLayer:HideEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:HideEasterEgg()
+	end
+end
+
+function WorldMediaCollectionMemoryGroupLayer:ExitEasterEgg()
+	if self.easterEggView then
+		self.easterEggView:willExit()
+	end
 end
 
 return WorldMediaCollectionMemoryGroupLayer

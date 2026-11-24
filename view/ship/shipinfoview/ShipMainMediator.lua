@@ -579,7 +579,8 @@ function ShipMainMediator:listNotificationInterests()
 		EquipmentProxy.EQUIPMENT_UPDATED,
 		GAME.WILL_LOGOUT,
 		PaintingGroupConst.NotifyPaintingDownloadFinish,
-		GAME.CHANGE_RANDOM_SHIPS_DONE
+		GAME.CHANGE_RANDOM_SHIPS_DONE,
+		GAME.OPEN_SKIN_COUPON_MULTI_MSG_BOX
 	}
 end
 
@@ -688,6 +689,8 @@ function ShipMainMediator:handleNotification(arg_57_1)
 		self.viewComponent:OnWillLogout()
 	elseif var_57_0 == PaintingGroupConst.NotifyPaintingDownloadFinish then
 		self.viewComponent:updateFashionTag()
+	elseif var_57_0 == GAME.OPEN_SKIN_COUPON_MULTI_MSG_BOX then
+		self.viewComponent.shipFashionView:OnOpenSkinCouponMultiMsgBox(var_57_1)
 	end
 end
 

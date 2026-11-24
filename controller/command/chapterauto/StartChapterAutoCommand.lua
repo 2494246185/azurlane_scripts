@@ -4,8 +4,8 @@ function StartChapterAutoCommand:execute(arg_1_1)
 	local var_1_0 = arg_1_1:getBody()
 	local var_1_1 = var_1_0.type
 	local var_1_2 = var_1_0.id
-	local var_1_3 = var_1_0.ticketNum
-	local var_1_4 = getProxy(ChapterProxy):getRemasterTicketCost()
+	local var_1_3 = var_1_0.num
+	local var_1_4 = var_1_0.ticketNum
 
 	if BeginStageCommand.DockOverload() then
 		return
@@ -14,19 +14,19 @@ function StartChapterAutoCommand:execute(arg_1_1)
 	local var_1_5 = getProxy(ChapterAutoProxy)
 	local var_1_6 = var_1_5:GetRemainTime()
 
-	if var_1_6 <= 0 or var_1_6 <= var_1_5:GetRecord(var_1_0.type, var_1_0.id) * (var_1_0.num - 1) then
+	if var_1_6 <= 0 or var_1_6 <= var_1_5:GetRecord(var_1_1, var_1_2) * (var_1_3 - 1) then
 		pg.TipsMgr.GetInstance():ShowTips(i18n("auto_battle_not_enough_time"))
 
 		return
 	end
 
-	if var_1_0.ticketNum > var_1_5:GetValidTicketCntByType(ChapterAutoTicket.TYPE.MAIN) then
+	if var_1_4 > var_1_5:GetValidTicketCntByType(ChapterAutoTicket.TYPE.MAIN) then
 		pg.TipsMgr.GetInstance():ShowTips(i18n("auto_battle_not_enough_resource"))
 
 		return
 	end
 
-	local var_1_7 = ChapterAutoCommission.GetOnceOil(var_1_0.type, var_1_0.id) * var_1_0.ticketNum
+	local var_1_7 = ChapterAutoCommission.GetOnceOil(var_1_1, var_1_2) * var_1_4
 	local var_1_8 = math.max(0, var_1_7 - var_1_5:GetOil())
 
 	if var_1_8 > getProxy(PlayerProxy):getRawData().oil then
@@ -36,25 +36,30 @@ function StartChapterAutoCommand:execute(arg_1_1)
 	end
 
 	local var_1_9 = false
-	local var_1_10 = getProxy(ChapterProxy)
+	local var_1_10 = 0
+	local var_1_11 = getProxy(ChapterProxy)
 
-	if var_1_0.type == ChapterAutoProxy.TYPE.SLG then
-		if var_1_10:getMapById(var_1_10:getChapterById(var_1_0.id, true):getConfig("map")):isRemaster() then
+	if var_1_1 == ChapterAutoProxy.TYPE.SLG then
+		if var_1_11:getMapById(var_1_11:getChapterById(var_1_2, true):getConfig("map")):isRemaster() then
 			var_1_9 = true
+			var_1_10 = getProxy(ChapterProxy):getRemasterTicketCost()
 		end
+	elseif var_1_1 == ChapterAutoProxy.TYPE.RUSH then
+		var_1_10 = BossRushChapterRemasterHelper.GetPermanentActivityTicketCost(pg.activity_series_enemy_auto[var_1_2].link_id, var_1_2)
+		var_1_9 = BossRushChapterRemasterHelper.GetRemasterByActivityId(pg.activity_series_enemy_auto[var_1_2].link_id) ~= nil
 	end
 
-	if var_1_9 and var_1_10.remasterTickets < var_1_0.ticketNum * var_1_4 then
+	if var_1_9 and var_1_11.remasterTickets < var_1_4 * var_1_10 then
 		pg.TipsMgr.GetInstance():ShowTips(i18n("levelScene_remaster_tickets_not_enough"))
 
 		return
 	end
 
 	pg.ConnectionMgr.GetInstance():Send(13012, {
-		type = var_1_0.type,
-		id = var_1_0.id,
-		num = var_1_0.num,
-		ticket_num = var_1_0.ticketNum
+		type = var_1_1,
+		id = var_1_2,
+		num = var_1_3,
+		ticket_num = var_1_4
 	}, 13013, function(arg_2_0)
 		if arg_2_0.result == 0 then
 			pg.TipsMgr.GetInstance():ShowTips(i18n("auto_battle_start_tips"))
@@ -65,7 +70,7 @@ function StartChapterAutoCommand:execute(arg_1_1)
 			var_2_0:AddCostTime((underscore.reduce(arg_2_0.chapter_auto_battle_list, 0, function(arg_3_0, arg_3_1)
 				return arg_3_0 + arg_3_1.seconds
 			end)))
-			var_2_0:ReduceTicketByType(ChapterAutoTicket.TYPE.MAIN, var_1_3)
+			var_2_0:ReduceTicketByType(ChapterAutoTicket.TYPE.MAIN, var_1_4)
 
 			if var_1_8 > 0 then
 				local var_2_1 = getProxy(PlayerProxy)
@@ -82,7 +87,7 @@ function StartChapterAutoCommand:execute(arg_1_1)
 			if var_1_9 then
 				local var_2_3 = getProxy(ChapterProxy)
 
-				var_2_3.remasterTickets = var_2_3.remasterTickets - var_1_3 * var_1_4
+				var_2_3.remasterTickets = var_2_3.remasterTickets - var_1_4 * var_1_10
 			end
 
 			self:sendNotification(GAME.START_CHAPTER_AUTO_DONE, {
@@ -94,39 +99,6 @@ function StartChapterAutoCommand:execute(arg_1_1)
 			pg.TipsMgr.GetInstance():ShowTips(errorTip("chapter_auto_start_fail", arg_2_0.result))
 		end
 	end)
-end
-
-function StartChapterAutoCommand.CheckOccupied()
-	local var_4_0 = getProxy(ChapterAutoProxy):GetCommissionDoingType()
-
-	if not var_4_0 or var_4_0 == ChapterAutoProxy.TYPE.WORLD then
-		return false
-	end
-
-	switch(var_4_0, {
-		[ChapterAutoProxy.TYPE.SLG] = function()
-			local var_5_0 = getProxy(ChapterProxy)
-			local var_5_1 = var_5_0:GetAutoChapterId()
-
-			if var_5_1 then
-				pg.MsgboxMgr.GetInstance():ShowMsgBox({
-					content = i18n("auto_drop_is_activation", var_5_0:getChapterById(var_5_1):getConfig("name")),
-					onYes = function()
-						local var_6_0 = var_5_0:getActiveChapter()
-
-						pg.m02:sendNotification(GAME.GO_SCENE, SCENE.LEVEL, {
-							chapterId = var_6_0 and var_6_0.id,
-							mapIdx = var_6_0 and var_6_0:getConfig("map")
-						})
-					end,
-					yesText = i18n("auto_drop_is_activation_go"),
-					noText = i18n("auto_drop_is_activation_cancle")
-				})
-			end
-
-			return true
-		end
-	})
 end
 
 return StartChapterAutoCommand

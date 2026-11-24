@@ -426,7 +426,20 @@ function ShipFashionView:RegisterShareToggle()
 	end, SFX_PANEL)
 end
 
+function ShipFashionView:OnOpenSkinCouponMultiMsgBox(arg_31_1)
+	self.skinCouponMultiMsgBox = self.skinCouponMultiMsgBox or SkinCouponMultiMsgBox.New(pg.UIMgr.GetInstance().OverlayMain, self)
+	arg_31_1 = arg_31_1 or {}
+
+	self.skinCouponMultiMsgBox:ExecuteAction("Show", arg_31_1)
+end
+
 function ShipFashionView:OnDestroy()
+	if self.skinCouponMultiMsgBox then
+		self.skinCouponMultiMsgBox:Destroy()
+
+		self.skinCouponMultiMsgBox = nil
+	end
+
 	setParent(self.phantomBtn, self._tf)
 
 	if self.fashionDetailWrapper and self.fashionDetailWrapper.character:Find(self.fashionDetailWrapper.prefab) and self.spineChar then
@@ -437,8 +450,8 @@ function ShipFashionView:OnDestroy()
 
 	self.fashionDetailWrapper = nil
 
-	for iter_31_0, iter_31_1 in pairs(self.fashionCellMap) do
-		iter_31_1:clear()
+	for iter_32_0, iter_32_1 in pairs(self.fashionCellMap) do
+		iter_32_1:clear()
 	end
 
 	self.fashionCellMap = {}

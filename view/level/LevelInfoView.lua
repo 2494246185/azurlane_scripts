@@ -499,144 +499,173 @@ function LevelInfoView:CheckChapterAutoOccupied(arg_41_1)
 				yesText = i18n("auto_drop_is_activation_go"),
 				noText = i18n("auto_drop_is_activation_cancle")
 			})
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			pg.MsgboxMgr.GetInstance():ShowMsgBox({
+				content = i18n("auto_battle_in_world"),
+				onYes = function()
+					pg.m02:sendNotification(GAME.GO_SCENE, SCENE.ACT_BOSS_BATTLE)
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
+		end,
+		[ChapterAutoProxy.TYPE.RUSH] = function()
+			local var_46_0 = pg.activity_series_enemy_auto[getProxy(ChapterAutoProxy):GetCommissionList()[1].id].link_id
+			local var_46_1 = BossRushChapterRemasterHelper.GetRemasterByActivityId(var_46_0) ~= nil
+
+			pg.MsgboxMgr.GetInstance():ShowMsgBox({
+				content = i18n("auto_battle_in_world"),
+				onYes = function()
+					if var_46_1 then
+						pg.m02:sendNotification(GAME.GO_SCENE, SCENE.BOSSRUSH_REMASTER, {
+							id = var_46_0
+						})
+					else
+						pg.m02:sendNotification(GAME.GO_SCENE, SCENE.BOSSRUSH_MAIN)
+					end
+				end,
+				yesText = i18n("auto_drop_is_activation_go"),
+				noText = i18n("auto_drop_is_activation_cancle")
+			})
 		end
 	})
 end
 
 function LevelInfoView:cancelTween()
-	_.each(self.delayTween, function(arg_45_0)
-		LeanTween.cancel(arg_45_0)
+	_.each(self.delayTween, function(arg_49_0)
+		LeanTween.cancel(arg_49_0)
 	end)
 
 	self.delayTween = {}
 end
 
-local function var_0_3(arg_46_0, arg_46_1, arg_46_2)
-	local var_46_0 = arg_46_2:Find("LevelDropUpTag")
+local function var_0_3(arg_50_0, arg_50_1, arg_50_2)
+	local var_50_0 = arg_50_2:Find("LevelDropUpTag")
 
-	if arg_46_1:getConfig("type") ~= 99 then
-		setActive(var_46_0, false)
+	if arg_50_1:getConfig("type") ~= 99 then
+		setActive(var_50_0, false)
 
 		return
 	end
 
-	setActive(var_46_0, _.all(arg_46_1:getConfig("display_icon"), function(arg_47_0)
-		return arg_47_0[1] == DROP_TYPE_SHIP
-	end) and arg_46_0 and LevelDropUpActUtil.IsDropUpChapter(arg_46_0.id))
+	setActive(var_50_0, _.all(arg_50_1:getConfig("display_icon"), function(arg_51_0)
+		return arg_51_0[1] == DROP_TYPE_SHIP
+	end) and arg_50_0 and LevelDropUpActUtil.IsDropUpChapter(arg_50_0.id))
 end
 
-function LevelInfoView:updateDrop(arg_48_1, arg_48_2, arg_48_3)
-	if arg_48_1 == UIItemList.EventUpdate then
-		local var_48_0 = Drop.Create(self.awards[arg_48_2 + 1])
+function LevelInfoView:updateDrop(arg_52_1, arg_52_2, arg_52_3)
+	if arg_52_1 == UIItemList.EventUpdate then
+		local var_52_0 = Drop.Create(self.awards[arg_52_2 + 1])
 
-		updateDrop(arg_48_3, var_48_0)
-		var_0_3(self.chapter, var_48_0, arg_48_3)
-		onButton(self, arg_48_3, function()
+		updateDrop(arg_52_3, var_52_0)
+		var_0_3(self.chapter, var_52_0, arg_52_3)
+		onButton(self, arg_52_3, function()
 			if ({
 				[99] = true
-			})[var_48_0:getConfig("type")] then
-				self:emit(LevelMediator2.GET_CHAPTER_DROP_SHIP_LIST, self.chapter.id, function(arg_50_0)
-					local var_50_0 = {}
+			})[var_52_0:getConfig("type")] then
+				self:emit(LevelMediator2.GET_CHAPTER_DROP_SHIP_LIST, self.chapter.id, function(arg_54_0)
+					local var_54_0 = {}
 
-					for iter_50_0, iter_50_1 in ipairs((var_48_0:getConfig("display_icon"))) do
-						local var_50_1 = iter_50_1[2]
+					for iter_54_0, iter_54_1 in ipairs((var_52_0:getConfig("display_icon"))) do
+						local var_54_1 = iter_54_1[2]
 
-						var_50_0[#var_50_0 + 1] = {
-							type = iter_50_1[1],
-							id = iter_50_1[2],
-							anonymous = iter_50_1[1] == DROP_TYPE_SHIP and not table.contains(arg_50_0, var_50_1)
+						var_54_0[#var_54_0 + 1] = {
+							type = iter_54_1[1],
+							id = iter_54_1[2],
+							anonymous = iter_54_1[1] == DROP_TYPE_SHIP and not table.contains(arg_54_0, var_54_1)
 						}
 					end
 
 					self:emit(BaseUI.ON_DROP_LIST, {
 						item2Row = true,
-						itemList = var_50_0,
-						content = var_48_0:getConfig("display")
+						itemList = var_54_0,
+						content = var_52_0:getConfig("display")
 					})
-					self:initTestShowDrop(var_48_0, Clone(var_50_0))
+					self:initTestShowDrop(var_52_0, Clone(var_54_0))
 				end)
 			else
-				self:emit(BaseUI.ON_DROP, var_48_0)
+				self:emit(BaseUI.ON_DROP, var_52_0)
 			end
 		end, SFX_PANEL)
 	end
 end
 
 function LevelInfoView:getChapterAwards()
-	local var_51_0 = Clone(self:getConfig("awards"))
-	local var_51_1 = self:getStageExtraAwards()
+	local var_55_0 = Clone(self:getConfig("awards"))
+	local var_55_1 = self:getStageExtraAwards()
 
-	if var_51_1 then
-		for iter_51_0 = #var_51_1, 1, -1 do
-			table.insert(var_51_0, 1, var_51_1[iter_51_0])
+	if var_55_1 then
+		for iter_55_0 = #var_55_1, 1, -1 do
+			table.insert(var_55_0, 1, var_55_1[iter_55_0])
 		end
 	end
 
-	local function var_51_2(arg_52_0)
-		return _.all(arg_52_0, function(arg_53_0)
-			return #arg_53_0 >= 3
+	local function var_55_2(arg_56_0)
+		return _.all(arg_56_0, function(arg_57_0)
+			return #arg_57_0 >= 3
 		end)
 	end
 
-	local var_51_3 = {
+	local var_55_3 = {
 		self:getConfig("boss_expedition_id"),
 		self:getConfig("ai_expedition_list")
 	}
-	local var_51_5
-	local var_51_4
+	local var_55_5
+	local var_55_4
 
 	if self:getPlayType() == ChapterConst.TypeMultiStageBoss then
-		table.insert(var_51_3, pg.chapter_model_multistageboss[self.id].boss_expedition_id)
+		table.insert(var_55_3, pg.chapter_model_multistageboss[self.id].boss_expedition_id)
 
-		var_51_4 = {}
-		var_51_5 = {}
+		var_55_4 = {}
+		var_55_5 = {}
 	end
 
-	for iter_51_1, iter_51_2 in ipairs((_.flatten(var_51_3))) do
-		local var_51_6 = checkExist(pg.expedition_activity_template[iter_51_2], {
+	for iter_55_1, iter_55_2 in ipairs((_.flatten(var_55_3))) do
+		local var_55_6 = checkExist(pg.expedition_activity_template[iter_55_2], {
 			"pt_drop_display"
 		})
 
-		if var_51_6 and type(var_51_6) == "table" and var_51_2(var_51_6) then
-			for iter_51_3, iter_51_4 in ipairs(var_51_6) do
-				local var_51_7, var_51_8, var_51_9, var_51_10 = unpack(iter_51_4)
+		if var_55_6 and type(var_55_6) == "table" and var_55_2(var_55_6) then
+			for iter_55_3, iter_55_4 in ipairs(var_55_6) do
+				local var_55_7, var_55_8, var_55_9, var_55_10 = unpack(iter_55_4)
 
-				if not var_51_5[var_51_8 .. "_" .. var_51_9] then
-					var_51_5[var_51_8 .. "_" .. var_51_9] = {}
+				if not var_55_5[var_55_8 .. "_" .. var_55_9] then
+					var_55_5[var_55_8 .. "_" .. var_55_9] = {}
 
-					table.insert(var_51_4, var_51_8 .. "_" .. var_51_9)
+					table.insert(var_55_4, var_55_8 .. "_" .. var_55_9)
 				end
 
-				var_51_5[var_51_8 .. "_" .. var_51_9][var_51_7] = var_51_10
+				var_55_5[var_55_8 .. "_" .. var_55_9][var_55_7] = var_55_10
 			end
 		end
 	end
 
-	local var_51_11 = getProxy(ActivityProxy)
+	local var_55_11 = getProxy(ActivityProxy)
 
-	for iter_51_5 = #var_51_4, 1, -1 do
-		local var_51_12, var_51_13 = unpack(underscore.map(string.split(var_51_4[iter_51_5], "_"), function(arg_54_0)
-			return tonumber(arg_54_0)
+	for iter_55_5 = #var_55_4, 1, -1 do
+		local var_55_12, var_55_13 = unpack(underscore.map(string.split(var_55_4[iter_55_5], "_"), function(arg_58_0)
+			return tonumber(arg_58_0)
 		end))
 
-		for iter_51_6, iter_51_7 in pairs(var_51_5[var_51_4[iter_51_5]]) do
-			local var_51_14 = var_51_11:getActivityById(iter_51_6)
+		for iter_55_6, iter_55_7 in pairs(var_55_5[var_55_4[iter_55_5]]) do
+			local var_55_14 = var_55_11:getActivityById(iter_55_6)
 
-			if var_51_14 and not var_51_14:isEnd() then
-				if var_51_12 == DROP_TYPE_RESOURCE then
-					table.insert(var_51_0, 1, {
+			if var_55_14 and not var_55_14:isEnd() then
+				if var_55_12 == DROP_TYPE_RESOURCE then
+					table.insert(var_55_0, 1, {
 						DROP_TYPE_ITEM,
-						id2ItemId(var_51_13),
-						iter_51_7
+						id2ItemId(var_55_13),
+						iter_55_7
 					})
 
 					break
 				end
 
-				table.insert(var_51_0, 1, {
-					var_51_12,
-					var_51_13,
-					iter_51_7
+				table.insert(var_55_0, 1, {
+					var_55_12,
+					var_55_13,
+					iter_55_7
 				})
 
 				break
@@ -644,37 +673,37 @@ function LevelInfoView:getChapterAwards()
 		end
 	end
 
-	return var_51_0
+	return var_55_0
 end
 
-function LevelInfoView:initTestShowDrop(arg_55_1, arg_55_2)
+function LevelInfoView:initTestShowDrop(arg_59_1, arg_59_2)
 	if IsUnityEditor then
-		local var_55_0 = pg.MsgboxMgr.GetInstance()._go
-		local var_55_1 = var_55_0.transform:Find("button_test_show_drop")
+		local var_59_0 = pg.MsgboxMgr.GetInstance()._go
+		local var_59_1 = var_59_0.transform:Find("button_test_show_drop")
 
-		if IsNil(var_55_1) then
-			var_55_1 = GameObject.New("button_test_show_drop")
+		if IsNil(var_59_1) then
+			var_59_1 = GameObject.New("button_test_show_drop")
 
-			var_55_1:AddComponent(typeof(Button))
-			var_55_1:AddComponent(typeof(RectTransform))
-			var_55_1:AddComponent(typeof(Image))
+			var_59_1:AddComponent(typeof(Button))
+			var_59_1:AddComponent(typeof(RectTransform))
+			var_59_1:AddComponent(typeof(Image))
 		end
 
-		local var_55_2 = var_55_1:GetComponent(typeof(RectTransform))
+		local var_59_2 = var_59_1:GetComponent(typeof(RectTransform))
 
-		var_55_2:SetParent(var_55_0.transform, false)
+		var_59_2:SetParent(var_59_0.transform, false)
 
-		var_55_2.anchoredPosition = Vector3(-239, 173, 0)
-		var_55_2.sizeDelta = Vector2(40, 40)
+		var_59_2.anchoredPosition = Vector3(-239, 173, 0)
+		var_59_2.sizeDelta = Vector2(40, 40)
 
-		onButton(self, var_55_2, function()
-			_.each(arg_55_2, function(arg_57_0)
-				arg_57_0.anonymous = false
+		onButton(self, var_59_2, function()
+			_.each(arg_59_2, function(arg_61_0)
+				arg_61_0.anonymous = false
 			end)
 			self:emit(BaseUI.ON_DROP_LIST, {
 				item2Row = true,
-				itemList = arg_55_2,
-				content = arg_55_1:getConfig("display")
+				itemList = arg_59_2,
+				content = arg_59_1:getConfig("display")
 			})
 		end)
 	end
@@ -682,10 +711,10 @@ end
 
 function LevelInfoView:clearTestShowDrop()
 	if IsUnityEditor then
-		local var_58_0 = pg.MsgboxMgr.GetInstance()._go.transform:Find("button_test_show_drop")
+		local var_62_0 = pg.MsgboxMgr.GetInstance()._go.transform:Find("button_test_show_drop")
 
-		if not IsNil(var_58_0) then
-			Destroy(var_58_0)
+		if not IsNil(var_62_0) then
+			Destroy(var_62_0)
 		end
 	end
 end
@@ -734,8 +763,8 @@ end
 
 function LevelInfoView:clear()
 	self:cancelTween()
-	self.dropList:each(function(arg_65_0, arg_65_1)
-		clearDrop(arg_65_1)
+	self.dropList:each(function(arg_69_0, arg_69_1)
+		clearDrop(arg_69_1)
 	end)
 	self:clearTestShowDrop()
 	self:ClearChapterRewardPanel()

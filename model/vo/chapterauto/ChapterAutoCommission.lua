@@ -12,11 +12,49 @@ function ChapterAutoCommission:Ctor(arg_1_1)
 end
 
 function ChapterAutoCommission:bindConfigTable()
-	return pg.chapter_auto_statistics
+	return switch(self.type, {
+		[ChapterAutoProxy.TYPE.SLG] = function()
+			return pg.chapter_auto_statistics
+		end,
+		[ChapterAutoProxy.TYPE.WORLD] = function()
+			return pg.world_auto_statistics
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			return pg.expedition_auto_statistics
+		end,
+		[ChapterAutoProxy.TYPE.RUSH] = function()
+			return pg.activity_series_enemy_auto
+		end
+	}, function()
+		assert(false, "invalid chapter auto type: " .. tostring(self.type))
+	end)
+end
+
+function ChapterAutoCommission:GetOccupiedName()
+	return switch(self.type, {
+		[ChapterAutoProxy.TYPE.SLG] = function()
+			return pg.chapter_template[self.id].name
+		end,
+		[ChapterAutoProxy.TYPE.WORLD] = function()
+			return ""
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			return self:getConfig("auto_expedition_name")
+		end,
+		[ChapterAutoProxy.TYPE.RUSH] = function()
+			return pg.activity_series_enemy[self.id].name
+		end
+	}, function()
+		assert(false, "invalid chapter auto type: " .. tostring(self.type))
+	end)
 end
 
 function ChapterAutoCommission:GetType()
 	return self.type
+end
+
+function ChapterAutoCommission:GetID()
+	return self.id
 end
 
 function ChapterAutoCommission:GetFinishTime()
@@ -51,13 +89,23 @@ function ChapterAutoCommission:GetExpBookAward()
 	return self:getConfig("drop_expbook") or 0
 end
 
-function ChapterAutoCommission:GetOnceOil(arg_12_1)
+function ChapterAutoCommission:GetOnceOil()
+	return self:getConfig("oil_limit") or 0
+end
+
+function ChapterAutoCommission:GetOnceOil(arg_25_1)
 	return switch(self, {
 		[ChapterAutoProxy.TYPE.SLG] = function()
-			return pg.chapter_auto_statistics[arg_12_1].oil_limit
+			return pg.chapter_auto_statistics[arg_25_1].oil_limit
 		end,
 		[ChapterAutoProxy.TYPE.WORLD] = function()
-			return pg.world_auto_statistics[arg_12_1].oil_limit
+			return pg.world_auto_statistics[arg_25_1].oil_limit
+		end,
+		[ChapterAutoProxy.TYPE.BOSS] = function()
+			return pg.expedition_auto_statistics[arg_25_1].oil_limit
+		end,
+		[ChapterAutoProxy.TYPE.RUSH] = function()
+			return pg.activity_series_enemy_auto[arg_25_1].oil_limit
 		end
 	}, function()
 		assert(false, "invalid chapter auto type: " .. tostring(self))

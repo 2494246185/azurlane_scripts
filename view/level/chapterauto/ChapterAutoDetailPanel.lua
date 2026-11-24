@@ -168,18 +168,7 @@ function ChapterAutoDetailPanel:OnDestroy()
 end
 
 function ChapterAutoDetailPanel:GetAwards()
-	local var_22_0 = LevelInfoView.getChapterAwards(self)
-
-	if type(pg.chapter_auto_statistics[self.id].drop_display_extra) == "table" then
-		for iter_22_0, iter_22_1 in ipairs(pg.chapter_auto_statistics[self.id].drop_display_extra) do
-			table.insert(var_22_0, {
-				iter_22_1[1],
-				iter_22_1[2]
-			})
-		end
-	end
-
-	return var_22_0
+	return ChapterAutoPanel.GetAwards(self)
 end
 
 return ChapterAutoDetailPanel

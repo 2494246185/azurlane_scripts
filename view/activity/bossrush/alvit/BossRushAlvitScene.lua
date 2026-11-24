@@ -1,4 +1,4 @@
-local BossRushAlvitScene = class("BossRushAlvitScene", import("view.base.BaseUI"))
+local BossRushAlvitScene = class("BossRushAlvitScene", import("view.activity.BossRush.BossRushBaseScene"))
 
 BossRushAlvitScene.DISPLAY = {
 	STORY = 2,

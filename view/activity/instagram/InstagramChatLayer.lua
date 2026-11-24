@@ -1639,6 +1639,15 @@ function InstagramChatLayer:ShowOfficialAccountsInfo(arg_112_1)
 			self:CloseCommentPanel()
 		end
 	end, SFX_PANEL)
+
+	local var_112_0 = arg_112_1:getConfig("official_type") == InstagramConst.OFFICIAL_TYPE.STORY
+	local var_112_1 = EasterEggTools.GetActivity()
+
+	if var_112_1 then
+		var_112_0 = var_112_0 and not EasterEggTools.IsEnabled(var_112_1, EasterEggConst.SCENE.InstagramMainUI)
+	end
+
+	setActive(self.officialAccountsInfoItem:Find("easterEgg"), var_112_0)
 end
 
 function InstagramChatLayer:ExitOfficialAccountsInfo()
