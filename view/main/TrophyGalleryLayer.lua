@@ -92,6 +92,10 @@ function TrophyGalleryLayer:init()
 		self._tf:Find("blur_panel/adapt/left_length/frame/root/limited_toggle"),
 		self.toggleLoveLetter
 	}
+	self._pageTip = {
+		self._tf:Find("blur_panel/adapt/left_length/frame/root/common_toggle/tip"),
+		self._tf:Find("blur_panel/adapt/left_length/frame/root/limited_toggle/tip")
+	}
 	self._hideExpireBtn = self._tf:Find("blur_panel/adapt/top/expireCheckBox")
 	self._hideExpireCheck = self._hideExpireBtn:Find("check")
 	self._pageIndex = self.contextData.index or 1
@@ -283,6 +287,7 @@ function TrophyGalleryLayer:updatePage(arg_25_1)
 	end
 
 	setActive(self._hideExpireBtn, arg_25_1 == TrophyGalleryLayer.PAGE_LIMITED)
+	self:updateToggleTip()
 end
 
 function TrophyGalleryLayer:updateTrophyList()
@@ -356,7 +361,28 @@ function TrophyGalleryLayer:updateTrophyCounter()
 		end
 	end
 
+	self:updateToggleTip()
 	setText(self._trophyCounter, var_31_0)
+end
+
+function TrophyGalleryLayer:updateToggleTip()
+	for iter_32_0 = 1, #self._pageTip do
+		local var_32_0 = false
+
+		for iter_32_1, iter_32_2 in pairs(self.trophyGroups) do
+			if self:checkTrophyVisible(iter_32_2, iter_32_0, "all") then
+				local var_32_1 = iter_32_2:getProgressTrophy()
+
+				if var_32_1:canClaimed() and not var_32_1:isClaimed() then
+					var_32_0 = true
+
+					break
+				end
+			end
+		end
+
+		setActive(self._pageTip[iter_32_0], var_32_0)
+	end
 end
 
 function TrophyGalleryLayer:onFilter()
@@ -366,8 +392,8 @@ function TrophyGalleryLayer:onFilter()
 		self._filterIndex = 1
 	end
 
-	for iter_32_0 = 1, #TrophyGalleryLayer.Filter do
-		setActive(self._filterBtn:GetChild(iter_32_0 - 1), iter_32_0 == self._filterIndex)
+	for iter_33_0 = 1, #TrophyGalleryLayer.Filter do
+		setActive(self._filterBtn:GetChild(iter_33_0 - 1), iter_33_0 == self._filterIndex)
 	end
 
 	self:updateTrophyList()
@@ -386,33 +412,33 @@ function TrophyGalleryLayer:updateLoveLetterPage()
 
 	self.cardList:SetTotalCount(#self.cardInfos, -1)
 
-	local var_33_0 = getProxy(LoveLetterProxy)
-	local var_33_1 = self.rtCountLevelPanel:Find("info")
+	local var_34_0 = getProxy(LoveLetterProxy)
+	local var_34_1 = self.rtCountLevelPanel:Find("info")
 
-	setText(var_33_1:Find("word"), i18n("loveactivity_ui_10"))
-	setText(var_33_1:Find("count"), (var_33_0:GetAllLevel()))
+	setText(var_34_1:Find("word"), i18n("loveactivity_ui_10"))
+	setText(var_34_1:Find("count"), (var_34_0:GetAllLevel()))
 
-	local var_33_2, var_33_3 = var_33_0:GetAllLevelProgress()
+	local var_34_2, var_34_3 = var_34_0:GetAllLevelProgress()
 
-	if var_33_3 == 0 then
-		setSlider(var_33_1:Find("Slider"), 0, 1, 1)
+	if var_34_3 == 0 then
+		setSlider(var_34_1:Find("Slider"), 0, 1, 1)
 	else
-		setSlider(var_33_1:Find("Slider"), 0, var_33_3, var_33_2)
+		setSlider(var_34_1:Find("Slider"), 0, var_34_3, var_34_2)
 	end
 
-	setText(var_33_1:Find("Slider/Text"), var_33_2 .. "/" .. var_33_3)
-	updateDrop(var_33_1:Find("icon/mask/IconTpl"), var_33_0:GetAllLevelNextAward()[1])
-	onButton(self, var_33_1:Find("icon/mask/IconTpl"), function()
+	setText(var_34_1:Find("Slider/Text"), var_34_2 .. "/" .. var_34_3)
+	updateDrop(var_34_1:Find("icon/mask/IconTpl"), var_34_0:GetAllLevelNextAward()[1])
+	onButton(self, var_34_1:Find("icon/mask/IconTpl"), function()
 		self:emit(BaseUI.ON_DROP, drop[1])
 	end, SFX_PANEL)
-	setActive(var_33_1:Find("icon/got"), var_33_3 == 0)
-	onButton(self, var_33_1:Find("click"), function()
-		local var_35_0 = getProxy(LoveLetterProxy):GetAllLevelReadyReward()
-		local var_35_1 = pg.NewStyleMsgboxMgr.GetInstance()
-		local var_35_2 = pg.NewStyleMsgboxMgr.TYPE_LOVE_LETTER_LEVEL_REWARD
-		local var_35_3 = {}
+	setActive(var_34_1:Find("icon/got"), var_34_3 == 0)
+	onButton(self, var_34_1:Find("click"), function()
+		local var_36_0 = getProxy(LoveLetterProxy):GetAllLevelReadyReward()
+		local var_36_1 = pg.NewStyleMsgboxMgr.GetInstance()
+		local var_36_2 = pg.NewStyleMsgboxMgr.TYPE_LOVE_LETTER_LEVEL_REWARD
+		local var_36_3 = {}
 
-		var_35_3.btnList = #var_35_0 > 0 and {
+		var_36_3.btnList = #var_36_0 > 0 and {
 			{
 				type = pg.NewStyleMsgboxMgr.BUTTON_TYPE.cancel,
 				name = i18n("msgbox_text_cancel"),
@@ -422,59 +448,59 @@ function TrophyGalleryLayer:updateLoveLetterPage()
 				type = pg.NewStyleMsgboxMgr.BUTTON_TYPE.confirm,
 				name = i18n("mail_get_oneclick"),
 				func = function()
-					self:emit(TrophyGalleryMediator.ON_GET_ALL_LOVE_LETTER_REWARD, var_35_0)
+					self:emit(TrophyGalleryMediator.ON_GET_ALL_LOVE_LETTER_REWARD, var_36_0)
 				end,
 				sound = SFX_CONFIRM
 			}
 		} or nil
 
-		var_35_1:Show(var_35_2, var_35_3)
+		var_36_1:Show(var_36_2, var_36_3)
 	end, SFX_PANEL)
 end
 
-function TrophyGalleryLayer:onInitCard(arg_37_1)
-	local var_37_0 = LoveLetterShipCard.New(arg_37_1)
+function TrophyGalleryLayer:onInitCard(arg_38_1)
+	local var_38_0 = LoveLetterShipCard.New(arg_38_1)
 
-	onButton(self, var_37_0.go, function()
-		if var_37_0.shipGroup then
-			self:emit(TrophyGalleryMediator.OPEN_DISPLAY_WINDOW, var_37_0.shipGroup.id)
+	onButton(self, var_38_0.go, function()
+		if var_38_0.shipGroup then
+			self:emit(TrophyGalleryMediator.OPEN_DISPLAY_WINDOW, var_38_0.shipGroup.id)
 		end
 	end)
 
-	self.cardItems[arg_37_1] = var_37_0
+	self.cardItems[arg_38_1] = var_38_0
 end
 
-function TrophyGalleryLayer:onUpdateCard(arg_39_1, arg_39_2)
-	local var_39_0 = self.cardItems[arg_39_2]
+function TrophyGalleryLayer:onUpdateCard(arg_40_1, arg_40_2)
+	local var_40_0 = self.cardItems[arg_40_2]
 
-	if not self.cardItems[arg_39_2] then
-		self:onInitCard(arg_39_2)
+	if not self.cardItems[arg_40_2] then
+		self:onInitCard(arg_40_2)
 
-		var_39_0 = self.cardItems[arg_39_2]
+		var_40_0 = self.cardItems[arg_40_2]
 	end
 
-	local var_39_1 = self.cardInfos[arg_39_1 + 1]
+	local var_40_1 = self.cardInfos[arg_40_1 + 1]
 
-	var_39_0:update(self.cardInfos[arg_39_1 + 1])
-	pg.EasyRedDotMgr.GetInstance():RegisterRedDot(arg_39_2.transform:Find("content/pick_up"), {
+	var_40_0:update(self.cardInfos[arg_40_1 + 1])
+	pg.EasyRedDotMgr.GetInstance():RegisterRedDot(arg_40_2.transform:Find("content/pick_up"), {
 		"love_letter_level_up"
-	}, function(arg_40_0)
-		local var_40_0 = getProxy(LoveLetterProxy):GetGroupData(var_39_1.id)
+	}, function(arg_41_0)
+		local var_41_0 = getProxy(LoveLetterProxy):GetGroupData(var_40_1.id)
 
-		setActive(arg_40_0, var_40_0:GetDisplayLevel() < var_40_0:GetMaxLevel() and var_40_0:CanLevelUp())
+		setActive(arg_41_0, var_41_0:GetDisplayLevel() < var_41_0:GetMaxLevel() and var_41_0:CanLevelUp())
 	end)
 end
 
-function TrophyGalleryLayer:onReturnCard(arg_41_1, arg_41_2)
+function TrophyGalleryLayer:onReturnCard(arg_42_1, arg_42_2)
 	if self.exited then
 		return
 	end
 
-	if self.cardItems[arg_41_2] then
-		self.cardItems[arg_41_2]:clear()
+	if self.cardItems[arg_42_2] then
+		self.cardItems[arg_42_2]:clear()
 	end
 
-	self.cardItems[arg_41_2] = nil
+	self.cardItems[arg_42_2] = nil
 end
 
 function TrophyGalleryLayer:onBackPressed()
@@ -490,8 +516,8 @@ function TrophyGalleryLayer:willExit()
 	pg.EasyRedDotMgr.GetInstance():UnRegisterRedDot(self.toggleLoveLetter:Find("tip"))
 	pg.EasyRedDotMgr.GetInstance():UnRegisterRedDot(self.rtCountLevelPanel:Find("info/icon/tip"))
 
-	for iter_43_0, iter_43_1 in pairs(self.cardItems) do
-		pg.EasyRedDotMgr.GetInstance():UnRegisterRedDot(iter_43_0.transform:Find("content/pick_up"))
+	for iter_44_0, iter_44_1 in pairs(self.cardItems) do
+		pg.EasyRedDotMgr.GetInstance():UnRegisterRedDot(iter_44_0.transform:Find("content/pick_up"))
 	end
 
 	self:UnOverlayPanel(self._blurPanel, self._tf)

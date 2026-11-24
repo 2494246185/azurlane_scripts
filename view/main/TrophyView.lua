@@ -13,6 +13,7 @@ function TrophyView:Ctor(arg_1_1)
 	self._trophyCountBG = findTF(self._tf, "frame/trophyCount")
 	self._trophyCount = findTF(self._tf, "frame/trophyCount/Text"):GetComponent(typeof(Text))
 	self._progressBar = findTF(self._tf, "frame/trophy_progress/Fill"):GetComponent(typeof(Slider))
+	self._tip = findTF(self._tf, "frame/tip")
 	self._reminder = findTF(self._tf, "frame/reminder")
 end
 
@@ -66,7 +67,10 @@ function TrophyView:updateProgressView(arg_7_1)
 	self._progressTrophy = arg_7_1
 	self._progressBar.value = arg_7_1:getProgressRate()
 
-	setActive(self._reminder, self._progressTrophy:canClaimed() and not self._progressTrophy:isClaimed())
+	local var_7_0 = self._progressTrophy:canClaimed() and not self._progressTrophy:isClaimed()
+
+	setActive(self._reminder, var_7_0)
+	setActive(self._tip, var_7_0)
 end
 
 function TrophyView:GetTrophyClaimTipsID()
@@ -89,6 +93,7 @@ function TrophyView:PlayClaimAnima(arg_10_1, arg_10_2, arg_10_3)
 	self._isPlaying = true
 
 	setActive(self._reminder, false)
+	setActive(self._tip, false)
 
 	local var_10_0 = self._tf:GetComponent(typeof(Animator))
 
@@ -96,7 +101,11 @@ function TrophyView:PlayClaimAnima(arg_10_1, arg_10_2, arg_10_3)
 
 	self._tf:GetComponent(typeof(DftAniEvent)):SetEndEvent(function(arg_11_0)
 		arg_10_3()
-		setActive(self._reminder, self._progressTrophy:canClaimed() and not self._progressTrophy:isClaimed())
+
+		local var_11_0 = self._progressTrophy:canClaimed() and not self._progressTrophy:isClaimed()
+
+		setActive(self._reminder, var_11_0)
+		setActive(self._tip, var_11_0)
 	end)
 	var_10_0:Play("trophy_upper", -1, 0)
 	setActive(arg_10_2, true)

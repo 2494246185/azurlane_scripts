@@ -77,7 +77,7 @@ function BossRushVeritasAcademyScene:didEnter()
 		})
 	end, SFX_PANEL)
 	onButton(self, self.rankBtn, function()
-		self:emit(BossRushVeritasAcademyMediator.ON_EXTRA_RANK)
+		self:emit(BossRushVeritasAcademyMediator.ON_PT_RANK)
 	end, SFX_PANEL)
 	onButton(self, self.ptBtn, function()
 		self:emit(BossRushVeritasAcademyMediator.GO_SCENE, SCENE.ACTIVITY, {

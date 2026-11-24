@@ -246,7 +246,7 @@ function BossRushBattleResultLayer:didEnter()
 
 				setText(var_17_3, "+" .. var_17_5 + var_17_0:getExp() - arg_16_2[arg_16_1[arg_17_1 + 1].id]:getExp())
 			elseif arg_16_2[arg_16_1[arg_17_1 + 1].id].level == arg_16_2[arg_16_1[arg_17_1 + 1].id]:getMaxLevel() then
-				setText(var_17_3, "+" .. 0)
+				setText(var_17_3, "+" .. var_17_0:getExp() - arg_16_2[arg_16_1[arg_17_1 + 1].id]:getExp())
 			else
 				setText(var_17_3, "+" .. ((not arg_16_2[arg_16_1[arg_17_1 + 1].id].expAdd or nil) and 0))
 			end
