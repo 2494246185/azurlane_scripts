@@ -1,0 +1,25 @@
+local WindFogCorridorPtPage = class("WindFogCorridorPtPage", import("view.activity.CorePage.CorePageNewPtTemplatePage"))
+
+function WindFogCorridorPtPage:UpdateAward(arg_1_1, arg_1_2)
+	local var_1_0 = self.awardList[arg_1_1 + 1].drop
+
+	updateDrop(arg_1_2:Find("mask/IconTpl"), self.awardList[arg_1_1 + 1].drop)
+
+	GetComponent(arg_1_2:Find("mask/IconTpl/icon_bg/frame"), typeof(Image)).enabled = false
+
+	setText(arg_1_2:Find("pt"), self.awardList[arg_1_1 + 1].target)
+
+	local var_1_1 = arg_1_1 + 1 <= self.ptData:GetLevel()
+	local var_1_2 = not var_1_1 and arg_1_1 + 1 <= self.ptData:GetMaxAvailableTargetIndex()
+	local var_1_3 = not var_1_1 and not var_1_2
+
+	setActive(arg_1_2:Find("got_mask"), var_1_1)
+	setActive(arg_1_2:Find("get"), var_1_2)
+	setActive(arg_1_2:Find("lock"), not var_1_2)
+	setActive(arg_1_2:Find("lock"), var_1_3)
+	onButton(self, arg_1_2, function()
+		self:emit(BaseUI.ON_DROP, var_1_0)
+	end, SFX_PANEL)
+end
+
+return WindFogCorridorPtPage

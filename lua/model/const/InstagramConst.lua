@@ -1,0 +1,13 @@
+return {
+	INSTAGRAM_CHAT_TYPE = {
+		OFFICIAL_ACCOUNT = 1,
+		CHAT = 2
+	},
+	INSTAGRAM_TYPE = {
+		INSTANGRAM = 1,
+		OFFICIAL_ACCOUNT = 2
+	},
+	OFFICIAL_TYPE = {
+		STORY = 1
+	}
+}
